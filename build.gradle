@@ -1,0 +1,50 @@
+buildscript {
+    repositories {
+    	maven { url "https://plugins.gradle.org/m2/"  }
+    }
+    dependencies {
+        classpath 'com.blackducksoftware.integration:common-gradle-plugin:0.0.+'
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE")
+    }
+}
+
+version =  '0.1.0'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'com.blackducksoftware.integration.solution'
+apply plugin: 'maven'
+
+jar {
+    baseName = 'hub-imageinspector-ws'
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+	// cd ../hub-docker-inspector/build
+	// mvn install:install-file -Dfile=build/libs/hub-docker-inspector-4.3.2-SNAPSHOT.jar -DgroupId=com.blackducksoftware.integration -DartifactId=image-inspector -Dversion=4.3.2-SNAPSHOT -Dpackaging=jar -DgeneratePom=true
+	compile("com.blackducksoftware.integration:image-inspector:4.3.2-SNAPSHOT")
+
+    ////////////
+    // transitive dependencies pulled in by image inspector lib
+    compile 'org.apache.commons:commons-lang3:3.5'
+    compile 'commons-io:commons-io:2.5'
+    compile 'org.apache.commons:commons-collections4:4.1'
+    compile 'org.apache.commons:commons-exec:1.3'
+    compile 'org.apache.commons:commons-compress:1.12'
+    ///////////
+
+    compile 'com.blackducksoftware.integration:hub-common:18.0.0'
+    compile("org.springframework.boot:spring-boot-starter-web")
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
