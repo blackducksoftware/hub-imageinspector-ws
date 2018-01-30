@@ -1,0 +1,12 @@
+/bin/
+/.gradle/
+/.settings/
+/.classpath
+/.project
+/build/
+/rpm/
+/yum/
+/docker/
+/testing/
+/testBdio
+/test/

@@ -59,7 +59,7 @@ public class ImageInspectorHandler {
             // logger.error(e.getMessage(), e);
             // return responseFactory.createResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (final Exception e) {
-            logger.error(e.getMessage(), e);
+            logger.error(String.format("Exception thrown while getting image packages: %s", e.getMessage()), e);
             return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }

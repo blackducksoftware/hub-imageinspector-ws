@@ -27,17 +27,19 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.blackducksoftware.integration.hub.bdio.model.SimpleBdioDocument;
-import com.blackducksoftware.integration.hub.docker.imageinspector.api.ImageInspectorApi;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorApi;
 
 @Component
 public class ImageInspectorAction {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    ImageInspectorApi api = new ImageInspectorApi();
+    @Autowired
+    ImageInspectorApi api;
 
     public SimpleBdioDocument getImagePackages(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix) throws HubIntegrationException, IOException, InterruptedException {
         final String msg = String.format("dockerTarfilePath: %s, hubProjectName: %s, hubProjectVersion: %s, codeLocationPrefix: %s", dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
