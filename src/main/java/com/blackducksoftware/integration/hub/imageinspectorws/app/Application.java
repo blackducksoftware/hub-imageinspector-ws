@@ -26,15 +26,7 @@ package com.blackducksoftware.integration.hub.imageinspectorws.app;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-//@SpringBootApplication(scanBasePackages = { "com.blackducksoftware.integration.hub.imageinspector", "com.blackducksoftware.integration.hub.imageinspectorws" })
-// @SpringBootApplication(scanBasePackages = "com.blackducksoftware.integration.hub")
-@SpringBootApplication(scanBasePackages = { "com.blackducksoftware.integration.hub.imageinspector*", "com.blackducksoftware.integration.hub.imageinspectorws" }, scanBasePackageClasses = {
-        com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorApi.class, com.blackducksoftware.integration.hub.imageinspector.lib.ImageInspector.class,
-        com.blackducksoftware.integration.hub.imageinspector.linux.extractor.ExtractorManager.class, com.blackducksoftware.integration.hub.imageinspector.linux.extractor.ApkExtractor.class,
-        com.blackducksoftware.integration.hub.imageinspector.linux.extractor.Extractor.class, com.blackducksoftware.integration.hub.imageinspector.linux.executor.ApkExecutor.class,
-        com.blackducksoftware.integration.hub.imageinspector.linux.executor.Executor.class, com.blackducksoftware.integration.hub.imageinspector.imageformat.docker.DockerTarParser.class,
-        com.blackducksoftware.integration.hub.imageinspector.linux.Os.class, com.blackducksoftware.integration.hub.imageinspectorws.controller.ImageInspectorAction.class })
-
+@SpringBootApplication(scanBasePackages = { "com.blackducksoftware.integration.hub.imageinspector", "com.blackducksoftware.integration.hub.imageinspectorws" })
 public class Application {
 
     public static void main(final String[] args) {
