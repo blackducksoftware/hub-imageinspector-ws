@@ -47,11 +47,12 @@ public class ResponseFactory {
         return createResponse(status, -1L, message);
     }
 
-    public ResponseEntity<String> createRedirect(final String newUrl) {
+    public ResponseEntity<String> createRedirectWithInspectorPlatform(final String newUrl, final String inspectorPlatform, final String message) {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Location", newUrl);
-
-        return new ResponseEntity<>(null, headers, HttpStatus.FOUND);
+        // TODO what should this ID be? remove it??
+        final String responseBody = new ResponseBodyBuilder(0L, message).put("inspectorPlatform", inspectorPlatform).build();
+        return new ResponseEntity<>(responseBody, headers, HttpStatus.FOUND);
     }
 
     private Long stringToLong(final String value) {

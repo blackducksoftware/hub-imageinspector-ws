@@ -62,8 +62,14 @@ public class ImageInspectorHandler {
             // return responseFactory.createResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (final WrongInspectorOsException e) {
             logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", e.getMessage()));
-            final ImageInspectorOsEnum x = e.getcorrectInspectorOs();
-            return responseFactory.createRedirect("http://localhost:8080/getimagepackages?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar");
+            // TODO How do we get the root URL?
+            final String inspectorRootUrl = "http://localhost:8080";
+            final ImageInspectorOsEnum correctInspectorPlatform = e.getcorrectInspectorOs();
+            final String dockerTarfilePath = e.getDockerTarfilePath();
+            final String correctInspectorUrl = String.format("%s/getimagepackages?tarfile=%s", inspectorRootUrl, dockerTarfilePath);
+            final ResponseEntity<String> redirectResponse = responseFactory.createRedirectWithInspectorPlatform(correctInspectorUrl, correctInspectorPlatform.name(), e.getMessage());
+
+            return redirectResponse;
         } catch (final Exception e) {
             logger.error(String.format("Exception thrown while getting image packages: %s", e.getMessage()), e);
             return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
