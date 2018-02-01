@@ -23,6 +23,7 @@
  */
 package com.blackducksoftware.integration.hub.imageinspectorws.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,13 @@ public class ResponseFactory {
 
     public ResponseEntity<String> createResponse(final HttpStatus status, final String message) {
         return createResponse(status, -1L, message);
+    }
+
+    public ResponseEntity<String> createRedirect(final String newUrl) {
+        final HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", newUrl);
+
+        return new ResponseEntity<>(null, headers, HttpStatus.FOUND);
     }
 
     private Long stringToLong(final String value) {

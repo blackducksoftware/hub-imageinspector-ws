@@ -89,7 +89,7 @@ task createApkDockerfileTasks() {
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /lib/apk"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar"
+            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8080"
         }
     }
 }
@@ -102,7 +102,7 @@ task createRpmDockerfileTasks() {
             println "destFile: ${destFile}"
             from linuxFlavor
             maintainer 'Black Duck Software'
-            exposePort 8080
+            exposePort 8081
 			//environmentVariable('LANG', 'en_US.UTF-8')
             runCommand 'yum update -y && yum install -y java-1.8.0-openjdk && yum clean all -y'
             runCommand "mkdir -p ${imagePgmDir}/target"
@@ -110,7 +110,7 @@ task createRpmDockerfileTasks() {
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar"
+            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8081"
         }
     }
 }
@@ -123,7 +123,7 @@ task createDpkgDockerfileTasks() {
             println "destFile: ${destFile}"
             from linuxFlavor
             maintainer 'Black Duck Software'
-            exposePort 8080
+            exposePort 8082
 			//environmentVariable('LANG', 'en_US.UTF-8')
             runCommand 'apt-get update -y && \
                 apt install -y openjdk-8-jdk vim && \
@@ -134,7 +134,7 @@ task createDpkgDockerfileTasks() {
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib/dpkg"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar"
+            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8082"
         }
     }
 }
@@ -187,11 +187,28 @@ task createBuildDockerImageTasks() {
 
 
 
-task buildDockerImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_centos, buildDockerImage_ubuntu]) {
+task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_centos, buildDockerImage_ubuntu]) {
 }
 
-task images(dependsOn: [buildDockerImages]) {
+task dockerLogin(type: Exec) {
+    commandLine "docker", "login", "--username", "$System.env.DOCKER_HUB_USER", "--password", "$System.env.DOCKER_HUB_PASSWORD"
 }
+
+task pushImageAlpine(type: Exec, dependsOn: [buildDockerImage_alpine, dockerLogin]) {
+	commandLine "docker", "push", "blackducksoftware/${project.name}-alpine:${version}"
+}
+
+task pushImageCentos(type: Exec, dependsOn: [buildDockerImage_centos, dockerLogin]) {
+	commandLine "docker", "push", "blackducksoftware/${project.name}-centos:${version}"
+}
+
+task pushImageUbuntu(type: Exec, dependsOn: [buildDockerImage_ubuntu, dockerLogin]) {
+	commandLine "docker", "push", "blackducksoftware/${project.name}-ubuntu:${version}"
+}
+
+task pushImages(dependsOn: [pushImageAlpine, pushImageCentos, pushImageUbuntu]) {
+}
+
 
 //// helper methods ////
 String getNameWithoutVersion(String linuxFlavor) {

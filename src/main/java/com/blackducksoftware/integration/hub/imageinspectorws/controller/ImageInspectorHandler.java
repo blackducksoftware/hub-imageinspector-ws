@@ -31,6 +31,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.blackducksoftware.integration.hub.bdio.model.SimpleBdioDocument;
+import com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorOsEnum;
+import com.blackducksoftware.integration.hub.imageinspector.api.WrongInspectorOsException;
 import com.google.gson.Gson;
 
 @Component
@@ -58,6 +60,10 @@ public class ImageInspectorHandler {
             // } catch (final IntegrationException e) {
             // logger.error(e.getMessage(), e);
             // return responseFactory.createResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (final WrongInspectorOsException e) {
+            logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", e.getMessage()));
+            final ImageInspectorOsEnum x = e.getcorrectInspectorOs();
+            return responseFactory.createRedirect("http://localhost:8080/getimagepackages?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar");
         } catch (final Exception e) {
             logger.error(String.format("Exception thrown while getting image packages: %s", e.getMessage()), e);
             return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
