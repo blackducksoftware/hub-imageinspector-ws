@@ -7,6 +7,7 @@ buildscript {
     dependencies {
         classpath 'com.blackducksoftware.integration:common-gradle-plugin:0.0.+'
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE")
+        classpath 'com.bmuschko:gradle-docker-plugin:3.0.6'
     }
 }
 
@@ -21,14 +22,24 @@ apply plugin: 'maven-publish'
 version =  '0.1.0'
 
 apply plugin: 'com.blackducksoftware.integration.solution'
+apply plugin: 'com.bmuschko.docker-remote-api'
+
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
+///
+// TODO these don't need to be arrays:
+def linuxFlavorsDpkg = ["ubuntu:16.04"]
+def linuxFlavorsRpm = ["centos:7.3.1611"]
+def linuxFlavorsApk = ["alpine:3.5"]
+def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
+
+String imagePgmDir = "/opt/blackduck/${project.name}"
+///
 
 final def versionFile = new File("${projectDir}/src/main/resources/version.txt")
 versionFile.delete()
 versionFile << version
-
-//jar {
-//    baseName = 'hub-imageinspector-ws'
-//}
 
 publishing {
     publications {
@@ -55,36 +66,141 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-	// cd ../hub-docker-inspector/build
-	// ./gradlew publishToMavenLocal
-	// mvn install:install-file -Dfile=build/libs/hub-docker-inspector-4.3.2-SNAPSHOT.jar -DgroupId=com.blackducksoftware.integration -DartifactId=image-inspector -Dversion=4.3.2-SNAPSHOT -Dpackaging=jar -DgeneratePom=true
-	//compile("com.blackducksoftware.integration:image-inspector:4.3.2-SNAPSHOT")
-	//compile("com.blackducksoftware.integration:hub-docker-inspector:4.3.2-SNAPSHOT")
-
-    /////////////
-    // transitive dependencies pulled in by image inspector lib
-    //compile 'com.github.docker-java:docker-java:3.0.12'
-    //compile 'org.apache.commons:commons-lang3:3.5'
-    //compile 'commons-io:commons-io:2.5'
-    //compile 'org.apache.commons:commons-collections4:4.1'
-    //compile 'org.apache.commons:commons-exec:1.3'
-    //compile 'org.apache.commons:commons-compress:1.12'
-    ///////////
-
-    ////////////
-    // Pretty sure this is totally stupid
-    // transitive dependencies pulled in by image inspector lib
-    //testCompile("com.blackducksoftware.integration:image-inspector:4.3.2-SNAPSHOT")
-    //testCompile 'org.apache.commons:commons-lang3:3.5'
-    //testCompile 'commons-io:commons-io:2.5'
-    //testCompile 'org.apache.commons:commons-collections4:4.1'
-    //testCompile 'org.apache.commons:commons-exec:1.3'
-    //testCompile 'org.apache.commons:commons-compress:1.12'
-    ///////////
-    
-    //compile 'com.blackducksoftware.integration:hub-common:18.0.0'
     compile 'com.blackducksoftware.integration:hub-imageinspector-lib:0.1.0-SNAPSHOT'
     compile("org.springframework.boot:spring-boot-starter-web")
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
+
+//////////// Create Docker Containers ///////////
+task createApkDockerfileTasks() {
+    linuxFlavorsApk.eachWithIndex {linuxFlavor, index ->
+        String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
+        task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
+            destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${project.name}/Dockerfile")
+            println "destFile: ${destFile}"
+            from linuxFlavor
+            maintainer 'Black Duck Software'
+            exposePort 8080
+            //environmentVariable('LANG', 'en_US.UTF-8')
+            runCommand 'apk update && apk add bash && apk add openjdk8-jre'
+            runCommand "mkdir -p ${imagePgmDir}"
+            addFile("${project.name}-${version}.jar", "${imagePgmDir}/${project.name}.jar")
+            runCommand "chown -R 10001 ${imagePgmDir}"
+            user '10001'
+            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar"
+        }
+    }
+}
+
+task createRpmDockerfileTasks() {
+    linuxFlavorsRpm.eachWithIndex {linuxFlavor, index ->
+        String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
+        task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
+            destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${project.name}/Dockerfile")
+            println "destFile: ${destFile}"
+            from linuxFlavor
+            maintainer 'Black Duck Software'
+            exposePort 8080
+			//environmentVariable('LANG', 'en_US.UTF-8')
+            runCommand 'yum update -y && yum install -y java-1.8.0-openjdk && yum clean all -y'
+            runCommand "mkdir -p ${imagePgmDir}"
+            addFile("${project.name}-${version}.jar", "/opt/blackduck/${project.name}/${project.name}.jar")
+            runCommand "chown -R 10001 ${imagePgmDir}"
+            user '10001'
+            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar"
+        }
+    }
+}
+
+task createDpkgDockerfileTasks() {
+    linuxFlavorsDpkg.eachWithIndex {linuxFlavor, index ->
+        String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
+        task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
+            destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${project.name}/Dockerfile")
+            println "destFile: ${destFile}"
+            from linuxFlavor
+            maintainer 'Black Duck Software'
+            exposePort 8080
+			//environmentVariable('LANG', 'en_US.UTF-8')
+            runCommand 'apt-get update -y && \
+                apt install -y openjdk-8-jdk vim && \
+                apt-get install -y locales && apt-get -y clean'
+			//runCommand 'locale-gen "en_US.UTF-8"'
+            runCommand "mkdir -p ${imagePgmDir}"
+            addFile("${project.name}-${version}.jar", "/opt/blackduck/${project.name}/${project.name}.jar")
+            runCommand "chown -R 10001 ${imagePgmDir}"
+            user '10001'
+            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar"
+        }
+    }
+}
+
+task createDockerfiles(dependsOn: [createubuntuDockerfile, createcentosDockerfile, createalpineDockerfile]) {
+}
+
+task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles]) {
+	linuxFlavors.eachWithIndex {linuxFlavor, index ->
+		String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
+		println "Copying jar to Dockerfile dir for ${linuxFlavorDirName}"
+        task "copyJarToDockerfileDir_${linuxFlavorDirName}"(type: Copy) {
+			from "build/libs/${project.name}-${version}.jar"
+			into "${buildDir}/images/${linuxFlavorDirName}/${project.name}"
+		}
+	}
+}
+
+task copyJarFileToDockerfileDirs(dependsOn: [copyJarToDockerfileDir_ubuntu, copyJarToDockerfileDir_centos, copyJarToDockerfileDir_alpine]) {
+}
+
+task createRemoveDockerImageTasks() {
+    linuxFlavors.eachWithIndex {linuxFlavor, index ->
+        String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
+        def taskName = "removeDockerImage_${linuxFlavorDirName}"
+        String suffix = getSuffix(linuxFlavorDirName)
+        println "creating task ${taskName}"
+        task "${taskName}"(type: Exec) {
+			ignoreExitValue true
+            commandLine "docker", "rmi", "blackducksoftware/${project.name}${suffix}:${version}"
+        }
+    }
+}
+
+task buildImageDirs(dependsOn: [createDockerfiles, copyJarFileToDockerfileDirs]) {
+}
+
+task createBuildDockerImageTasks() {
+    linuxFlavors.eachWithIndex {linuxFlavor, index ->
+        String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
+        def taskName = "buildDockerImage_${linuxFlavorDirName}"
+        String suffix = getSuffix(linuxFlavorDirName)
+        println "creating task ${taskName}"
+        task "${taskName}"(type: Exec, dependsOn: ["removeDockerImage_${linuxFlavorDirName}", buildImageDirs]) {
+            commandLine "docker", "build", "--tag", "blackducksoftware/${project.name}${suffix}:${version}", \
+                "${buildDir}/images/${linuxFlavorDirName}/${project.name}"
+        }
+    }
+}
+
+
+
+task buildDockerImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_centos, buildDockerImage_ubuntu]) {
+}
+
+task images(dependsOn: [buildDockerImages]) {
+}
+
+//// helper methods ////
+String getNameWithoutVersion(String linuxFlavor) {
+    String linuxFlavorDirName = linuxFlavor
+    int colonIndex = linuxFlavor.indexOf(':')
+    if (colonIndex >= 0) {
+        linuxFlavorDirName = linuxFlavor.subSequence(0, colonIndex)
+    }
+    linuxFlavorDirName
+}
+
+private String getSuffix(String linuxFlavorName) {
+    String suffix = "-${linuxFlavorName}"
+    suffix
+}
