@@ -23,6 +23,8 @@
  */
 package com.blackducksoftware.integration.hub.imageinspectorws.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,9 +39,11 @@ public class ImageInspectorController {
     private ImageInspectorHandler imageInspectorHandler;
 
     @RequestMapping(path = "/getimagepackages", method = RequestMethod.GET)
-    public ResponseEntity<String> getImagePackages(@RequestParam(value = "tarfile") final String tarFilePath, @RequestParam(value = "hubprojectname", defaultValue = "") final String hubProjectName,
+    public ResponseEntity<String> getImagePackages(final HttpServletRequest request, @RequestParam(value = "tarfile") final String tarFilePath, @RequestParam(value = "hubprojectname", defaultValue = "") final String hubProjectName,
             @RequestParam(value = "hubprojectversion", defaultValue = "") final String hubProjectVersion, @RequestParam(value = "codelocationprefix", defaultValue = "") final String codeLocationPrefix) {
-        return imageInspectorHandler.getImagePackages(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
+        System.out.println(String.format("*** Request: Protocol: %s", request.getProtocol()));
+        System.out.println(String.format("*** Request: Host: %s; Port: %d", request.getServerName(), request.getServerPort()));
+        return imageInspectorHandler.getImagePackages(request.getProtocol(), request.getServerName(), request.getServerPort(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
     }
 
 }

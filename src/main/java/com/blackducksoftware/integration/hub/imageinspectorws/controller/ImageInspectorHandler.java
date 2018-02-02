@@ -31,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.blackducksoftware.integration.hub.bdio.model.SimpleBdioDocument;
+import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorOsEnum;
 import com.blackducksoftware.integration.hub.imageinspector.api.WrongInspectorOsException;
 import com.google.gson.Gson;
@@ -48,32 +49,49 @@ public class ImageInspectorHandler {
     @Autowired
     private Gson gson;
 
-    public ResponseEntity<String> getImagePackages(final String tarFilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix) {
-
+    public ResponseEntity<String> getImagePackages(final String protocol, final String host, final int port, final String tarFilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix) {
         try {
             final SimpleBdioDocument bdio = imageInspectorAction.getImagePackages(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
             final String usersJson = gson.toJson(bdio);
             return responseFactory.createResponse(HttpStatus.OK, usersJson);
-            // } catch (final IntegrationRestException e) {
-            // logger.error(e.getMessage(), e);
-            // return responseFactory.createResponse(HttpStatus.valueOf(e.getHttpStatusCode()), e.getHttpStatusMessage() + " : " + e.getMessage());
-            // } catch (final IntegrationException e) {
-            // logger.error(e.getMessage(), e);
-            // return responseFactory.createResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (final WrongInspectorOsException e) {
             logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", e.getMessage()));
-            // TODO How do we get the root URL?
-            final String inspectorRootUrl = "http://localhost:8080";
             final ImageInspectorOsEnum correctInspectorPlatform = e.getcorrectInspectorOs();
             final String dockerTarfilePath = e.getDockerTarfilePath();
-            final String correctInspectorUrl = String.format("%s/getimagepackages?tarfile=%s", inspectorRootUrl, dockerTarfilePath);
+            final String correctInspectorRelUrl = String.format("getimagepackages?tarfile=%s", dockerTarfilePath);
+            String correctInspectorUrl;
+            try {
+                correctInspectorUrl = deriveUrl(protocol, host, derivePort(correctInspectorPlatform), correctInspectorRelUrl);
+            } catch (final HubIntegrationException deriveUrlException) {
+                logger.error(String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage()), deriveUrlException);
+                return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, deriveUrlException.getMessage());
+            }
             final ResponseEntity<String> redirectResponse = responseFactory.createRedirectWithInspectorPlatform(correctInspectorUrl, correctInspectorPlatform.name(), e.getMessage());
-
             return redirectResponse;
         } catch (final Exception e) {
             logger.error(String.format("Exception thrown while getting image packages: %s", e.getMessage()), e);
             return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
+    }
+
+    private int derivePort(final ImageInspectorOsEnum correctInspectorPlatform) throws HubIntegrationException {
+        switch (correctInspectorPlatform) {
+        case ALPINE:
+            return 8080;
+        case CENTOS:
+            return 8081;
+        case UBUNTU:
+            return 8082;
+        default:
+            throw new HubIntegrationException(String.format("Unexpected inspector platform: %s", correctInspectorPlatform.name()));
+        }
+    }
+
+    private String deriveUrl(final String protocolName, final String host, final int port, final String relativeUrl) {
+        final String protocolPrefix = protocolName.contains("HTTPS") ? "https" : "http";
+        final String url = String.format("%s://%s:%d/%s", protocolPrefix, host, port, relativeUrl);
+        logger.debug(String.format("deriveUrl() returning: %s", url));
+        return url;
     }
 
 }
