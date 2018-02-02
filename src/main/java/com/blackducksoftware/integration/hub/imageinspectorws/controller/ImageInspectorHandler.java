@@ -34,7 +34,6 @@ import com.blackducksoftware.integration.hub.bdio.model.SimpleBdioDocument;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorOsEnum;
 import com.blackducksoftware.integration.hub.imageinspector.api.WrongInspectorOsException;
-import com.google.gson.Gson;
 
 @Component
 public class ImageInspectorHandler {
@@ -46,14 +45,11 @@ public class ImageInspectorHandler {
     @Autowired
     private ResponseFactory responseFactory;
 
-    @Autowired
-    private Gson gson;
-
     public ResponseEntity<String> getImagePackages(final String protocol, final String host, final int port, final String tarFilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix) {
         try {
             final SimpleBdioDocument bdio = imageInspectorAction.getImagePackages(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
-            final String usersJson = gson.toJson(bdio);
-            return responseFactory.createResponse(HttpStatus.OK, usersJson);
+
+            return responseFactory.createResponse(bdio);
         } catch (final WrongInspectorOsException e) {
             logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", e.getMessage()));
             final ImageInspectorOsEnum correctInspectorPlatform = e.getcorrectInspectorOs();
@@ -67,7 +63,7 @@ public class ImageInspectorHandler {
                 logger.error(String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage()), deriveUrlException);
                 return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, deriveUrlException.getMessage());
             }
-            final ResponseEntity<String> redirectResponse = responseFactory.createRedirectWithInspectorPlatform(correctInspectorUrl, correctInspectorPlatform.name(), e.getMessage());
+            final ResponseEntity<String> redirectResponse = responseFactory.createRedirect(correctInspectorUrl, e.getMessage());
             return redirectResponse;
         } catch (final Exception e) {
             logger.error(String.format("Exception thrown while getting image packages: %s", e.getMessage()), e);

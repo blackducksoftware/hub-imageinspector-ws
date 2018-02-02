@@ -23,46 +23,36 @@
  */
 package com.blackducksoftware.integration.hub.imageinspectorws.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.blackducksoftware.integration.hub.bdio.model.SimpleBdioDocument;
+import com.google.gson.Gson;
+
 @Component
 public class ResponseFactory {
-    public ResponseEntity<String> doNotAllowHttpMethod() {
-        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+
+    @Autowired
+    private Gson gson;
+
+    public ResponseEntity<String> createResponse(final SimpleBdioDocument bdio) {
+        final String responseBody = gson.toJson(bdio);
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
-    public ResponseEntity<String> createResponse(final HttpStatus status, final String id, final String message) {
-        return createResponse(status, stringToLong(id), message);
+    public ResponseEntity<String> createResponse(final HttpStatus status, final String warning) {
+        final HttpHeaders headers = new HttpHeaders();
+        headers.add("Warning", warning);
+        return new ResponseEntity<>(null, status);
     }
 
-    public ResponseEntity<String> createResponse(final HttpStatus status, final Long id, final String message) {
-        final String responseBody = new ResponseBodyBuilder(id, message).build();
-        return new ResponseEntity<>(responseBody, status);
-    }
-
-    public ResponseEntity<String> createResponse(final HttpStatus status, final String message) {
-        return createResponse(status, -1L, message);
-    }
-
-    public ResponseEntity<String> createRedirectWithInspectorPlatform(final String newUrl, final String inspectorPlatform, final String message) {
+    public ResponseEntity<String> createRedirect(final String newUrl, final String warning) {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Location", newUrl);
-        // TODO what should this ID be? remove it??
-        final String responseBody = new ResponseBodyBuilder(0L, message).put("inspectorPlatform", inspectorPlatform).build();
-        return new ResponseEntity<>(responseBody, headers, HttpStatus.FOUND);
-    }
-
-    private Long stringToLong(final String value) {
-        if (value != null) {
-            final String trimmedValue = value.trim();
-            try {
-                return Long.valueOf(trimmedValue);
-            } catch (final NumberFormatException e) {
-            }
-        }
-        return null;
+        headers.add("Warning", warning);
+        return new ResponseEntity<>(null, headers, HttpStatus.FOUND);
     }
 }
