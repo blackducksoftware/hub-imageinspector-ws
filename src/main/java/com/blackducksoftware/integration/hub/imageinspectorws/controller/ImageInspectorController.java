@@ -34,13 +34,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ImageInspectorController {
+    static final String GET_BDIO_PATH = "/getimagepackages";
+    static final String TARFILE_PATH_QUERY_PARAM = "tarfile";
+    // TODO there are more query params to extract to constants
 
     @Autowired
     private ImageInspectorHandler imageInspectorHandler;
 
-    @RequestMapping(path = "/getimagepackages", method = RequestMethod.GET)
-    public ResponseEntity<String> getImagePackages(final HttpServletRequest request, @RequestParam(value = "tarfile") final String tarFilePath, @RequestParam(value = "hubprojectname", defaultValue = "") final String hubProjectName,
-            @RequestParam(value = "hubprojectversion", defaultValue = "") final String hubProjectVersion, @RequestParam(value = "codelocationprefix", defaultValue = "") final String codeLocationPrefix) {
+    @RequestMapping(path = GET_BDIO_PATH, method = RequestMethod.GET)
+    public ResponseEntity<String> getImagePackages(final HttpServletRequest request, @RequestParam(value = TARFILE_PATH_QUERY_PARAM) final String tarFilePath,
+            @RequestParam(value = "hubprojectname", defaultValue = "") final String hubProjectName, @RequestParam(value = "hubprojectversion", defaultValue = "") final String hubProjectVersion,
+            @RequestParam(value = "codelocationprefix", defaultValue = "") final String codeLocationPrefix) {
         System.out.println(String.format("*** Request: Protocol: %s", request.getProtocol()));
         System.out.println(String.format("*** Request: Host: %s; Port: %d", request.getServerName(), request.getServerPort()));
         return imageInspectorHandler.getImagePackages(request.getProtocol(), request.getServerName(), request.getServerPort(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);

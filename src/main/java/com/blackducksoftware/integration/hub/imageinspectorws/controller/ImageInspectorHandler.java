@@ -58,7 +58,8 @@ public class ImageInspectorHandler {
             logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", e.getMessage()));
             final ImageInspectorOsEnum correctInspectorPlatform = e.getcorrectInspectorOs();
             final String dockerTarfilePath = e.getDockerTarfilePath();
-            final String correctInspectorRelUrl = String.format("getimagepackages?tarfile=%s", dockerTarfilePath);
+            // TODO need to handle more query params: hub project/version
+            final String correctInspectorRelUrl = String.format("%s?%s=%s", ImageInspectorController.GET_BDIO_PATH, ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath);
             String correctInspectorUrl;
             try {
                 correctInspectorUrl = deriveUrl(protocol, host, derivePort(correctInspectorPlatform), correctInspectorRelUrl);
@@ -88,8 +89,9 @@ public class ImageInspectorHandler {
     }
 
     private String deriveUrl(final String protocolName, final String host, final int port, final String relativeUrl) {
+        final String slashLessRelativeUrl = relativeUrl.startsWith("/") ? relativeUrl.substring(1) : relativeUrl;
         final String protocolPrefix = protocolName.contains("HTTPS") ? "https" : "http";
-        final String url = String.format("%s://%s:%d/%s", protocolPrefix, host, port, relativeUrl);
+        final String url = String.format("%s://%s:%d/%s", protocolPrefix, host, port, slashLessRelativeUrl);
         logger.debug(String.format("deriveUrl() returning: %s", url));
         return url;
     }
