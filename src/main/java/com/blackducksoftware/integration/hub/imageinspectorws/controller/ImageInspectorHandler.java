@@ -45,7 +45,8 @@ public class ImageInspectorHandler {
     @Autowired
     private ResponseFactory responseFactory;
 
-    public ResponseEntity<String> getImagePackages(final String protocol, final String host, final int port, final String tarFilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix) {
+    public ResponseEntity<String> getImagePackages(final String scheme, final String host, final int port, final String requestUri, final String tarFilePath, final String hubProjectName, final String hubProjectVersion,
+            final String codeLocationPrefix) {
         try {
             final SimpleBdioDocument bdio = imageInspectorAction.getImagePackages(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
 
@@ -55,10 +56,10 @@ public class ImageInspectorHandler {
             final ImageInspectorOsEnum correctInspectorPlatform = e.getcorrectInspectorOs();
             final String dockerTarfilePath = e.getDockerTarfilePath();
             // TODO need to handle more query params: hub project/version
-            final String correctInspectorRelUrl = String.format("%s?%s=%s", ImageInspectorController.GET_BDIO_PATH, ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath);
+            final String correctInspectorRelUrl = String.format("%s?%s=%s", deriveEndpoint(requestUri), ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath);
             String correctInspectorUrl;
             try {
-                correctInspectorUrl = deriveUrl(protocol, host, derivePort(correctInspectorPlatform), correctInspectorRelUrl);
+                correctInspectorUrl = deriveUrl(scheme, host, derivePort(correctInspectorPlatform), correctInspectorRelUrl);
             } catch (final HubIntegrationException deriveUrlException) {
                 logger.error(String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage()), deriveUrlException);
                 return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, deriveUrlException.getMessage());
@@ -71,6 +72,15 @@ public class ImageInspectorHandler {
         }
     }
 
+    // TODO unit test
+    private String deriveEndpoint(final String requestUri) {
+        final int lastSlashIndex = requestUri.lastIndexOf('/');
+        final String endpoint = lastSlashIndex < 0 ? requestUri : requestUri.substring(lastSlashIndex + 1);
+        logger.debug(String.format("Converted requestUri %s to endpoint %s", requestUri, endpoint));
+        return endpoint;
+    }
+
+    // TODO unit test
     private int derivePort(final ImageInspectorOsEnum correctInspectorPlatform) throws HubIntegrationException {
         switch (correctInspectorPlatform) {
         case ALPINE:
@@ -84,10 +94,10 @@ public class ImageInspectorHandler {
         }
     }
 
-    private String deriveUrl(final String protocolName, final String host, final int port, final String relativeUrl) {
+    // TODO unit test
+    private String deriveUrl(final String scheme, final String host, final int port, final String relativeUrl) {
         final String slashLessRelativeUrl = relativeUrl.startsWith("/") ? relativeUrl.substring(1) : relativeUrl;
-        final String protocolPrefix = protocolName.contains("HTTPS") ? "https" : "http";
-        final String url = String.format("%s://%s:%d/%s", protocolPrefix, host, port, slashLessRelativeUrl);
+        final String url = String.format("%s://%s:%d/%s", scheme, host, port, slashLessRelativeUrl);
         logger.debug(String.format("deriveUrl() returning: %s", url));
         return url;
     }
