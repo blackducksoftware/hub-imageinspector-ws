@@ -23,19 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.imageinspectorws.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -56,18 +46,4 @@ public class ImageInspectorController {
             @RequestParam(value = "hubprojectversion", defaultValue = "") final String hubProjectVersion, @RequestParam(value = "codelocationprefix", defaultValue = "") final String codeLocationPrefix) {
         return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
     }
-
-    @RequestMapping(path = "/getbdiofile", method = RequestMethod.GET)
-    public ResponseEntity<Resource> getBdioFile(final String param) throws IOException {
-
-        // TODO this is all TEMP code
-        // final File file = new File("/opt/blackduck/hub-imageinspector-ws/target/alpine.tar");
-        final File file = new File("/tmp/alpine.tar");
-
-        final Path path = Paths.get(file.getAbsolutePath());
-        final ByteArrayResource resource = new ByteArrayResource(Files.readAllBytes(path));
-        final HttpHeaders headers = new HttpHeaders();
-        return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
-    }
-
 }

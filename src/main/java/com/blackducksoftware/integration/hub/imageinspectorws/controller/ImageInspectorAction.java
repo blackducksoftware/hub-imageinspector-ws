@@ -41,7 +41,7 @@ public class ImageInspectorAction {
     @Autowired
     ImageInspectorApi api;
 
-    public SimpleBdioDocument getImagePackages(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix) throws HubIntegrationException, IOException, InterruptedException {
+    public SimpleBdioDocument getBdio(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix) throws HubIntegrationException, IOException, InterruptedException {
         final String msg = String.format("dockerTarfilePath: %s, hubProjectName: %s, hubProjectVersion: %s, codeLocationPrefix: %s", dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
         logger.info(msg);
         final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
