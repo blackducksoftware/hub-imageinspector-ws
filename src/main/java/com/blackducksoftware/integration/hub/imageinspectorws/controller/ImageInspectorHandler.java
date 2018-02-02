@@ -45,7 +45,7 @@ public class ImageInspectorHandler {
     @Autowired
     private ResponseFactory responseFactory;
 
-    public ResponseEntity<String> getImagePackages(final String scheme, final String host, final int port, final String requestUri, final String tarFilePath, final String hubProjectName, final String hubProjectVersion,
+    public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String tarFilePath, final String hubProjectName, final String hubProjectVersion,
             final String codeLocationPrefix) {
         try {
             final SimpleBdioDocument bdio = imageInspectorAction.getImagePackages(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
