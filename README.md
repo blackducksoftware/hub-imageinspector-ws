@@ -11,7 +11,7 @@ You can download the latest release artifacts from GitHub: https://github.com/bl
 ## Documentation ##
 hub-imageinspector-ws is under development.
 
-src/main/resources/demo.sh is a shell script that get 3 containers running, and then suggests (echo's) some curl commands to test them.
+src/main/resources/demo.sh is a shell script that uses docker to get 3 containers running, and then suggests (echo's) some curl commands to test them.
 
 Requirements: bash, docker, java 8, curl, port 8080, 8081, 8082, and a /tmp dir.
 
