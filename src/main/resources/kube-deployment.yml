@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hub-imageinspector-ws
+  labels:
+    app: hub-imageinspector-ws
+    run: hub-imageinspector-ws
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hub-imageinspector-ws
+  template:
+    metadata:
+      labels:
+        app: hub-imageinspector-ws
+        run: hub-imageinspector-ws
+    spec:
+      containers:
+      - name: hub-imageinspector-ws-alpine
+        image: blackducksoftware/hub-imageinspector-ws-alpine:0.1.0
+        volumeMounts:
+        - name: inspector-target-dir
+          mountPath: /opt/blackduck/hub-imageinspector-ws/target
+        ports:
+        - containerPort: 8080
+          hostPort: 8080
+      - name: hub-imageinspector-ws-centos
+        image: blackducksoftware/hub-imageinspector-ws-centos:0.1.0
+        volumeMounts:
+        - name: inspector-target-dir
+          mountPath: /opt/blackduck/hub-imageinspector-ws/target
+        ports:
+        - containerPort: 8081
+          hostPort: 8081
+      - name: hub-imageinspector-ws-ubuntu
+        image: blackducksoftware/hub-imageinspector-ws-ubuntu:0.1.0
+        volumeMounts:
+        - name: inspector-target-dir
+          mountPath: /opt/blackduck/hub-imageinspector-ws/target
+        ports:
+        - containerPort: 8082
+          hostPort: 8082
+      volumes:
+      - name: inspector-target-dir
+        hostPath:
+          path: /Users/sbillings/tmp/target
+          type: Directory
