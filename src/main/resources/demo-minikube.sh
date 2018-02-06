@@ -90,20 +90,23 @@ clusterIp=$(kubectl cluster-info|grep "is running at"|sed -e 's/^.*https:\/\///'
 ##servicePort=$(kubectl describe services hub-imageinspector-ws|grep -v '^Type:'|grep NodePort|awk '{print $3}'|sed 's/\/TCP//')
 servicePort=8080
 cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar"
+echo "${cmd}"
 $cmd
 echo "--------------------------------------------------------------"
 echo "Using service to get BDIO for fedora"
 echo "--------------------------------------------------------------"
 cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/fedora.tar"
+echo "${cmd}"
 $cmd
 echo "--------------------------------------------------------------"
 echo "Using service to get BDIO for debian"
 echo "--------------------------------------------------------------"
 cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/debian.tar"
+echo "${cmd}"
 $cmd
 
-echo "--------------------------------------------------------------"
-echo "Deleting deployment, service"
-echo "--------------------------------------------------------------"
-kubectl delete service "${serviceName}"
-kubectl delete deployment "${deploymentName}"
+#echo "--------------------------------------------------------------"
+#echo "Deleting deployment, service"
+#echo "--------------------------------------------------------------"
+#kubectl delete service "${serviceName}"
+#kubectl delete deployment "${deploymentName}"
