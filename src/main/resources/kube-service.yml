@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: hub-imageinspector-ws
   labels:
-    run: hub-imageinspector-ws
+    app: hub-imageinspector-ws
 spec:
   ports:
   - port: 8080
     protocol: TCP
   selector:
-    run: hub-imageinspector-ws
+    app: hub-imageinspector-ws
   type: NodePort
