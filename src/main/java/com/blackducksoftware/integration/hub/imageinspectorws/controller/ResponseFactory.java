@@ -46,7 +46,7 @@ public class ResponseFactory {
     public ResponseEntity<String> createResponse(final HttpStatus status, final String warning) {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Warning", warning);
-        return new ResponseEntity<>(null, status);
+        return new ResponseEntity<>(null, headers, status);
     }
 
     public ResponseEntity<String> createRedirect(final String newUrl, final String warning) {
