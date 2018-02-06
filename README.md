@@ -17,7 +17,7 @@ You only need files in the src/main/resources directory, but it's probably easie
 
 ### Trying hub-imageinspector-ws in a Kubernetes (minikube) environment ##
 
-src/main/resources/demo-minikube.sh is a shell script that uses minikube to get a pod running, and then executes (and echo's) some curl commands to test them.
+src/main/resources/demo-minikube.sh is a shell script that uses minikube to get a pod running, and then executes (and echo's) some curl commands to test the service.
 
 Requirements: bash, minikube, java 8, curl, port 8080, 8081, 8082. It creates a ~/tmp/target dir.
 
@@ -30,7 +30,7 @@ Supported package manager database formats: apk, dpkg (which apt also uses), and
 
 ### Trying hub-imageinspector-ws in a Docker environment ###
 
-src/main/resources/demo-docker.sh is a shell script that uses docker to get 3 containers running, and then suggests (echo's) some curl commands to test them.
+src/main/resources/demo-docker.sh is a shell script that uses docker to get 3 containers running, and then suggests (echo's) some curl commands to test the service.
 
 Requirements: bash, docker, java 8, curl, port 8080, 8081, 8082, and a /tmp dir.
 
