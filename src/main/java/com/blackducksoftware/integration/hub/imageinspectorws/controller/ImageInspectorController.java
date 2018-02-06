@@ -43,7 +43,8 @@ public class ImageInspectorController {
 
     @RequestMapping(path = GET_BDIO_PATH, method = RequestMethod.GET)
     public ResponseEntity<String> getBdio(final HttpServletRequest request, @RequestParam(value = TARFILE_PATH_QUERY_PARAM) final String tarFilePath, @RequestParam(value = "hubprojectname", defaultValue = "") final String hubProjectName,
-            @RequestParam(value = "hubprojectversion", defaultValue = "") final String hubProjectVersion, @RequestParam(value = "codelocationprefix", defaultValue = "") final String codeLocationPrefix) {
-        return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
+            @RequestParam(value = "hubprojectversion", defaultValue = "") final String hubProjectVersion, @RequestParam(value = "codelocationprefix", defaultValue = "") final String codeLocationPrefix,
+            @RequestParam(value = "cleanup", required = false, defaultValue = "true") final boolean cleanupWorkingDir) {
+        return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
     }
 }

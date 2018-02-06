@@ -33,7 +33,7 @@ public class ImageInspectorActionTest {
     @Test
     public void test() throws HubIntegrationException, IOException, InterruptedException {
         try {
-            imageInspectorAction.getBdio("/tmp/alpine.tar", "SB001", "testVersion", "testCodeLocationPrefix");
+            imageInspectorAction.getBdio("/tmp/alpine.tar", "SB001", "testVersion", "testCodeLocationPrefix", true);
         } catch (final WrongInspectorOsException e) {
             System.out.println(String.format("Got expected WrongInspectorOsException: %s", e.getMessage()));
         }

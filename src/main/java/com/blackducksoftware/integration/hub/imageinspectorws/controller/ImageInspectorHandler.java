@@ -46,9 +46,9 @@ public class ImageInspectorHandler {
     private ResponseFactory responseFactory;
 
     public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String tarFilePath, final String hubProjectName, final String hubProjectVersion,
-            final String codeLocationPrefix) {
+            final String codeLocationPrefix, final boolean cleanupWorkingDir) {
         try {
-            final SimpleBdioDocument bdio = imageInspectorAction.getBdio(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
+            final SimpleBdioDocument bdio = imageInspectorAction.getBdio(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
 
             return responseFactory.createResponse(bdio);
         } catch (final WrongInspectorOsException e) {

@@ -41,10 +41,12 @@ public class ImageInspectorAction {
     @Autowired
     ImageInspectorApi api;
 
-    public SimpleBdioDocument getBdio(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix) throws HubIntegrationException, IOException, InterruptedException {
-        final String msg = String.format("dockerTarfilePath: %s, hubProjectName: %s, hubProjectVersion: %s, codeLocationPrefix: %s", dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
+    public SimpleBdioDocument getBdio(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir)
+            throws HubIntegrationException, IOException, InterruptedException {
+        final String msg = String.format("dockerTarfilePath: %s, hubProjectName: %s, hubProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b", dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix,
+                cleanupWorkingDir);
         logger.info(msg);
-        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix);
+        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
         return bdio;
     }
 }

@@ -40,3 +40,12 @@ You could send requests to any one of ports/containers and get the same result (
 
 Supported package manager database formats: apk, dpkg (which apt also uses), and rpm (which yum also uses). 
 
+### Endpoints ###
+
+
+* GET /getbdio?tarfile=<path to save Docker image>
+* GET /mappings
+* GET /trace
+* GET /health
+* POST /loggers/<logger>  Example: curl -i -X POST -H 'Content-Type: application/json' -d '{"configuredLevel": "TRACE"}' http://<IP>:8080/loggers/com.blackducksoftware
+
