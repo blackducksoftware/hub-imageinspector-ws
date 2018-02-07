@@ -147,7 +147,7 @@ task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles
 	linuxFlavors.eachWithIndex {linuxFlavor, index ->
 		String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
 		println "Copying jar to Dockerfile dir for ${linuxFlavorDirName}"
-        task "copyJarToDockerfileDir_${linuxFlavorDirName}"(type: Copy) {
+        task "copyJarToDockerfileDir_${linuxFlavorDirName}"(type: Copy, dependsOn: build) {
 			from "build/libs/${project.name}-${version}.jar"
 			into "${buildDir}/images/${linuxFlavorDirName}/${project.name}"
 		}

@@ -51,24 +51,24 @@ function waitForPodToStart() {
 
 ensureKubeRunning
 mkdir -p ${targetImageDir}
-rm -f "${targetImageDir}/alpine.tar"
-rm -f "${targetImageDir}/fedora.tar"
-rm -f "${targetImageDir}/debian.tar"
+#rm -f "${targetImageDir}/alpine.tar"
+#rm -f "${targetImageDir}/fedora.tar"
+#rm -f "${targetImageDir}/debian.tar"
 
-echo "--------------------------------------------------------------"
-echo "Pulling/saving the target images"
-echo "--------------------------------------------------------------"
-docker pull "alpine:latest"
-docker save -o "${targetImageDir}/alpine.tar" "alpine:latest"
-chmod a+r "${targetImageDir}/alpine.tar"
+#echo "--------------------------------------------------------------"
+#echo "Pulling/saving the target images"
+#echo "--------------------------------------------------------------"
+#docker pull "alpine:latest"
+#docker save -o "${targetImageDir}/alpine.tar" "alpine:latest"
+#chmod a+r "${targetImageDir}/alpine.tar"
 
-docker pull "fedora:latest"
-docker save -o "${targetImageDir}/fedora.tar" "fedora:latest"
-chmod a+r "${targetImageDir}/fedora.tar"
+#docker pull "fedora:latest"
+#docker save -o "${targetImageDir}/fedora.tar" "fedora:latest"
+#chmod a+r "${targetImageDir}/fedora.tar"
 
-docker pull "debian:latest"
-docker save -o "${targetImageDir}/debian.tar" "debian:latest"
-chmod a+r "${targetImageDir}/debian.tar"
+#docker pull "debian:latest"
+#docker save -o "${targetImageDir}/debian.tar" "debian:latest"
+#chmod a+r "${targetImageDir}/debian.tar"
 
 echo "--------------------------------------------------------------"
 echo "Creating deployment"
