@@ -11,7 +11,7 @@ There are no releases yet, but eventually:
 You can download the latest release artifacts from GitHub: https://github.com/blackducksoftware/hub-imageinspector-ws/releases
 
 ## Documentation ##
-hub-imageinspector-ws is under development, but you can use provided bash scripts to try a pre-release version in either a Kubernetes or a Docker environment.
+hub-imageinspector-ws is under development (definitely not production-ready), but you can use provided bash scripts to try a pre-release version in either a Kubernetes or a Docker environment.
 
 You only need files in the src/main/resources directory, but it's probably easiest to clone the whole repo. For the relative paths to be correct, execute the scripts (src/main/resources/demo-*.sh) from the top level directory (the one that contains build.gradle). Whichever script you use, you'll want to read the script to understand what it's doing.
 
