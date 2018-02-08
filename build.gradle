@@ -90,7 +90,7 @@ task createApkDockerfileTasks() {
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /lib/apk"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8080"
+            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8080", "--current.linux.distro=${linuxFlavorDirName}"
         }
     }
 }
@@ -111,7 +111,7 @@ task createRpmDockerfileTasks() {
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8081"
+            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8081", "--current.linux.distro=${linuxFlavorDirName}"
         }
     }
 }
@@ -135,7 +135,7 @@ task createDpkgDockerfileTasks() {
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib/dpkg"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8082"
+            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8082", "--current.linux.distro=${linuxFlavorDirName}"
         }
     }
 }

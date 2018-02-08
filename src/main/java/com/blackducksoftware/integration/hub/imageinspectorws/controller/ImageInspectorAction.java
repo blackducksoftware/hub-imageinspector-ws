@@ -28,6 +28,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.blackducksoftware.integration.hub.bdio.model.SimpleBdioDocument;
@@ -41,11 +42,15 @@ public class ImageInspectorAction {
     @Autowired
     ImageInspectorApi api;
 
+    @Value("${current.linux.distro:}")
+    private String currentLinuxDistro;
+
     public SimpleBdioDocument getBdio(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir)
             throws HubIntegrationException, IOException, InterruptedException {
         final String msg = String.format("dockerTarfilePath: %s, hubProjectName: %s, hubProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b", dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix,
                 cleanupWorkingDir);
         logger.info(msg);
+        logger.info(String.format("***** Given value of current.linux.distro: %s", currentLinuxDistro));
         final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
         return bdio;
     }
