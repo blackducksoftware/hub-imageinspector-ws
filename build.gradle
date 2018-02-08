@@ -20,6 +20,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 version =  '0.1.1'
+def appName='hub-imageinspector-ws'
 
 apply plugin: 'com.blackducksoftware.integration.solution'
 apply plugin: 'com.bmuschko.docker-remote-api'
@@ -34,7 +35,7 @@ def linuxFlavorsRpm = ["centos:7.3.1611"]
 def linuxFlavorsApk = ["alpine:3.5"]
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
 
-String imagePgmDir = "/opt/blackduck/${project.name}"
+String imagePgmDir = "/opt/blackduck/${appName}"
 ///
 
 final def versionFile = new File("${projectDir}/src/main/resources/version.txt")
@@ -44,7 +45,7 @@ versionFile << version
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            def artifactName = "${buildDir}/libs/${project.name}-${version}.jar"
+            def artifactName = "${buildDir}/libs/${appName}-${version}.jar"
             artifact (artifactName)
         }
     }
@@ -78,7 +79,7 @@ task createApkDockerfileTasks() {
     linuxFlavorsApk.eachWithIndex {linuxFlavor, index ->
         String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
         task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
-            destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${project.name}/Dockerfile")
+            destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
             println "destFile: ${destFile}"
             from linuxFlavor
             maintainer 'Black Duck Software'
@@ -86,11 +87,11 @@ task createApkDockerfileTasks() {
             //environmentVariable('LANG', 'en_US.UTF-8')
             runCommand 'apk update && apk add bash && apk add openjdk8-jre'
             runCommand "mkdir -p ${imagePgmDir}/target"
-            addFile("${project.name}-${version}.jar", "${imagePgmDir}/${project.name}.jar")
+            addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /lib/apk"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8080", "--current.linux.distro=${linuxFlavorDirName}"
+            entryPoint "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8080", "--current.linux.distro=${linuxFlavorDirName}"
         }
     }
 }
@@ -99,7 +100,7 @@ task createRpmDockerfileTasks() {
     linuxFlavorsRpm.eachWithIndex {linuxFlavor, index ->
         String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
         task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
-            destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${project.name}/Dockerfile")
+            destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
             println "destFile: ${destFile}"
             from linuxFlavor
             maintainer 'Black Duck Software'
@@ -107,11 +108,11 @@ task createRpmDockerfileTasks() {
 			//environmentVariable('LANG', 'en_US.UTF-8')
             runCommand 'yum update -y && yum install -y java-1.8.0-openjdk && yum clean all -y'
             runCommand "mkdir -p ${imagePgmDir}/target"
-            addFile("${project.name}-${version}.jar", "${imagePgmDir}/${project.name}.jar")
+            addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8081", "--current.linux.distro=${linuxFlavorDirName}"
+            entryPoint "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8081", "--current.linux.distro=${linuxFlavorDirName}"
         }
     }
 }
@@ -120,7 +121,7 @@ task createDpkgDockerfileTasks() {
     linuxFlavorsDpkg.eachWithIndex {linuxFlavor, index ->
         String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
         task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
-            destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${project.name}/Dockerfile")
+            destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
             println "destFile: ${destFile}"
             from linuxFlavor
             maintainer 'Black Duck Software'
@@ -131,11 +132,11 @@ task createDpkgDockerfileTasks() {
                 apt-get install -y locales && apt-get -y clean'
 			//runCommand 'locale-gen "en_US.UTF-8"'
             runCommand "mkdir -p ${imagePgmDir}/target"
-            addFile("${project.name}-${version}.jar", "${imagePgmDir}/${project.name}.jar")
+            addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib/dpkg"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${project.name}.jar", "--server.port=8082", "--current.linux.distro=${linuxFlavorDirName}"
+            entryPoint "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=${linuxFlavorDirName}"
         }
     }
 }
@@ -148,8 +149,8 @@ task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles
 		String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
 		println "Copying jar to Dockerfile dir for ${linuxFlavorDirName}"
         task "copyJarToDockerfileDir_${linuxFlavorDirName}"(type: Copy, dependsOn: build) {
-			from "build/libs/${project.name}-${version}.jar"
-			into "${buildDir}/images/${linuxFlavorDirName}/${project.name}"
+			from "build/libs/${appName}-${version}.jar"
+			into "${buildDir}/images/${linuxFlavorDirName}/${appName}"
 		}
 	}
 }
@@ -165,7 +166,7 @@ task createRemoveDockerImageTasks() {
         println "creating task ${taskName}"
         task "${taskName}"(type: Exec) {
 			ignoreExitValue true
-            commandLine "docker", "rmi", "blackducksoftware/${project.name}${suffix}:${version}"
+            commandLine "docker", "rmi", "blackducksoftware/${appName}${suffix}:${version}"
         }
     }
 }
@@ -180,8 +181,8 @@ task createBuildDockerImageTasks() {
         String suffix = getSuffix(linuxFlavorDirName)
         println "creating task ${taskName}"
         task "${taskName}"(type: Exec, dependsOn: ["removeDockerImage_${linuxFlavorDirName}", buildImageDirs]) {
-            commandLine "docker", "build", "--tag", "blackducksoftware/${project.name}${suffix}:${version}", \
-                "${buildDir}/images/${linuxFlavorDirName}/${project.name}"
+            commandLine "docker", "build", "--tag", "blackducksoftware/${appName}${suffix}:${version}", \
+                "${buildDir}/images/${linuxFlavorDirName}/${appName}"
         }
     }
 }
@@ -196,15 +197,15 @@ task dockerLogin(type: Exec) {
 }
 
 task pushImageAlpine(type: Exec, dependsOn: [buildDockerImage_alpine, dockerLogin]) {
-	commandLine "docker", "push", "blackducksoftware/${project.name}-alpine:${version}"
+	commandLine "docker", "push", "blackducksoftware/${appName}-alpine:${version}"
 }
 
 task pushImageCentos(type: Exec, dependsOn: [buildDockerImage_centos, dockerLogin]) {
-	commandLine "docker", "push", "blackducksoftware/${project.name}-centos:${version}"
+	commandLine "docker", "push", "blackducksoftware/${appName}-centos:${version}"
 }
 
 task pushImageUbuntu(type: Exec, dependsOn: [buildDockerImage_ubuntu, dockerLogin]) {
-	commandLine "docker", "push", "blackducksoftware/${project.name}-ubuntu:${version}"
+	commandLine "docker", "push", "blackducksoftware/${appName}-ubuntu:${version}"
 }
 
 task pushImages(dependsOn: [pushImageAlpine, pushImageCentos, pushImageUbuntu]) {
