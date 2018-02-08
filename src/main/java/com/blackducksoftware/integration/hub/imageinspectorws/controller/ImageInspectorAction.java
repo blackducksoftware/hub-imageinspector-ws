@@ -50,8 +50,8 @@ public class ImageInspectorAction {
         final String msg = String.format("dockerTarfilePath: %s, hubProjectName: %s, hubProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b", dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix,
                 cleanupWorkingDir);
         logger.info(msg);
-        logger.info(String.format("***** Given value of current.linux.distro: %s", currentLinuxDistro));
-        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
+        logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
+        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, currentLinuxDistro);
         return bdio;
     }
 }
