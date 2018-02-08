@@ -147,10 +147,11 @@ task createDockerfiles(dependsOn: [createubuntuDockerfile, createcentosDockerfil
 task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles]) {
 	linuxFlavors.eachWithIndex {linuxFlavor, index ->
 		String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
-		println "Copying jar to Dockerfile dir for ${linuxFlavorDirName}"
+		println "Creating task to copy jar from build/libs/${project.name}-${version}.jar to Dockerfile dir for ${linuxFlavorDirName}, renaming to ${appName}-${version}.jar"
         task "copyJarToDockerfileDir_${linuxFlavorDirName}"(type: Copy, dependsOn: build) {
-			from "build/libs/${appName}-${version}.jar"
+			from "build/libs/${project.name}-${version}.jar"
 			into "${buildDir}/images/${linuxFlavorDirName}/${appName}"
+			rename ("${project.name}-${version}.jar", "${appName}-${version}.jar")
 		}
 	}
 }
