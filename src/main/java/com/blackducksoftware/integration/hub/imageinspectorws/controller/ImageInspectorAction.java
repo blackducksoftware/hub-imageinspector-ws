@@ -42,13 +42,16 @@ public class ImageInspectorAction {
     @Autowired
     ImageInspectorApi api;
 
+    @Autowired
+    private ProgramVersion programVersion;
+
     @Value("${current.linux.distro:}")
     private String currentLinuxDistro;
 
     public SimpleBdioDocument getBdio(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir)
             throws HubIntegrationException, IOException, InterruptedException {
-        final String msg = String.format("dockerTarfilePath: %s, hubProjectName: %s, hubProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b", dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix,
-                cleanupWorkingDir);
+        final String msg = String.format("hub-imageinspector-ws v%s: dockerTarfilePath: %s, hubProjectName: %s, hubProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b", programVersion.getProgramVersion(), dockerTarfilePath,
+                hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
         logger.info(msg);
         logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
         final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, currentLinuxDistro);

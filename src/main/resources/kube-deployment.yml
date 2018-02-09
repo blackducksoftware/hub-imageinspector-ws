@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: hub-imageinspector-ws-alpine
-        image: blackducksoftware/hub-imageinspector-ws-alpine:0.1.1
+        image: blackducksoftware/hub-imageinspector-ws-alpine:0.1.2-SNAPSHOT
         volumeMounts:
         - name: inspector-target-dir
           mountPath: /opt/blackduck/hub-imageinspector-ws/target
@@ -24,7 +24,7 @@ spec:
         - containerPort: 8080
           hostPort: 8080
       - name: hub-imageinspector-ws-centos
-        image: blackducksoftware/hub-imageinspector-ws-centos:0.1.1
+        image: blackducksoftware/hub-imageinspector-ws-centos:0.1.2-SNAPSHOT
         volumeMounts:
         - name: inspector-target-dir
           mountPath: /opt/blackduck/hub-imageinspector-ws/target
@@ -32,7 +32,7 @@ spec:
         - containerPort: 8081
           hostPort: 8081
       - name: hub-imageinspector-ws-ubuntu
-        image: blackducksoftware/hub-imageinspector-ws-ubuntu:0.1.1
+        image: blackducksoftware/hub-imageinspector-ws-ubuntu:0.1.2-SNAPSHOT
         volumeMounts:
         - name: inspector-target-dir
           mountPath: /opt/blackduck/hub-imageinspector-ws/target
