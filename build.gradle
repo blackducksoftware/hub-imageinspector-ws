@@ -61,6 +61,10 @@ repositories {
     mavenLocal()
     jcenter()
     mavenCentral()
+	// TEMP: pick up snapshots for dependency libs
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
 }
 
 sourceCompatibility = 1.8
