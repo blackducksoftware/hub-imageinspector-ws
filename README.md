@@ -47,7 +47,7 @@ GET /getbdio?tarfile=<path to Docker image tarfile>
 GET /trace # get history of http requests
 GET /health # check health
 GET /metrics # get Spring Boot-provided metrics in JSON format
-GET /prometheus # get Prometheus- (and perhaps someday imageinspector-) provided metrics in Prometheus format
+GET /prometheus # get Prometheus-provided metrics in Prometheus format
 GET /loggers # get list of loggers
 POST /loggers/<logger> # Example: curl -i -X POST -H 'Content-Type: application/json' -d '{"configuredLevel": "TRACE"}' http://<IP>:8080/loggers/com.blackducksoftware
 ```
