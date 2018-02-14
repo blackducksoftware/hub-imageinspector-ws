@@ -11,8 +11,6 @@ buildscript {
     }
 }
 
-
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
@@ -74,6 +72,9 @@ dependencies {
     compile 'com.blackducksoftware.integration:hub-imageinspector-lib:1.0.1-SNAPSHOT'
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("io.prometheus:simpleclient_spring_boot:0.2.0")
+    compile("io.prometheus:simpleclient_hotspot:0.2.0") // TODO check that we need this
+    compile("io.prometheus:simpleclient_dropwizard:0.2.0") // TODO check that we need this
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
