@@ -1,5 +1,5 @@
 ## Overview ##
-A container-based Web Service for analyzing Docker images
+A container-based Web Service for analyzing Docker images (IN DEVELOPMENT)
 
 # Build #
 TBD
@@ -7,8 +7,9 @@ TBD
 ## Where can I get the latest release? ##
 You can download the latest source from GitHub: https://github.com/blackducksoftware/hub-imageinspector-ws. 
 
-There are no releases yet, but eventually:
-You can download the latest release artifacts from GitHub: https://github.com/blackducksoftware/hub-imageinspector-ws/releases
+To try it in a Docker environment, you can use this bash script as a starting point: https://github.com/blackducksoftware/hub-imageinspector-ws/blob/master/src/main/resources/demo-docker.sh.
+
+Ty try it in a Kubernetes environment, you use this bash script as a starting point: https://github.com/blackducksoftware/hub-imageinspector-ws/blob/master/src/main/resources/demo-minikube.sh. It depends on: https://github.com/blackducksoftware/hub-imageinspector-ws/blob/master/src/main/resources/kube-deployment.yml, https://github.com/blackducksoftware/hub-imageinspector-ws/blob/master/src/main/resources/kube-service.yml.
 
 ## Documentation ##
 hub-imageinspector-ws is under development. You can use provided bash scripts to try a pre-release version in either a Kubernetes or a Docker environment.
