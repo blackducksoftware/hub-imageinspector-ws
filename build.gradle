@@ -26,15 +26,15 @@ apply plugin: 'com.bmuschko.docker-remote-api'
 import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
-///
 // TODO these don't need to be arrays:
 def linuxFlavorsDpkg = ["ubuntu:16.04"]
 def linuxFlavorsRpm = ["centos:7.3.1611"]
 def linuxFlavorsApk = ["alpine:3.5"]
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
 
-String imagePgmDir = "/opt/blackduck/${appName}"
-///
+String blackduckDir = "/opt/blackduck"
+String imagePgmDir = "${blackduckDir}/${appName}"
+String dockerInspectorDir = "${blackduckDir}/hub-docker-inspector"
 
 final def versionFile = new File("${projectDir}/src/main/resources/version.properties")
 versionFile.delete()
@@ -95,6 +95,11 @@ task createApkDockerfileTasks() {
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /lib/apk"
+            runCommand "mkdir -p ${dockerInspectorDir}/config"
+            runCommand "mkdir -p ${dockerInspectorDir}/target"
+            runCommand "mkdir -p ${dockerInspectorDir}/output"
+            runCommand "mkdir -p ${dockerInspectorDir}/working"
+            runCommand "chmod -R g+w ${dockerInspectorDir}"
             user '10001'
             entryPoint "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8080", "--current.linux.distro=${linuxFlavorDirName}"
         }
@@ -116,6 +121,11 @@ task createRpmDockerfileTasks() {
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib"
+            runCommand "mkdir -p ${dockerInspectorDir}/config"
+            runCommand "mkdir -p ${dockerInspectorDir}/target"
+            runCommand "mkdir -p ${dockerInspectorDir}/output"
+            runCommand "mkdir -p ${dockerInspectorDir}/working"
+            runCommand "chmod -R g+w ${dockerInspectorDir}"
             user '10001'
             entryPoint "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8081", "--current.linux.distro=${linuxFlavorDirName}"
         }
@@ -140,6 +150,11 @@ task createDpkgDockerfileTasks() {
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib/dpkg"
+            runCommand "mkdir -p ${dockerInspectorDir}/config"
+            runCommand "mkdir -p ${dockerInspectorDir}/target"
+            runCommand "mkdir -p ${dockerInspectorDir}/output"
+            runCommand "mkdir -p ${dockerInspectorDir}/working"
+            runCommand "chmod -R g+w ${dockerInspectorDir}"
             user '10001'
             entryPoint "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=${linuxFlavorDirName}"
         }
