@@ -52,3 +52,17 @@ GET /prometheus # get Prometheus-generated metrics in Prometheus format
 GET /loggers # get list of loggers
 POST /loggers/<logger> # Example: curl -i -X POST -H 'Content-Type: application/json' -d '{"configuredLevel": "TRACE"}' http://<IP>:8080/loggers/com.blackducksoftware
 ```
+
+### Optimizing Performance ###
+
+Each service (port) handles a different family of linux distribution based on package manager database format:
+* port 8080 inspects Linux images that use the apk package manager database format (used by apk).
+* port 8081 inspects Linux images that use the rpm package manager database format (used by rpm and yum).
+* port 8082 inspects Linux images that use the dpkg package manager database format (used by dpkg and apt).
+
+Any mis-directed request (any request sent to one port that can/must be handled by a different port) will be redirected to the correct port. Correcly-directed requests (sent initially to the port that can handle the image) are faster and more efficient than mis-directed requests.
+
+If you know (or learn) that most of your images are being handled by a port other than the one you are directing requests too, you can decrease response time and system load by directing requests to the port that is most likely correct. You can determine this by examining the information returned by either of the two metrics endpoints: /metrics and /prometheus. 
+* counter.status.200.getbdio tells you how many inspection requests this port handled. 
+* counter.status.302.getbdio tells you how many inspection requests this port redirected to a different port.
+(If you are using the /prometheus endpoint, your counter names will use '_' instead of '.'.)
