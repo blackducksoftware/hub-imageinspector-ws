@@ -62,7 +62,7 @@ Each service (port) handles a different family of linux distribution based on pa
 
 Any mis-directed request (any request sent to one port that can/must be handled by a different port) will be redirected to the correct port. Correcly-directed requests (sent initially to the port that can handle the image) are faster and more efficient than mis-directed requests.
 
-If you know (or learn) that most of your images are being handled by a port other than the one you are directing requests too, you can decrease response time and system load by directing requests to the port that is most likely correct. You can determine this by examining the information returned by either of the two metrics endpoints: /metrics and /prometheus. 
+If you know (or learn) that most of your images are being handled by a port other than the one you are directing requests too, you can decrease response time and system load by directing requests to the port that is most often the correct port to handle your portfolio of images. You can determine this by examining the information returned by either of the two metrics endpoints: /metrics and /prometheus. 
 * counter.status.200.getbdio tells you how many inspection requests this port handled. 
 * counter.status.302.getbdio tells you how many inspection requests this port redirected to a different port.
 (If you are using the /prometheus endpoint, your counter names will use '_' instead of '.'.)
