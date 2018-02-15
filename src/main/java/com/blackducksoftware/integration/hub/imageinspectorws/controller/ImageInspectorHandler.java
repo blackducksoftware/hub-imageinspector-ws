@@ -49,14 +49,12 @@ public class ImageInspectorHandler {
             final String codeLocationPrefix, final boolean cleanupWorkingDir) {
         try {
             final SimpleBdioDocument bdio = imageInspectorAction.getBdio(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
-
             return responseFactory.createResponse(bdio);
         } catch (final WrongInspectorOsException e) {
             logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", e.getMessage()));
             final ImageInspectorOsEnum correctInspectorPlatform = e.getcorrectInspectorOs();
             final String dockerTarfilePath = e.getDockerTarfilePath();
-            // TODO need to handle more query params: hub project/version
-            final String correctInspectorRelUrl = String.format("%s?%s=%s", deriveEndpoint(requestUri), ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath);
+            final String correctInspectorRelUrl = deriveRelativeUrl(requestUri, dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
             String correctInspectorUrl;
             try {
                 correctInspectorUrl = deriveUrl(scheme, host, derivePort(correctInspectorPlatform), correctInspectorRelUrl);
@@ -72,7 +70,15 @@ public class ImageInspectorHandler {
         }
     }
 
-    // TODO unit test
+    // TODO move these methods to diff class?
+    private String deriveRelativeUrl(final String requestUri, final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir) {
+        final String relUrl = String.format("%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%b", deriveEndpoint(requestUri), ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath, ImageInspectorController.HUB_PROJECT_NAME_QUERY_PARAM,
+                hubProjectName, ImageInspectorController.HUB_PROJECT_VERSION_QUERY_PARAM, hubProjectVersion, ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, codeLocationPrefix,
+                ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, cleanupWorkingDir);
+        logger.debug(String.format("relativeUrl for redirect: %s", relUrl));
+        return relUrl;
+    }
+
     private String deriveEndpoint(final String requestUri) {
         final int lastSlashIndex = requestUri.lastIndexOf('/');
         final String endpoint = lastSlashIndex < 0 ? requestUri : requestUri.substring(lastSlashIndex + 1);
@@ -80,7 +86,7 @@ public class ImageInspectorHandler {
         return endpoint;
     }
 
-    // TODO unit test
+    // TODO this should be configurable?
     private int derivePort(final ImageInspectorOsEnum correctInspectorPlatform) throws HubIntegrationException {
         switch (correctInspectorPlatform) {
         case ALPINE:
@@ -94,7 +100,6 @@ public class ImageInspectorHandler {
         }
     }
 
-    // TODO unit test
     private String deriveUrl(final String scheme, final String host, final int port, final String relativeUrl) {
         final String slashLessRelativeUrl = relativeUrl.startsWith("/") ? relativeUrl.substring(1) : relativeUrl;
         final String url = String.format("%s://%s:%d/%s", scheme, host, port, slashLessRelativeUrl);

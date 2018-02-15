@@ -16,6 +16,16 @@ hub-imageinspector-ws is under development. You can use provided bash scripts to
 
 You only need files in the src/main/resources directory, but it's probably easiest to clone the whole repo. For the relative paths to be correct, execute the scripts (src/main/resources/demo-*.sh) from the top level directory (the one that contains build.gradle). Whichever script you use, you'll want to read the script to understand what it's doing.
 
+### ImageInspector Service Endpoint ###
+
+GET /getbdio
+* Mandatory query param: tarfile=`<path to Docker image tarfile>`
+* Optional query params:
+** hubprojectname=`<Hub project name>`
+** hubprojectversion=`<Hub project version>`
+** codelocationprefix=`<Hub CodeLocation name prefix>`
+** cleanup=`<cleanup working dirs when done: true or false; default: true>`
+
 ### Trying hub-imageinspector-ws in a Kubernetes (minikube) environment ##
 
 src/main/resources/demo-minikube.sh is a shell script that uses minikube to get a pod running, and then executes (and echo's) some curl commands to test the service.
@@ -41,10 +51,9 @@ You could send requests to any one of ports/containers and get the same result (
 
 Supported package manager database formats: apk, dpkg (which apt also uses), and rpm (which yum also uses). 
 
-### ImageInspector Service Endpoints ###
+### Other ImageInspector Service Endpoints ###
 
 ```
-GET /getbdio?tarfile=<path to Docker image tarfile>
 GET /trace # get history of http requests
 GET /health # check the health of the service
 GET /metrics # get Spring Boot-generated metrics in JSON format

@@ -34,17 +34,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ImageInspectorController {
-    static final String GET_BDIO_PATH = "/getbdio";
+    // Endpoint
+    private static final String GET_BDIO_PATH = "/getbdio";
+    // Mandatory query param
     static final String TARFILE_PATH_QUERY_PARAM = "tarfile";
-    // TODO there are more query params to extract to constants
+    // Optional query params
+    static final String HUB_PROJECT_NAME_QUERY_PARAM = "hubprojectname";
+    static final String HUB_PROJECT_VERSION_QUERY_PARAM = "hubprojectversion";
+    static final String CODELOCATION_PREFIX_QUERY_PARAM = "codelocationprefix";
+    static final String CLEANUP_WORKING_DIR_QUERY_PARAM = "cleanup";
 
     @Autowired
     private ImageInspectorHandler imageInspectorHandler;
 
     @RequestMapping(path = GET_BDIO_PATH, method = RequestMethod.GET)
-    public ResponseEntity<String> getBdio(final HttpServletRequest request, @RequestParam(value = TARFILE_PATH_QUERY_PARAM) final String tarFilePath, @RequestParam(value = "hubprojectname", defaultValue = "") final String hubProjectName,
-            @RequestParam(value = "hubprojectversion", defaultValue = "") final String hubProjectVersion, @RequestParam(value = "codelocationprefix", defaultValue = "") final String codeLocationPrefix,
-            @RequestParam(value = "cleanup", required = false, defaultValue = "true") final boolean cleanupWorkingDir) {
+    public ResponseEntity<String> getBdio(final HttpServletRequest request, @RequestParam(value = TARFILE_PATH_QUERY_PARAM) final String tarFilePath,
+            @RequestParam(value = HUB_PROJECT_NAME_QUERY_PARAM, defaultValue = "") final String hubProjectName, @RequestParam(value = HUB_PROJECT_VERSION_QUERY_PARAM, defaultValue = "") final String hubProjectVersion,
+            @RequestParam(value = CODELOCATION_PREFIX_QUERY_PARAM, defaultValue = "") final String codeLocationPrefix,
+            @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir) {
         return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
     }
 }
