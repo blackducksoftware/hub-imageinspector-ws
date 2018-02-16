@@ -30,7 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.blackducksoftware.integration.hub.bdio.model.SimpleBdioDocument;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorOsEnum;
 import com.blackducksoftware.integration.hub.imageinspector.api.WrongInspectorOsException;
@@ -48,7 +47,7 @@ public class ImageInspectorHandler {
     public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String tarFilePath, final String hubProjectName, final String hubProjectVersion,
             final String codeLocationPrefix, final boolean cleanupWorkingDir) {
         try {
-            final SimpleBdioDocument bdio = imageInspectorAction.getBdio(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
+            final String bdio = imageInspectorAction.getBdio(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
             return responseFactory.createResponse(bdio);
         } catch (final WrongInspectorOsException e) {
             logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", e.getMessage()));

@@ -23,7 +23,9 @@
  */
 package com.blackducksoftware.integration.hub.imageinspectorws.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.blackducksoftware.integration.hub.bdio.BdioWriter;
 import com.blackducksoftware.integration.hub.bdio.model.SimpleBdioDocument;
 import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
 import com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorApi;
+import com.google.gson.Gson;
 
 @Component
 public class ImageInspectorAction {
@@ -45,16 +49,23 @@ public class ImageInspectorAction {
     @Autowired
     private ProgramVersion programVersion;
 
+    @Autowired
+    private Gson gson;
+
     @Value("${current.linux.distro:}")
     private String currentLinuxDistro;
 
-    public SimpleBdioDocument getBdio(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir)
+    public String getBdio(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir)
             throws HubIntegrationException, IOException, InterruptedException {
         final String msg = String.format("hub-imageinspector-ws v%s: dockerTarfilePath: %s, hubProjectName: %s, hubProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b", programVersion.getProgramVersion(), dockerTarfilePath,
                 hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
         logger.info(msg);
         logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
         final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, currentLinuxDistro);
-        return bdio;
+        final ByteArrayOutputStream bdioBytes = new ByteArrayOutputStream();
+        try (BdioWriter writer = new BdioWriter(gson, bdioBytes)) {
+            writer.writeSimpleBdioDocument(bdio);
+        }
+        return bdioBytes.toString(StandardCharsets.UTF_8.name());
     }
 }

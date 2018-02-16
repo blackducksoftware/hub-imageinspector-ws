@@ -23,24 +23,16 @@
  */
 package com.blackducksoftware.integration.hub.imageinspectorws.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.blackducksoftware.integration.hub.bdio.model.SimpleBdioDocument;
-import com.google.gson.Gson;
-
 @Component
 public class ResponseFactory {
 
-    @Autowired
-    private Gson gson;
-
-    public ResponseEntity<String> createResponse(final SimpleBdioDocument bdio) {
-        final String responseBody = gson.toJson(bdio);
-        return new ResponseEntity<>(responseBody, HttpStatus.OK);
+    public ResponseEntity<String> createResponse(final String bdio) {
+        return new ResponseEntity<>(bdio, HttpStatus.OK);
     }
 
     public ResponseEntity<String> createResponse(final HttpStatus status, final String warning) {
