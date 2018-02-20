@@ -86,7 +86,7 @@ sleep 10
 echo "--------------------------------------------------------------"
 echo "Using service to get BDIO for alpine"
 echo "--------------------------------------------------------------"
-clusterIp=$(kubectl cluster-info|grep "is running at"|sed -e 's/^.*https:\/\///' -e 's/:.*$//')
+clusterIp=$(minikube ip)
 ##servicePort=$(kubectl describe services hub-imageinspector-ws|grep -v '^Type:'|grep NodePort|awk '{print $3}'|sed 's/\/TCP//')
 servicePort=8080
 cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar"

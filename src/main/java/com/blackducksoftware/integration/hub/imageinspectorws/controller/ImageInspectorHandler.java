@@ -85,7 +85,7 @@ public class ImageInspectorHandler {
         return endpoint;
     }
 
-    // TODO this should be configurable?
+    // TODO this should be configurable
     private int derivePort(final ImageInspectorOsEnum correctInspectorPlatform) throws IntegrationException {
         switch (correctInspectorPlatform) {
         case ALPINE:
