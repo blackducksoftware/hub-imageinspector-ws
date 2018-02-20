@@ -30,7 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorOsEnum;
 import com.blackducksoftware.integration.hub.imageinspector.api.WrongInspectorOsException;
 
@@ -57,7 +57,7 @@ public class ImageInspectorHandler {
             String correctInspectorUrl;
             try {
                 correctInspectorUrl = deriveUrl(scheme, host, derivePort(correctInspectorPlatform), correctInspectorRelUrl);
-            } catch (final HubIntegrationException deriveUrlException) {
+            } catch (final IntegrationException deriveUrlException) {
                 logger.error(String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage()), deriveUrlException);
                 return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, deriveUrlException.getMessage());
             }
@@ -86,7 +86,7 @@ public class ImageInspectorHandler {
     }
 
     // TODO this should be configurable?
-    private int derivePort(final ImageInspectorOsEnum correctInspectorPlatform) throws HubIntegrationException {
+    private int derivePort(final ImageInspectorOsEnum correctInspectorPlatform) throws IntegrationException {
         switch (correctInspectorPlatform) {
         case ALPINE:
             return 8080;
@@ -95,7 +95,7 @@ public class ImageInspectorHandler {
         case UBUNTU:
             return 8082;
         default:
-            throw new HubIntegrationException(String.format("Unexpected inspector platform: %s", correctInspectorPlatform.name()));
+            throw new IntegrationException(String.format("Unexpected inspector platform: %s", correctInspectorPlatform.name()));
         }
     }
 

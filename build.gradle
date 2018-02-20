@@ -69,7 +69,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile 'com.blackducksoftware.integration:hub-imageinspector-lib:1.0.1-SNAPSHOT'
+    compile 'com.blackducksoftware.integration:hub-imageinspector-lib:1.0.2-SNAPSHOT'
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("io.prometheus:simpleclient_spring_boot:0.2.0")

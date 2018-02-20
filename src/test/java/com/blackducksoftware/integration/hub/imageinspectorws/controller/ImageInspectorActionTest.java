@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.blackducksoftware.integration.hub.exception.HubIntegrationException;
+import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.imageinspector.api.WrongInspectorOsException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -31,7 +31,7 @@ public class ImageInspectorActionTest {
 
     @Ignore // TODO TEMP
     @Test
-    public void test() throws HubIntegrationException, IOException, InterruptedException {
+    public void test() throws IntegrationException, IOException, InterruptedException {
         try {
             imageInspectorAction.getBdio("/tmp/alpine.tar", "SB001", "testVersion", "testCodeLocationPrefix", true);
         } catch (final WrongInspectorOsException e) {
