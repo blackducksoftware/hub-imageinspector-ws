@@ -73,13 +73,12 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("io.prometheus:simpleclient_spring_boot:0.2.0")
-    compile("io.prometheus:simpleclient_hotspot:0.2.0") // TODO check that we need this
-    compile("io.prometheus:simpleclient_dropwizard:0.2.0") // TODO check that we need this
+    compile("io.prometheus:simpleclient_hotspot:0.2.0")
+    compile("io.prometheus:simpleclient_dropwizard:0.2.0")
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile 'org.apache.commons:commons-exec:1.3'
     testCompile 'io.fabric8:kubernetes-client:3.1.8'
     testCompile 'io.fabric8:kubernetes-model:2.0.8'
-    testCompile 'io.fabric8:openshift-client:3.1.1' // TODO ???
 }
 
 
