@@ -71,7 +71,6 @@ public class InMinikubeTest {
         boolean serviceIsHealthy = false;
         final int healthCheckLimit = 20;
         for (int i = 0; i < healthCheckLimit; i++) {
-            Thread.sleep(10000L);
             String[] healthCheckOutput;
             try {
                 System.out.printf("Port %s Health check attempt %d of %d:\n", port, i, healthCheckLimit);
@@ -90,6 +89,7 @@ public class InMinikubeTest {
             } catch (final IntegrationException e) {
                 System.out.printf("Port %s Health check failed: %s\n", port, e.getMessage());
             }
+            Thread.sleep(10000L);
         }
         return serviceIsHealthy;
     }
@@ -145,6 +145,9 @@ public class InMinikubeTest {
             System.out.printf("getBdio output: %s\n", line);
         }
         final String getBdioOutputJoined = Arrays.asList(getBdioOutput).stream().collect(Collectors.joining(";"));
-        // TODO
+        System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
+        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
+                PORT_ALPINE);
+        assertTrue(getBdioOutputJoined.contains(String.format(";%s", expectedRedirect)));
     }
 }
