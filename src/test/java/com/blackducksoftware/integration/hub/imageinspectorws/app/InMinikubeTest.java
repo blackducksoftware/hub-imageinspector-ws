@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -23,15 +24,20 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 
 public class InMinikubeTest {
     private static final String POD_NAME = "hub-imageinspector-ws";
-    static KubernetesClient client;
+    private static final String PORT_ALPINE = "8080";
+    private static final String PORT_CENTOS = "8081";
+    private static final String PORT_UBUNTU = "8082";
+    private static KubernetesClient client;
+    private static String clusterIp;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         final String[] ipOutput = new Executor().executeCommand("minikube ip", 5000L);
         for (final String line : ipOutput) {
-            System.out.printf("getBdio output: %s\n", line);
+            System.out.printf("get IP output: %s\n", line);
         }
-
+        clusterIp = ipOutput[0];
+        // TODO verify kube running somewhere around here
         client = new DefaultKubernetesClient();
         try {
             System.out.printf("API version: %s\n", client.getApiVersion());
@@ -52,18 +58,28 @@ public class InMinikubeTest {
             System.out.printf("Service: %s; app: %s\n", service.getMetadata().getName(), service.getMetadata().getLabels().get("app"));
         }
         Thread.sleep(20000L);
-        final int healthCheckLimit = 20;
+        assertTrue(isServiceHealthy(PORT_ALPINE));
+        assertTrue(isServiceHealthy(PORT_CENTOS));
+        assertTrue(isServiceHealthy(PORT_UBUNTU));
+        final String[] getPodsOutput = new Executor().executeCommand("kubectl get pods", 5000L);
+        final String getPodsOutputJoined = Arrays.asList(getPodsOutput).stream().collect(Collectors.joining("\n"));
+        System.out.printf("get pods output:\n%s\n", getPodsOutputJoined);
+        System.out.println("The service is ready");
+    }
+
+    private static boolean isServiceHealthy(final String port) throws InterruptedException, UnsupportedEncodingException {
         boolean serviceIsHealthy = false;
+        final int healthCheckLimit = 20;
         for (int i = 0; i < healthCheckLimit; i++) {
             Thread.sleep(10000L);
             String[] healthCheckOutput;
             try {
-                System.out.printf("Health check attempt %d of %d:\n", i, healthCheckLimit);
-                healthCheckOutput = new Executor().executeCommand("curl -i http://192.168.99.100:8080/health", 5000L);
+                System.out.printf("Port %s Health check attempt %d of %d:\n", port, i, healthCheckLimit);
+                healthCheckOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/health", clusterIp, port), 5000L);
                 for (final String line : healthCheckOutput) {
-                    System.out.printf("Health check output: %s\n", line);
+                    System.out.printf("Port %s Health check output: %s\n", port, line);
                     if ((line.startsWith("HTTP")) && (line.contains(" 200"))) {
-                        System.out.println("Health check passed");
+                        System.out.printf("Port %s Health check passed\n", port);
                         serviceIsHealthy = true;
                         break;
                     }
@@ -71,28 +87,23 @@ public class InMinikubeTest {
                 if (serviceIsHealthy) {
                     break;
                 }
-                final String[] getPodsOutput = new Executor().executeCommand("kubectl get pods", 5000L);
-                final String getPodsOutputJoined = Arrays.asList(getPodsOutput).stream().collect(Collectors.joining("\n"));
-                System.out.printf("get pods output:\n%s\n", getPodsOutputJoined);
             } catch (final IntegrationException e) {
-                System.out.printf("Health check failed: %s\n", e.getMessage());
+                System.out.printf("Port %s Health check failed: %s\n", port, e.getMessage());
             }
         }
-        assertTrue(serviceIsHealthy);
-        System.out.println("The service is ready");
+        return serviceIsHealthy;
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws UnsupportedEncodingException, IntegrationException, InterruptedException {
         client.close();
-
-        new Executor().executeCommand("kubectl delete service hub-imageinspector-ws", 5000L);
-        new Executor().executeCommand("kubectl delete pod hub-imageinspector-ws", 5000L);
+        new Executor().executeCommand(String.format("kubectl delete service %s", POD_NAME), 5000L);
+        new Executor().executeCommand(String.format("kubectl delete pod %s", POD_NAME), 5000L);
         Thread.sleep(20000L);
         boolean podExited = false;
         for (int i = 0; i < 10; i++) {
             try {
-                new Executor().executeCommand("kubectl get pod hub-imageinspector-ws", 5000L);
+                new Executor().executeCommand(String.format("kubectl get pod %s", POD_NAME), 5000L);
             } catch (final IntegrationException e) {
                 if (e.getMessage().contains("NotFound")) {
                     podExited = true;
@@ -109,9 +120,10 @@ public class InMinikubeTest {
         System.out.println("Test has completed");
     }
 
+    @Ignore // TODO TEMP
     @Test
-    public void test() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
-        final String[] getBdioOutput = new Executor().executeCommand("curl -i http://192.168.99.100:8080/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", 5000L);
+    public void testAlpineOnAlpine() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
+        final String[] getBdioOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_ALPINE), 5000L);
         for (final String line : getBdioOutput) {
             System.out.printf("getBdio output: %s\n", line);
         }
@@ -124,5 +136,15 @@ public class InMinikubeTest {
         assertTrue(getBdioOutputJoined.contains("libressl2.6-libssl/"));
         assertTrue(getBdioOutputJoined.contains("x86_64"));
         assertTrue(getBdioOutputJoined.endsWith("]"));
+    }
+
+    @Test
+    public void testAlpineOnUbuntu() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
+        final String[] getBdioOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_UBUNTU), 5000L);
+        for (final String line : getBdioOutput) {
+            System.out.printf("getBdio output: %s\n", line);
+        }
+        final String getBdioOutputJoined = Arrays.asList(getBdioOutput).stream().collect(Collectors.joining(";"));
+        // TODO
     }
 }
