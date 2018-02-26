@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 buildscript {
     repositories {
     	jcenter()
@@ -79,6 +81,13 @@ dependencies {
     testCompile 'org.apache.commons:commons-exec:1.3'
     testCompile 'io.fabric8:kubernetes-client:3.1.8'
     testCompile 'io.fabric8:kubernetes-model:2.0.8'
+}
+
+// Prepare test config file
+task buildKubeTestPodConfig(type: Copy) {
+	from 'src/main/resources/kube-test-pod.yml'
+	into 'build/test'
+	filter(ReplaceTokens, tokens: [CURRENT_DIR: System.getProperty("user.dir")])
 }
 
 
