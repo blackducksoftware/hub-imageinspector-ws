@@ -1,12 +1,18 @@
 package com.blackducksoftware.integration.hub.imageinspectorws.app;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.junit.AfterClass;
@@ -14,7 +20,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
-import com.blackducksoftware.integration.hub.imageinspector.linux.executor.Executor;
 
 import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.api.model.Service;
@@ -32,13 +37,13 @@ public class InMinikubeTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        final String[] kubeStatusOutput = new Executor().executeCommand("minikube status", 10000L);
-        final String kubeStatusOutputJoined = Arrays.asList(kubeStatusOutput).stream().collect(Collectors.joining("\n"));
+
+        final String kubeStatusOutputJoined = execCmd("minikube status", 15);
         System.out.println(String.format("kubeStatusOutputJoined: %s", kubeStatusOutputJoined));
         assertTrue("Minikube is not running", kubeStatusOutputJoined.contains("minikube: Running"));
         assertTrue("Minikube is not running", kubeStatusOutputJoined.contains("cluster: Running"));
 
-        final String[] ipOutput = new Executor().executeCommand("minikube ip", 10000L);
+        final String[] ipOutput = execCmd("minikube ip", 10).split("\n");
         clusterIp = ipOutput[0];
         client = new DefaultKubernetesClient();
         try {
@@ -47,7 +52,7 @@ public class InMinikubeTest {
             e.printStackTrace();
         }
 
-        final String[] dockerEnvOutput = new Executor().executeCommand("minikube docker-env", 5000L);
+        final String[] dockerEnvOutput = execCmd("minikube docker-env", 5).split("\n");
         final Map<String, String> dockerEnv = new HashMap<>();
         for (final String line : dockerEnvOutput) {
             if (line.startsWith("export")) {
@@ -58,20 +63,28 @@ public class InMinikubeTest {
             }
         }
 
-        new Executor().executeCommand("mkdir -p build/test/target", 5000L);
-        new Executor().executeCommand("docker pull alpine:latest", 120000L, dockerEnv);
-        new Executor().executeCommand("docker save -o build/test/target/alpine.tar alpine:latest", 20000L, dockerEnv);
-        new Executor().executeCommand("chmod a+r build/test/target/alpine.tar", 5000L);
+        execCmd("mkdir -p build/test/target", 5);
+        execCmd("docker pull alpine:latest", 120, dockerEnv);
+        execCmd("docker save -o build/test/target/alpine.tar alpine:latest", 20, dockerEnv);
+        execCmd("chmod a+r build/test/target/alpine.tar", 5);
 
-        new Executor().executeCommand("docker pull debian:latest", 120000L, dockerEnv);
-        new Executor().executeCommand("docker save -o build/test/target/debian.tar debian:latest", 20000L, dockerEnv);
-        new Executor().executeCommand("chmod a+r build/test/target/debian.tar", 5000L);
+        execCmd("docker pull debian:latest", 120, dockerEnv);
+        execCmd("docker save -o build/test/target/debian.tar debian:latest", 20, dockerEnv);
+        execCmd("chmod a+r build/test/target/debian.tar", 5);
 
-        new Executor().executeCommand("docker pull fedora:latest", 120000L, dockerEnv);
-        new Executor().executeCommand("docker save -o build/test/target/fedora.tar fedora:latest", 20000L, dockerEnv);
-        new Executor().executeCommand("chmod a+r build/test/target/fedora.tar", 5000L);
+        execCmd("docker pull fedora:latest", 120, dockerEnv);
+        execCmd("docker save -o build/test/target/fedora.tar fedora:latest", 20, dockerEnv);
+        execCmd("chmod a+r build/test/target/fedora.tar", 5);
 
-        client.load(InMinikubeTest.class.getResourceAsStream("kube-test-pod.yml")).inNamespace("default").createOrReplace();
+        InputStream configInputStream = InMinikubeTest.class.getResourceAsStream("kube-test-pod.yml");
+        if (configInputStream == null) {
+            final File configFile = new File("build/classes/java/test/com/blackducksoftware/integration/hub/imageinspectorws/app/kube-test-pod.yml");
+            assertNotNull(configFile);
+            assertTrue(configFile.exists());
+            configInputStream = new FileInputStream(configFile);
+        }
+        assertNotNull(configInputStream);
+        client.load(configInputStream).inNamespace("default").createOrReplace();
         Thread.sleep(10000L);
         client.load(InMinikubeTest.class.getResourceAsStream("/kube-service.yml")).inNamespace("default").createOrReplace();
         Thread.sleep(5000L);
@@ -94,14 +107,14 @@ public class InMinikubeTest {
         System.out.println("The service is ready");
     }
 
-    private static boolean isServiceHealthy(final String port) throws InterruptedException, UnsupportedEncodingException {
+    private static boolean isServiceHealthy(final String port) throws InterruptedException, IOException {
         boolean serviceIsHealthy = false;
         final int healthCheckLimit = 20;
         for (int i = 0; i < healthCheckLimit; i++) {
             String[] healthCheckOutput;
             try {
                 System.out.printf("Port %s Health check attempt %d of %d:\n", port, i, healthCheckLimit);
-                healthCheckOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/health", clusterIp, port), 10000L);
+                healthCheckOutput = execCmd(String.format("curl -i http://%s:%s/health", clusterIp, port), 10).split("\n");
                 for (final String line : healthCheckOutput) {
                     System.out.printf("Port %s Health check output: %s\n", port, line);
                     if ((line.startsWith("HTTP")) && (line.contains(" 200"))) {
@@ -122,23 +135,24 @@ public class InMinikubeTest {
     }
 
     @AfterClass
-    public static void tearDownAfterClass() throws UnsupportedEncodingException, IntegrationException, InterruptedException {
+    public static void tearDownAfterClass() throws IntegrationException, InterruptedException, IOException {
         if (client != null) {
             client.close();
         }
-        new Executor().executeCommand(String.format("kubectl delete service %s", POD_NAME), 10000L);
-        new Executor().executeCommand(String.format("kubectl delete pod %s", POD_NAME), 10000L);
+        execCmd(String.format("kubectl delete service %s", POD_NAME), 10);
+        execCmd(String.format("kubectl delete pod %s", POD_NAME), 10);
         Thread.sleep(20000L);
         boolean podExited = false;
         for (int i = 0; i < 10; i++) {
             try {
-                new Executor().executeCommand(String.format("kubectl get pod %s", POD_NAME), 10000L);
-            } catch (final IntegrationException e) {
+                execCmd(String.format("kubectl get pod %s", POD_NAME), 10);
+            } catch (final Exception e) {
+                System.out.println(String.format("kubectl get pod %s failed: %s", POD_NAME, e.getMessage()));
                 if (e.getMessage().contains("NotFound")) {
                     podExited = true;
                     break;
                 } else {
-                    throw e;
+                    System.out.println("Don't understand this error; continuing to wait...");
                 }
             }
             Thread.sleep(10000L);
@@ -150,9 +164,8 @@ public class InMinikubeTest {
     }
 
     @Test
-    public void testAlpineOnAlpine() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
-        final String[] getBdioOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_ALPINE), 10000L);
-        final String getBdioOutputJoined = Arrays.asList(getBdioOutput).stream().collect(Collectors.joining("\n"));
+    public void testAlpineOnAlpine() throws InterruptedException, IntegrationException, IOException {
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_ALPINE), 30);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("alpine_latest_lib_apk_APK"));
         assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
@@ -165,9 +178,8 @@ public class InMinikubeTest {
     }
 
     @Test
-    public void testAlpineOnUbuntu() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
-        final String[] getBdioOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_UBUNTU), 10000L);
-        final String getBdioOutputJoined = Arrays.asList(getBdioOutput).stream().collect(Collectors.joining("\n"));
+    public void testAlpineOnUbuntu() throws InterruptedException, IntegrationException, IOException {
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_UBUNTU), 10);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
                 PORT_ALPINE);
@@ -175,9 +187,8 @@ public class InMinikubeTest {
     }
 
     @Test
-    public void testAlpineOnCentos() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
-        final String[] getBdioOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_CENTOS), 10000L);
-        final String getBdioOutputJoined = Arrays.asList(getBdioOutput).stream().collect(Collectors.joining("\n"));
+    public void testAlpineOnCentos() throws InterruptedException, IntegrationException, IOException {
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_CENTOS), 10);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
                 PORT_ALPINE);
@@ -185,24 +196,67 @@ public class InMinikubeTest {
     }
 
     @Test
-    public void testFedoraOnCentos() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
-        final String[] getBdioOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/fedora.tar", clusterIp, PORT_CENTOS), 10000L);
-        final String getBdioOutputJoined = Arrays.asList(getBdioOutput).stream().collect(Collectors.joining("\n"));
+    public void testFedoraOnCentos() throws InterruptedException, IntegrationException, IOException {
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/fedora.tar", clusterIp, PORT_CENTOS), 120);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("file-libs/"));
         assertTrue(getBdioOutputJoined.contains("x86_64"));
         assertTrue(getBdioOutputJoined.endsWith("]"));
-
     }
 
     @Test
-    public void testDebianOnUbuntu() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
-        final String[] getBdioOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/debian.tar", clusterIp, PORT_UBUNTU), 10000L);
-        final String getBdioOutputJoined = Arrays.asList(getBdioOutput).stream().collect(Collectors.joining("\n"));
+    public void testDebianOnUbuntu() throws InterruptedException, IntegrationException, IOException {
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/debian.tar", clusterIp, PORT_UBUNTU), 120);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("libsemanage-common/"));
         assertTrue(getBdioOutputJoined.contains("amd64"));
         assertTrue(getBdioOutputJoined.endsWith("]"));
 
+    }
+
+    // @Test
+    public void tttt() throws IOException, InterruptedException, IntegrationException {
+        final String stdout = execCmd("minikube ip", 20);
+        System.out.println(String.format("stdout: '%s'", stdout));
+    }
+
+    private static String execCmd(final String cmd, final long timeout) throws IOException, InterruptedException, IntegrationException {
+        return execCmd(cmd, timeout, null);
+    }
+
+    private static String execCmd(final String cmd, final long timeout, final Map<String, String> env) throws IOException, InterruptedException, IntegrationException {
+        System.out.println(String.format("Executing: %s", cmd));
+        final ProcessBuilder pb = new ProcessBuilder("bash", "-c", cmd);
+        pb.redirectOutput(Redirect.PIPE);
+        pb.redirectError(Redirect.PIPE);
+        pb.environment().put("PATH", "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin");
+        if (env != null) {
+            pb.environment().putAll(env);
+        }
+        final Process p = pb.start();
+        final boolean finished = p.waitFor(timeout, TimeUnit.SECONDS);
+        if (!finished) {
+            throw new InterruptedException("Command timed out");
+        }
+        final int retCode = p.exitValue();
+        if (retCode != 0) {
+            final String stderr = toString(p.getErrorStream());
+            System.out.println(String.format("%s: stderr: %s", cmd, stderr));
+            throw new IntegrationException(String.format("Command failed: %s", stderr));
+        }
+        return toString(p.getInputStream());
+    }
+
+    private static String toString(final InputStream is) throws IOException {
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        final StringBuilder builder = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            if (builder.length() > 0) {
+                builder.append("\n");
+            }
+            builder.append(line);
+        }
+        return builder.toString();
     }
 }
