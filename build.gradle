@@ -84,11 +84,14 @@ dependencies {
 }
 
 // Prepare test config file
+// System.getProperty("user.dir")
 task buildKubeTestPodConfig(type: Copy) {
 	from 'src/main/resources/kube-test-pod.yml'
-	into 'build/test'
+	into 'build/classes/java/test/com/blackducksoftware/integration/hub/imageinspectorws/app'
 	filter(ReplaceTokens, tokens: [CURRENT_DIR: System.getProperty("user.dir")])
 }
+
+test.dependsOn buildKubeTestPodConfig
 
 
 //////////// Create Docker Containers ///////////

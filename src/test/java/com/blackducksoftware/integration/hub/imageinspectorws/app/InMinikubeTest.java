@@ -5,11 +5,12 @@ import static org.junit.Assert.assertTrue;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
@@ -31,19 +32,6 @@ public class InMinikubeTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        new Executor().executeCommand("mkdir -p build/test/target", 5000L);
-        new Executor().executeCommand("docker pull alpine:latest", 120000L);
-        new Executor().executeCommand("docker save -o build/test/target/alpine.tar alpine:latest", 20000L);
-        new Executor().executeCommand("chmod a+r build/test/target/alpine.tar", 5000L);
-
-        new Executor().executeCommand("docker pull debian:latest", 120000L);
-        new Executor().executeCommand("docker save -o build/test/target/debian.tar debian:latest", 20000L);
-        new Executor().executeCommand("chmod a+r build/test/target/debian.tar", 5000L);
-
-        new Executor().executeCommand("docker pull fedora:latest", 120000L);
-        new Executor().executeCommand("docker save -o build/test/target/fedora.tar fedora:latest", 20000L);
-        new Executor().executeCommand("chmod a+r build/test/target/fedora.tar", 5000L);
-
         final String[] kubeStatusOutput = new Executor().executeCommand("minikube status", 10000L);
         final String kubeStatusOutputJoined = Arrays.asList(kubeStatusOutput).stream().collect(Collectors.joining("\n"));
         System.out.println(String.format("kubeStatusOutputJoined: %s", kubeStatusOutputJoined));
@@ -59,7 +47,31 @@ public class InMinikubeTest {
             e.printStackTrace();
         }
 
-        client.load(InMinikubeTest.class.getResourceAsStream("/kube-test-pod.yml")).inNamespace("default").createOrReplace();
+        final String[] dockerEnvOutput = new Executor().executeCommand("minikube docker-env", 5000L);
+        final Map<String, String> dockerEnv = new HashMap<>();
+        for (final String line : dockerEnvOutput) {
+            if (line.startsWith("export")) {
+                final String envVariableName = line.substring("export".length() + 1, line.indexOf("="));
+                final String envVariableValue = line.substring(line.indexOf("=") + 2, line.length() - 1);
+                System.out.println(String.format("env var assignment: %s=%s", envVariableName, envVariableValue));
+                dockerEnv.put(envVariableName, envVariableValue);
+            }
+        }
+
+        new Executor().executeCommand("mkdir -p build/test/target", 5000L);
+        new Executor().executeCommand("docker pull alpine:latest", 120000L, dockerEnv);
+        new Executor().executeCommand("docker save -o build/test/target/alpine.tar alpine:latest", 20000L, dockerEnv);
+        new Executor().executeCommand("chmod a+r build/test/target/alpine.tar", 5000L);
+
+        new Executor().executeCommand("docker pull debian:latest", 120000L, dockerEnv);
+        new Executor().executeCommand("docker save -o build/test/target/debian.tar debian:latest", 20000L, dockerEnv);
+        new Executor().executeCommand("chmod a+r build/test/target/debian.tar", 5000L);
+
+        new Executor().executeCommand("docker pull fedora:latest", 120000L, dockerEnv);
+        new Executor().executeCommand("docker save -o build/test/target/fedora.tar fedora:latest", 20000L, dockerEnv);
+        new Executor().executeCommand("chmod a+r build/test/target/fedora.tar", 5000L);
+
+        client.load(InMinikubeTest.class.getResourceAsStream("kube-test-pod.yml")).inNamespace("default").createOrReplace();
         Thread.sleep(10000L);
         client.load(InMinikubeTest.class.getResourceAsStream("/kube-service.yml")).inNamespace("default").createOrReplace();
         Thread.sleep(5000L);
@@ -79,9 +91,6 @@ public class InMinikubeTest {
         assertTrue(isServiceHealthy(PORT_ALPINE));
         assertTrue(isServiceHealthy(PORT_CENTOS));
         assertTrue(isServiceHealthy(PORT_UBUNTU));
-        final String[] getPodsOutput = new Executor().executeCommand("kubectl get pods", 10000L);
-        final String getPodsOutputJoined = Arrays.asList(getPodsOutput).stream().collect(Collectors.joining("\n"));
-        System.out.printf("get pods output:\n%s\n", getPodsOutputJoined);
         System.out.println("The service is ready");
     }
 
@@ -140,11 +149,10 @@ public class InMinikubeTest {
         System.out.println("Test has completed");
     }
 
-    @Ignore // TODO TEMP
     @Test
     public void testAlpineOnAlpine() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
         final String[] getBdioOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_ALPINE), 10000L);
-        final String getBdioOutputJoined = Arrays.asList(getBdioOutput).stream().collect(Collectors.joining(";"));
+        final String getBdioOutputJoined = Arrays.asList(getBdioOutput).stream().collect(Collectors.joining("\n"));
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("alpine_latest_lib_apk_APK"));
         assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
@@ -156,18 +164,16 @@ public class InMinikubeTest {
         assertTrue(getBdioOutputJoined.endsWith("]"));
     }
 
-    @Ignore // TODO TEMP
     @Test
     public void testAlpineOnUbuntu() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
         final String[] getBdioOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_UBUNTU), 10000L);
-        final String getBdioOutputJoined = Arrays.asList(getBdioOutput).stream().collect(Collectors.joining(";"));
+        final String getBdioOutputJoined = Arrays.asList(getBdioOutput).stream().collect(Collectors.joining("\n"));
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
                 PORT_ALPINE);
-        assertTrue(getBdioOutputJoined.contains(String.format(";%s", expectedRedirect)));
+        assertTrue(getBdioOutputJoined.contains(String.format("%s", expectedRedirect)));
     }
 
-    @Ignore // TODO TEMP
     @Test
     public void testAlpineOnCentos() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
         final String[] getBdioOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_CENTOS), 10000L);
@@ -175,10 +181,9 @@ public class InMinikubeTest {
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
                 PORT_ALPINE);
-        assertTrue(getBdioOutputJoined.contains(String.format(";%s", expectedRedirect)));
+        assertTrue(getBdioOutputJoined.contains(String.format("%s", expectedRedirect)));
     }
 
-    @Ignore // TODO TEMP
     @Test
     public void testFedoraOnCentos() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException, IntegrationException {
         final String[] getBdioOutput = new Executor().executeCommand(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/fedora.tar", clusterIp, PORT_CENTOS), 10000L);
