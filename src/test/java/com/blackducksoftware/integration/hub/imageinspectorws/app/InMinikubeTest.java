@@ -18,8 +18,10 @@ import java.util.stream.Collectors;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.blackducksoftware.integration.exception.IntegrationException;
+import com.blackducksoftware.integration.test.annotation.IntegrationTest;
 
 import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.api.model.Service;
@@ -27,6 +29,7 @@ import io.fabric8.kubernetes.api.model.ServiceList;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 
+@Category(IntegrationTest.class)
 public class InMinikubeTest {
     private static final String POD_NAME = "hub-imageinspector-ws";
     private static final String PORT_ALPINE = "8080";
@@ -91,9 +94,6 @@ public class InMinikubeTest {
         final PodList podList = client.pods().inNamespace("default").list();
         final String podListString = podList.getItems().stream().map(pod -> pod.getMetadata().getName()).collect(Collectors.joining("\n"));
         System.out.printf("Pods: %s\n", podListString);
-        // for (final Pod pod : podList.getItems()) {
-        // System.out.printf("Pod: %s; app: %s\n", pod.getMetadata().getName(), pod.getMetadata().getLabels().get("app"));
-        // }
 
         final ServiceList serviceList = client.services().inNamespace("default").list();
         for (final Service service : serviceList.getItems()) {
@@ -106,33 +106,6 @@ public class InMinikubeTest {
         System.out.println("The service is ready");
 
         Thread.sleep(20000L);
-    }
-
-    private static boolean isServiceHealthy(final String port) throws InterruptedException, IOException {
-        boolean serviceIsHealthy = false;
-        final int healthCheckLimit = 30;
-        for (int i = 0; i < healthCheckLimit; i++) {
-            String[] healthCheckOutput;
-            try {
-                System.out.printf("Port %s Health check attempt %d of %d:\n", port, i, healthCheckLimit);
-                healthCheckOutput = execCmd(String.format("curl -i http://%s:%s/health", clusterIp, port), 10).split("\n");
-                for (final String line : healthCheckOutput) {
-                    System.out.printf("Port %s Health check output: %s\n", port, line);
-                    if ((line.startsWith("HTTP")) && (line.contains(" 200"))) {
-                        System.out.printf("Port %s Health check passed\n", port);
-                        serviceIsHealthy = true;
-                        break;
-                    }
-                }
-                if (serviceIsHealthy) {
-                    break;
-                }
-            } catch (final IntegrationException e) {
-                System.out.printf("Port %s Health check failed: %s\n", port, e.getMessage());
-            }
-            Thread.sleep(10000L);
-        }
-        return serviceIsHealthy;
     }
 
     @AfterClass
@@ -270,4 +243,32 @@ public class InMinikubeTest {
         }
         return builder.toString();
     }
+
+    private static boolean isServiceHealthy(final String port) throws InterruptedException, IOException {
+        boolean serviceIsHealthy = false;
+        final int healthCheckLimit = 30;
+        for (int i = 0; i < healthCheckLimit; i++) {
+            String[] healthCheckOutput;
+            try {
+                System.out.printf("Port %s Health check attempt %d of %d:\n", port, i, healthCheckLimit);
+                healthCheckOutput = execCmd(String.format("curl -i http://%s:%s/health", clusterIp, port), 10).split("\n");
+                for (final String line : healthCheckOutput) {
+                    System.out.printf("Port %s Health check output: %s\n", port, line);
+                    if ((line.startsWith("HTTP")) && (line.contains(" 200"))) {
+                        System.out.printf("Port %s Health check passed\n", port);
+                        serviceIsHealthy = true;
+                        break;
+                    }
+                }
+                if (serviceIsHealthy) {
+                    break;
+                }
+            } catch (final IntegrationException e) {
+                System.out.printf("Port %s Health check failed: %s\n", port, e.getMessage());
+            }
+            Thread.sleep(10000L);
+        }
+        return serviceIsHealthy;
+    }
+
 }
