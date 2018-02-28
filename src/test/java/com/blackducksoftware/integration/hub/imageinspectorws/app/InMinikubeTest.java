@@ -79,11 +79,10 @@ public class InMinikubeTest {
         InputStream configInputStream = InMinikubeTest.class.getResourceAsStream("kube-test-pod.yml");
         if (configInputStream == null) {
             final File configFile = new File("build/classes/java/test/com/blackducksoftware/integration/hub/imageinspectorws/app/kube-test-pod.yml");
-            assertNotNull(configFile);
-            assertTrue(configFile.exists());
+            assertTrue("Unable to find pod config file", configFile.exists());
             configInputStream = new FileInputStream(configFile);
         }
-        assertNotNull(configInputStream);
+        assertNotNull("Unable to load pod config file", configInputStream);
         client.load(configInputStream).inNamespace("default").createOrReplace();
         Thread.sleep(10000L);
         client.load(InMinikubeTest.class.getResourceAsStream("/kube-service.yml")).inNamespace("default").createOrReplace();
@@ -101,15 +100,17 @@ public class InMinikubeTest {
             System.out.printf("Service: %s; app: %s\n", service.getMetadata().getName(), service.getMetadata().getLabels().get("app"));
         }
         Thread.sleep(20000L);
-        assertTrue(isServiceHealthy(PORT_ALPINE));
-        assertTrue(isServiceHealthy(PORT_CENTOS));
-        assertTrue(isServiceHealthy(PORT_UBUNTU));
+        assertTrue("never got a successful alpine service health check", isServiceHealthy(PORT_ALPINE));
+        assertTrue("never got a successful centos service health check", isServiceHealthy(PORT_CENTOS));
+        assertTrue("never got a successful ubuntu service health check", isServiceHealthy(PORT_UBUNTU));
         System.out.println("The service is ready");
+
+        Thread.sleep(20000L);
     }
 
     private static boolean isServiceHealthy(final String port) throws InterruptedException, IOException {
         boolean serviceIsHealthy = false;
-        final int healthCheckLimit = 20;
+        final int healthCheckLimit = 30;
         for (int i = 0; i < healthCheckLimit; i++) {
             String[] healthCheckOutput;
             try {
@@ -135,13 +136,22 @@ public class InMinikubeTest {
     }
 
     @AfterClass
-    public static void tearDownAfterClass() throws IntegrationException, InterruptedException, IOException {
+    public static void tearDownAfterClass() {
         if (client != null) {
             client.close();
         }
-        execCmd(String.format("kubectl delete service %s", POD_NAME), 10);
-        execCmd(String.format("kubectl delete pod %s", POD_NAME), 10);
-        Thread.sleep(20000L);
+        try {
+            execCmd(String.format("kubectl delete service %s", POD_NAME), 10);
+        } catch (IOException | InterruptedException | IntegrationException e1) {
+        }
+        try {
+            execCmd(String.format("kubectl delete pod %s", POD_NAME), 10);
+        } catch (IOException | InterruptedException | IntegrationException e1) {
+        }
+        try {
+            Thread.sleep(20000L);
+        } catch (final InterruptedException e1) {
+        }
         boolean podExited = false;
         for (int i = 0; i < 10; i++) {
             try {
@@ -155,7 +165,10 @@ public class InMinikubeTest {
                     System.out.println("Don't understand this error; continuing to wait...");
                 }
             }
-            Thread.sleep(10000L);
+            try {
+                Thread.sleep(10000L);
+            } catch (final InterruptedException e) {
+            }
         }
         if (!podExited) {
             System.out.println(String.format("Warning: Pod %s has not exited", POD_NAME));
@@ -214,12 +227,6 @@ public class InMinikubeTest {
 
     }
 
-    // @Test
-    public void tttt() throws IOException, InterruptedException, IntegrationException {
-        final String stdout = execCmd("minikube ip", 20);
-        System.out.println(String.format("stdout: '%s'", stdout));
-    }
-
     private static String execCmd(final String cmd, final long timeout) throws IOException, InterruptedException, IntegrationException {
         return execCmd(cmd, timeout, null);
     }
@@ -234,17 +241,21 @@ public class InMinikubeTest {
             pb.environment().putAll(env);
         }
         final Process p = pb.start();
+        final String stdoutString = toString(p.getInputStream());
+        final String stderrString = toString(p.getErrorStream());
         final boolean finished = p.waitFor(timeout, TimeUnit.SECONDS);
         if (!finished) {
-            throw new InterruptedException("Command timed out");
+            throw new InterruptedException(String.format("Command '%s' timed out", cmd));
         }
+
+        System.out.println(String.format("%s: stdout: %s", cmd, stdoutString));
+        System.out.println(String.format("%s: stderr: %s", cmd, stderrString));
         final int retCode = p.exitValue();
         if (retCode != 0) {
-            final String stderr = toString(p.getErrorStream());
-            System.out.println(String.format("%s: stderr: %s", cmd, stderr));
-            throw new IntegrationException(String.format("Command failed: %s", stderr));
+            System.out.println(String.format("%s: retCode: %d", cmd, retCode));
+            throw new IntegrationException(String.format("Command '%s' failed: %s", cmd, stderrString));
         }
-        return toString(p.getInputStream());
+        return stdoutString;
     }
 
     private static String toString(final InputStream is) throws IOException {
