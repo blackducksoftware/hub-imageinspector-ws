@@ -27,8 +27,8 @@ spec:
           httpGet:
             path: /health
             port: 8080
-          initialDelaySeconds: 10
-          periodSeconds: 5
+          initialDelaySeconds: 120
+          periodSeconds: 30
       - name: hub-imageinspector-ws-centos
         image: blackducksoftware/hub-imageinspector-ws-centos:0.2.1-SNAPSHOT
         volumeMounts:
@@ -41,8 +41,8 @@ spec:
           httpGet:
             path: /health
             port: 8081
-          initialDelaySeconds: 10
-          periodSeconds: 5
+          initialDelaySeconds: 120
+          periodSeconds: 30
       - name: hub-imageinspector-ws-ubuntu
         image: blackducksoftware/hub-imageinspector-ws-ubuntu:0.2.1-SNAPSHOT
         volumeMounts:
@@ -55,8 +55,8 @@ spec:
           httpGet:
             path: /health
             port: 8082
-          initialDelaySeconds: 10
-          periodSeconds: 5
+          initialDelaySeconds: 120
+          periodSeconds: 30
       volumes:
       - name: inspector-target-dir
         hostPath:
