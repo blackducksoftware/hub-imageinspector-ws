@@ -200,6 +200,20 @@ public class InMinikubeTest {
 
     }
 
+    @Test
+    public void testAlpineOnUbuntuFollowingRedirect() throws InterruptedException, IntegrationException, IOException {
+        final String getBdioOutputJoined = execCmd(String.format("curl -i -L http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_UBUNTU), 120);
+        System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
+        assertTrue(getBdioOutputJoined.contains("alpine_latest_lib_apk_APK"));
+        assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
+        assertTrue(getBdioOutputJoined.contains("http:alpine/libc_utils"));
+        assertTrue(getBdioOutputJoined.contains("musl/"));
+        assertTrue(getBdioOutputJoined.contains("musl_utils/"));
+        assertTrue(getBdioOutputJoined.contains("libressl2.6-libssl/"));
+        assertTrue(getBdioOutputJoined.contains("x86_64"));
+        assertTrue(getBdioOutputJoined.endsWith("]"));
+    }
+
     private static String execCmd(final String cmd, final long timeout) throws IOException, InterruptedException, IntegrationException {
         return execCmd(cmd, timeout, null);
     }
