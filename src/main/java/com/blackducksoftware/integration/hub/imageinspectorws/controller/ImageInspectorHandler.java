@@ -69,7 +69,6 @@ public class ImageInspectorHandler {
         }
     }
 
-    // TODO move these methods to diff class?
     private String deriveRelativeUrl(final String requestUri, final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir) {
         final String relUrl = String.format("%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%b", deriveEndpoint(requestUri), ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath, ImageInspectorController.HUB_PROJECT_NAME_QUERY_PARAM,
                 hubProjectName, ImageInspectorController.HUB_PROJECT_VERSION_QUERY_PARAM, hubProjectVersion, ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, codeLocationPrefix,
