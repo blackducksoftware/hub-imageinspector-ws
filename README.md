@@ -1,20 +1,19 @@
-## Overview ##
-A container-based Web Service for analyzing Docker images (IN DEVELOPMENT)
+# Overview #
+A container-based Web Service for analyzing Docker images.
 
-# Build #
-TBD
-
-## Where can I get the latest release? ##
+# Where can I get the latest release? #
 You can download the latest source from GitHub: https://github.com/blackducksoftware/hub-imageinspector-ws. 
 
 To try it in a Docker environment, you can use this bash script as a starting point: https://github.com/blackducksoftware/hub-imageinspector-ws/blob/master/src/main/resources/demo-docker.sh.
 
 Ty try it in a Kubernetes environment, you use this bash script as a starting point: https://github.com/blackducksoftware/hub-imageinspector-ws/blob/master/src/main/resources/demo-minikube.sh. It depends on: https://github.com/blackducksoftware/hub-imageinspector-ws/blob/master/src/main/resources/kube-deployment.yml, https://github.com/blackducksoftware/hub-imageinspector-ws/blob/master/src/main/resources/kube-service.yml.
 
-## Documentation ##
-hub-imageinspector-ws is under development. You can use provided bash scripts to try a pre-release version in either a Kubernetes or a Docker environment.
+# Documentation #
+hub-imageinspector-ws is a simple container-based web service that, given a path to a docker image tarfile, returns a Black Duck Hub BDIO (Bill Of Materials) file.
 
-You only need files in the src/main/resources directory, but it's probably easiest to clone the whole repo. For the relative paths to be correct, execute the scripts (src/main/resources/demo-*.sh) from the top level directory (the one that contains build.gradle). Whichever script you use, you'll want to read the script to understand what it's doing.
+You can use provided bash scripts as sample code that shows how to deploy and use hub-imageinspector-ws in either a Kubernetes or a Docker environment. You only need files in the src/main/resources directory. Whichever script you use, you'll want to read the script to understand what it's doing. 
+
+The Docker images (blackducksoftware/hub-imageinspector-ws-alpine, blackducksoftware/hub-imageinspector-ws-centos, and blackducksoftware/hub-imageinspector-ws-ubuntu) are available on Docker Hub. 
 
 ### ImageInspector Service Endpoint ###
 
@@ -37,7 +36,6 @@ The script will start a 3-container pod, and expose ports 8080, 8081, and 8082. 
 You could send requests to any one of ports and get the same result (assuming you follow redirects), but for simplicity you can send all requests to the same one (say, 8080). If the inspector you send the request to can't inspect the target image (because it doesn't have the right package manager), it redirects you to the one that can.
 
 Supported package manager database formats: apk, dpkg (which apt also uses), and rpm (which yum also uses). 
-
 
 ### Trying hub-imageinspector-ws in a Docker environment ###
 
