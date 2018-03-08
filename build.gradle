@@ -91,7 +91,7 @@ task buildKubeTestPodConfig(type: Copy) {
 	filter(ReplaceTokens, tokens: [CURRENT_DIR: System.getProperty("user.dir"), VERSION: version])
 }
 
-test.dependsOn buildKubeTestPodConfig
+testIntegration.dependsOn buildKubeTestPodConfig
 
 
 //////////// Create Docker Containers ///////////
