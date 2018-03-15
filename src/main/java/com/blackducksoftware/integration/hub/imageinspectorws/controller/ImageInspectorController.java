@@ -43,6 +43,7 @@ public class ImageInspectorController {
     static final String HUB_PROJECT_VERSION_QUERY_PARAM = "hubprojectversion";
     static final String CODELOCATION_PREFIX_QUERY_PARAM = "codelocationprefix";
     static final String CLEANUP_WORKING_DIR_QUERY_PARAM = "cleanup";
+    static final String CONTAINER_FILESYSTEM_PATH_PARAM = "resultingcontainerfspath";
 
     @Autowired
     private ImageInspectorHandler imageInspectorHandler;
@@ -51,7 +52,9 @@ public class ImageInspectorController {
     public ResponseEntity<String> getBdio(final HttpServletRequest request, @RequestParam(value = TARFILE_PATH_QUERY_PARAM) final String tarFilePath,
             @RequestParam(value = HUB_PROJECT_NAME_QUERY_PARAM, defaultValue = "") final String hubProjectName, @RequestParam(value = HUB_PROJECT_VERSION_QUERY_PARAM, defaultValue = "") final String hubProjectVersion,
             @RequestParam(value = CODELOCATION_PREFIX_QUERY_PARAM, defaultValue = "") final String codeLocationPrefix,
-            @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir) {
-        return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
+            @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir,
+            @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath) {
+        return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir,
+                containerFileSystemPath);
     }
 }

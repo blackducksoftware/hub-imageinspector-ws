@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.compress.compressors.CompressorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +56,13 @@ public class ImageInspectorAction {
     @Value("${current.linux.distro:}")
     private String currentLinuxDistro;
 
-    public String getBdio(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir)
-            throws IntegrationException, IOException, InterruptedException {
+    public String getBdio(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath)
+            throws IntegrationException, IOException, InterruptedException, CompressorException {
         final String msg = String.format("hub-imageinspector-ws v%s: dockerTarfilePath: %s, hubProjectName: %s, hubProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b", programVersion.getProgramVersion(), dockerTarfilePath,
                 hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
         logger.info(msg);
         logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
-        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, currentLinuxDistro);
+        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath, currentLinuxDistro);
         final ByteArrayOutputStream bdioBytes = new ByteArrayOutputStream();
         try (BdioWriter writer = new BdioWriter(gson, bdioBytes)) {
             writer.writeSimpleBdioDocument(bdio);

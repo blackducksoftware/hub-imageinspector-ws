@@ -45,9 +45,9 @@ public class ImageInspectorHandler {
     private ResponseFactory responseFactory;
 
     public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String tarFilePath, final String hubProjectName, final String hubProjectVersion,
-            final String codeLocationPrefix, final boolean cleanupWorkingDir) {
+            final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath) {
         try {
-            final String bdio = imageInspectorAction.getBdio(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
+            final String bdio = imageInspectorAction.getBdio(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath);
             return responseFactory.createResponse(bdio);
         } catch (final WrongInspectorOsException e) {
             logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", e.getMessage()));

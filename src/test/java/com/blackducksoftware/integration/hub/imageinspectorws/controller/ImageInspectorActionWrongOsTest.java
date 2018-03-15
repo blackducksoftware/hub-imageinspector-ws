@@ -2,6 +2,7 @@ package com.blackducksoftware.integration.hub.imageinspectorws.controller;
 
 import java.io.IOException;
 
+import org.apache.commons.compress.compressors.CompressorException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -35,9 +36,9 @@ public class ImageInspectorActionWrongOsTest {
     // On correct OS, will try to overwrite files under /lib
     @Ignore
     @Test
-    public void test() throws IntegrationException, IOException, InterruptedException {
+    public void test() throws IntegrationException, IOException, InterruptedException, CompressorException {
         try {
-            imageInspectorAction.getBdio("/tmp/alpine.tar", "SB001", "testVersion", "testCodeLocationPrefix", true);
+            imageInspectorAction.getBdio("/tmp/alpine.tar", "SB001", "testVersion", "testCodeLocationPrefix", true, "");
         } catch (final WrongInspectorOsException e) {
             System.out.println(String.format("Got expected WrongInspectorOsException: %s", e.getMessage()));
         }
