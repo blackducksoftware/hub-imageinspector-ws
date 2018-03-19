@@ -104,9 +104,3 @@ echo "--------------------------------------------------------------"
 cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/debian.tar"
 echo "${cmd}"
 ######$cmd
-
-#echo "--------------------------------------------------------------"
-#echo "Deleting deployment, service"
-#echo "--------------------------------------------------------------"
-#kubectl delete service "${serviceName}"
-#kubectl delete deployment "${deploymentName}"
