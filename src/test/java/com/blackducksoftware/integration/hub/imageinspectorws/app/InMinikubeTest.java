@@ -1,5 +1,6 @@
 package com.blackducksoftware.integration.hub.imageinspectorws.app;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -65,19 +66,24 @@ public class InMinikubeTest {
                 dockerEnv.put(envVariableName, envVariableValue);
             }
         }
-
-        execCmd("mkdir -p build/test/target", 5);
-        execCmd("docker pull alpine:latest", 120, dockerEnv);
-        execCmd("docker save -o build/test/target/alpine.tar alpine:latest", 20, dockerEnv);
-        execCmd("chmod a+r build/test/target/alpine.tar", 5);
-
-        execCmd("docker pull debian:latest", 120, dockerEnv);
-        execCmd("docker save -o build/test/target/debian.tar debian:latest", 20, dockerEnv);
-        execCmd("chmod a+r build/test/target/debian.tar", 5);
-
-        execCmd("docker pull fedora:latest", 120, dockerEnv);
-        execCmd("docker save -o build/test/target/fedora.tar fedora:latest", 20, dockerEnv);
-        execCmd("chmod a+r build/test/target/fedora.tar", 5);
+        if (!new File("./build/test/target").exists()) {
+            execCmd("mkdir -p build/test/target", 5);
+        }
+        if (!new File("./build/test/target/alpine.tar").exists()) {
+            execCmd("docker pull alpine:latest", 120, dockerEnv);
+            execCmd("docker save -o build/test/target/alpine.tar alpine:latest", 20, dockerEnv);
+            execCmd("chmod a+r build/test/target/alpine.tar", 5);
+        }
+        if (!new File("./build/test/target/debian.tar").exists()) {
+            execCmd("docker pull debian:latest", 120, dockerEnv);
+            execCmd("docker save -o build/test/target/debian.tar debian:latest", 20, dockerEnv);
+            execCmd("chmod a+r build/test/target/debian.tar", 5);
+        }
+        if (!new File("./build/test/target/fedora.tar").exists()) {
+            execCmd("docker pull fedora:latest", 120, dockerEnv);
+            execCmd("docker save -o build/test/target/fedora.tar fedora:latest", 20, dockerEnv);
+            execCmd("chmod a+r build/test/target/fedora.tar", 5);
+        }
 
         InputStream configInputStream = InMinikubeTest.class.getResourceAsStream("kube-test-pod.yml");
         if (configInputStream == null) {
@@ -214,6 +220,20 @@ public class InMinikubeTest {
         assertTrue(getBdioOutputJoined.endsWith("]"));
     }
 
+    @Test
+    public void testContainerFileSystemGeneration() throws InterruptedException, IntegrationException, IOException {
+        final File outputDir = new File("./build/test/output");
+        outputDir.setWritable(true, false); // Make dir writeable by all
+
+        final File outputFile = new File("./build/test/output/alpinefs.tar.gz");
+        outputFile.delete();
+        assertFalse(outputFile.exists());
+        execCmd(String.format("curl -i \"http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar&resultingcontainerfspath=/opt/blackduck/hub-imageinspector-ws/output/alpinefs.tar.gz\"", clusterIp, PORT_ALPINE),
+                30);
+        assertTrue(outputFile.exists());
+        execCmd(String.format("tar tvf %s", outputFile.getAbsolutePath()), 30);
+    }
+
     private static String execCmd(final String cmd, final long timeout) throws IOException, InterruptedException, IntegrationException {
         return execCmd(cmd, timeout, null);
     }
@@ -268,7 +288,7 @@ public class InMinikubeTest {
                 healthCheckOutput = execCmd(String.format("curl -i http://%s:%s/health", clusterIp, port), 10).split("\n");
                 for (final String line : healthCheckOutput) {
                     System.out.printf("Port %s Health check output: %s\n", port, line);
-                    if ((line.startsWith("HTTP")) && (line.contains(" 200"))) {
+                    if (line.startsWith("HTTP") && line.contains(" 200")) {
                         System.out.printf("Port %s Health check passed\n", port);
                         serviceIsHealthy = true;
                         break;
