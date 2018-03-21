@@ -230,6 +230,7 @@ public class InMinikubeTest {
         assertFalse(outputFile.exists());
         execCmd(String.format("curl -i \"http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar&resultingcontainerfspath=/opt/blackduck/hub-imageinspector-ws/output/alpinefs.tar.gz\"", clusterIp, PORT_ALPINE),
                 30);
+        Thread.sleep(5000L); // TODO that this is necessary is somewhat of a concern
         assertTrue(outputFile.exists());
         execCmd(String.format("tar tvf %s", outputFile.getAbsolutePath()), 30);
     }
