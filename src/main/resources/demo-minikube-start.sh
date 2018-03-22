@@ -71,17 +71,17 @@ mkdir -p ${targetImageDir}
 #chmod a+r "${targetImageDir}/debian.tar"
 
 echo "--------------------------------------------------------------"
-echo "Creating deployment"
-echo "--------------------------------------------------------------"
-kubectl create -f src/main/resources/kube-deployment.yml
-waitForPodToStart ${deploymentName}
-
-echo "--------------------------------------------------------------"
 echo "Creating service"
 echo "--------------------------------------------------------------"
 kubectl create -f src/main/resources/kube-service.yml
 echo "Pausing to give the new service time to start..."
 sleep 10
+
+echo "--------------------------------------------------------------"
+echo "Creating deployment"
+echo "--------------------------------------------------------------"
+kubectl create -f src/main/resources/kube-deployment.yml
+waitForPodToStart ${deploymentName}
 
 echo "--------------------------------------------------------------"
 echo "Using service to get BDIO for alpine"

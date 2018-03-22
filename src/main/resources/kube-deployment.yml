@@ -20,6 +20,8 @@ spec:
         volumeMounts:
         - name: inspector-target-dir
           mountPath: /opt/blackduck/hub-imageinspector-ws/target
+        - name: inspector-working-dir
+          mountPath: /opt/blackduck/hub-imageinspector-ws/working
         ports:
         - containerPort: 8080
           hostPort: 8080
@@ -61,4 +63,8 @@ spec:
       - name: inspector-target-dir
         hostPath:
           path: /Users/billings/tmp/target
+          type: Directory
+      - name: inspector-working-dir
+        hostPath:
+          path: /Users/billings/tmp/working
           type: Directory
