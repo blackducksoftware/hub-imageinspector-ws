@@ -9,10 +9,8 @@ spec:
   - name: hub-imageinspector-ws-alpine
     image: blackducksoftware/hub-imageinspector-ws-alpine:@VERSION@
     volumeMounts:
-    - name: inspector-target-dir
-      mountPath: /opt/blackduck/hub-imageinspector-ws/target
-    - name: inspector-output-dir
-      mountPath: /opt/blackduck/hub-imageinspector-ws/output
+    - name: inspector-shared-dir
+      mountPath: /opt/blackduck/hub-imageinspector-ws/shared
     ports:
     - containerPort: 8080
       hostPort: 8080
@@ -25,8 +23,8 @@ spec:
   - name: hub-imageinspector-ws-centos
     image: blackducksoftware/hub-imageinspector-ws-centos:@VERSION@
     volumeMounts:
-    - name: inspector-target-dir
-      mountPath: /opt/blackduck/hub-imageinspector-ws/target
+    - name: inspector-shared-dir
+      mountPath: /opt/blackduck/hub-imageinspector-ws/shared
     ports:
     - containerPort: 8081
       hostPort: 8081
@@ -39,8 +37,8 @@ spec:
   - name: hub-imageinspector-ws-ubuntu
     image: blackducksoftware/hub-imageinspector-ws-ubuntu:@VERSION@
     volumeMounts:
-    - name: inspector-target-dir
-      mountPath: /opt/blackduck/hub-imageinspector-ws/target
+    - name: inspector-shared-dir
+      mountPath: /opt/blackduck/hub-imageinspector-ws/shared
     ports:
     - containerPort: 8082
       hostPort: 8082
@@ -51,11 +49,7 @@ spec:
       initialDelaySeconds: 120
       periodSeconds: 30
   volumes:
-  - name: inspector-target-dir
+  - name: inspector-shared-dir
     hostPath:
-      path: @CURRENT_DIR@/build/test/target
-      type: Directory
-  - name: inspector-output-dir
-    hostPath:
-      path: @CURRENT_DIR@/build/test/output
+      path: @CURRENT_DIR@/build/test/shared
       type: Directory

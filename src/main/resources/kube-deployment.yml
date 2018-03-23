@@ -18,10 +18,8 @@ spec:
       - name: hub-imageinspector-ws-alpine
         image: blackducksoftware/hub-imageinspector-ws-alpine:1.0.1-SNAPSHOT
         volumeMounts:
-        - name: inspector-target-dir
-          mountPath: /opt/blackduck/hub-imageinspector-ws/target
-        - name: inspector-working-dir
-          mountPath: /opt/blackduck/hub-imageinspector-ws/working
+        - name: inspector-shared-dir
+          mountPath: /opt/blackduck/hub-imageinspector-ws/shared
         ports:
         - containerPort: 8080
           hostPort: 8080
@@ -60,11 +58,7 @@ spec:
           initialDelaySeconds: 120
           periodSeconds: 30
       volumes:
-      - name: inspector-target-dir
+      - name: inspector-shared-dir
         hostPath:
-          path: /Users/billings/tmp/target
-          type: Directory
-      - name: inspector-working-dir
-        hostPath:
-          path: /Users/billings/tmp/working
+          path: /Users/billings/tmp/shared
           type: Directory

@@ -106,7 +106,8 @@ task createApkDockerfileTasks() {
             exposePort 8080
             //environmentVariable('LANG', 'en_US.UTF-8')
             runCommand 'apk update && apk add bash && apk add openjdk8-jre'
-            runCommand "mkdir -p ${imagePgmDir}/target"
+            runCommand "mkdir -p ${imagePgmDir}/shared/target"
+            runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /lib/apk"
@@ -132,7 +133,8 @@ task createRpmDockerfileTasks() {
             exposePort 8081
 			//environmentVariable('LANG', 'en_US.UTF-8')
             runCommand 'yum update -y && yum install -y java-1.8.0-openjdk && yum clean all -y'
-            runCommand "mkdir -p ${imagePgmDir}/target"
+            runCommand "mkdir -p ${imagePgmDir}/shared/target"
+            runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib"
@@ -161,7 +163,8 @@ task createDpkgDockerfileTasks() {
                 apt install -y openjdk-8-jdk vim && \
                 apt-get install -y locales && apt-get -y clean'
 			//runCommand 'locale-gen "en_US.UTF-8"'
-            runCommand "mkdir -p ${imagePgmDir}/target"
+            runCommand "mkdir -p ${imagePgmDir}/shared/target"
+            runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib/dpkg"

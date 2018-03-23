@@ -66,23 +66,32 @@ public class InMinikubeTest {
                 dockerEnv.put(envVariableName, envVariableValue);
             }
         }
-        if (!new File("./build/test/target").exists()) {
-            execCmd("mkdir -p build/test/target", 5);
+        File dir = new File("./build/test/shared/target");
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
-        if (!new File("./build/test/target/alpine.tar").exists()) {
+        dir = new File("./build/test/shared/output");
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        dir.setWritable(true, false); // Make dir writeable by all
+        if (!new File("./build/test/shared/target/alpine.tar").exists()) {
             execCmd("docker pull alpine:latest", 120, dockerEnv);
-            execCmd("docker save -o build/test/target/alpine.tar alpine:latest", 20, dockerEnv);
-            execCmd("chmod a+r build/test/target/alpine.tar", 5);
+            execCmd("docker save -o build/test/shared/target/alpine.tar alpine:latest", 20, dockerEnv);
+            // TODO don't exec here
+            execCmd("chmod a+r build/test/shared/target/alpine.tar", 5);
         }
-        if (!new File("./build/test/target/debian.tar").exists()) {
+        if (!new File("./build/test/shared/target/debian.tar").exists()) {
             execCmd("docker pull debian:latest", 120, dockerEnv);
-            execCmd("docker save -o build/test/target/debian.tar debian:latest", 20, dockerEnv);
-            execCmd("chmod a+r build/test/target/debian.tar", 5);
+            execCmd("docker save -o build/test/shared/target/debian.tar debian:latest", 20, dockerEnv);
+            // TODO don't exec here
+            execCmd("chmod a+r build/test/shared/target/debian.tar", 5);
         }
-        if (!new File("./build/test/target/fedora.tar").exists()) {
+        if (!new File("./build/test/shared/target/fedora.tar").exists()) {
             execCmd("docker pull fedora:latest", 120, dockerEnv);
-            execCmd("docker save -o build/test/target/fedora.tar fedora:latest", 20, dockerEnv);
-            execCmd("chmod a+r build/test/target/fedora.tar", 5);
+            execCmd("docker save -o build/test/shared/target/fedora.tar fedora:latest", 20, dockerEnv);
+            // TODO don't exec here
+            execCmd("chmod a+r build/test/shared/target/fedora.tar", 5);
         }
 
         InputStream configInputStream = InMinikubeTest.class.getResourceAsStream("kube-test-pod.yml");
@@ -157,7 +166,7 @@ public class InMinikubeTest {
 
     @Test
     public void testAlpineOnAlpine() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_ALPINE), 30);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar", clusterIp, PORT_ALPINE), 30);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("alpine_latest_lib_apk_APK"));
         assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
@@ -171,25 +180,25 @@ public class InMinikubeTest {
 
     @Test
     public void testAlpineOnUbuntu() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_UBUNTU), 10);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar", clusterIp, PORT_UBUNTU), 10);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
-        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
+        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
                 PORT_ALPINE);
         assertTrue(getBdioOutputJoined.contains(String.format("%s", expectedRedirect)));
     }
 
     @Test
     public void testAlpineOnCentos() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_CENTOS), 10);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar", clusterIp, PORT_CENTOS), 10);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
-        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
+        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
                 PORT_ALPINE);
         assertTrue(getBdioOutputJoined.contains(String.format("%s", expectedRedirect)));
     }
 
     @Test
     public void testFedoraOnCentos() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/fedora.tar", clusterIp, PORT_CENTOS), 120);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/fedora.tar", clusterIp, PORT_CENTOS), 120);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("file-libs/"));
         assertTrue(getBdioOutputJoined.contains("x86_64"));
@@ -198,7 +207,7 @@ public class InMinikubeTest {
 
     @Test
     public void testDebianOnUbuntu() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/debian.tar", clusterIp, PORT_UBUNTU), 120);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/debian.tar", clusterIp, PORT_UBUNTU), 120);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("libsemanage-common/"));
         assertTrue(getBdioOutputJoined.contains("amd64"));
@@ -208,7 +217,7 @@ public class InMinikubeTest {
 
     @Test
     public void testAlpineOnUbuntuFollowingRedirect() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i -L http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar", clusterIp, PORT_UBUNTU), 120);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i -L http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar", clusterIp, PORT_UBUNTU), 120);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("alpine_latest_lib_apk_APK"));
         assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
@@ -222,13 +231,13 @@ public class InMinikubeTest {
 
     @Test
     public void testContainerFileSystemGeneration() throws InterruptedException, IntegrationException, IOException {
-        final File outputDir = new File("./build/test/output");
-        outputDir.setWritable(true, false); // Make dir writeable by all
-
-        final File outputFile = new File("./build/test/output/alpinefs.tar.gz");
+        // TODO you've got the same dirs hard coded all over this file!
+        final File outputDir = new File("./build/test/shared/output");
+        final File outputFile = new File(outputDir, "alpinefs.tar.gz");
         outputFile.delete();
         assertFalse(outputFile.exists());
-        execCmd(String.format("curl -i \"http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar&resultingcontainerfspath=/opt/blackduck/hub-imageinspector-ws/output/alpinefs.tar.gz\"", clusterIp, PORT_ALPINE),
+        execCmd(String.format("curl -i \"http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar&resultingcontainerfspath=/opt/blackduck/hub-imageinspector-ws/shared/output/alpinefs.tar.gz\"", clusterIp,
+                PORT_ALPINE),
                 30);
         Thread.sleep(5000L); // TODO that this is necessary is somewhat of a concern
         assertTrue(outputFile.exists());
