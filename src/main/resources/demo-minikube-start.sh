@@ -1,6 +1,6 @@
 #!/bin/bash
 
-targetImageDir=~/tmp/target
+targetImageDir=~/tmp/shared/target
 
 deploymentName=hub-imageinspector-ws
 serviceName=hub-imageinspector-ws
@@ -89,18 +89,18 @@ echo "--------------------------------------------------------------"
 clusterIp=$(minikube ip)
 ##servicePort=$(kubectl describe services hub-imageinspector-ws|grep -v '^Type:'|grep NodePort|awk '{print $3}'|sed 's/\/TCP//')
 servicePort=8080
-cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/alpine.tar"
+cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar"
 echo "${cmd}"
 ######$cmd
 echo "--------------------------------------------------------------"
 echo "Using service to get BDIO for fedora"
 echo "--------------------------------------------------------------"
-cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/fedora.tar"
+cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/fedora.tar"
 echo "${cmd}"
 ######$cmd
 echo "--------------------------------------------------------------"
 echo "Using service to get BDIO for debian"
 echo "--------------------------------------------------------------"
-cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/target/debian.tar"
+cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/debian.tar"
 echo "${cmd}"
 ######$cmd
