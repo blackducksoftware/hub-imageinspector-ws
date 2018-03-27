@@ -53,7 +53,7 @@ public class ImageInspectorHandler {
             logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", e.getMessage()));
             final ImageInspectorOsEnum correctInspectorPlatform = e.getcorrectInspectorOs();
             final String dockerTarfilePath = e.getDockerTarfilePath();
-            final String correctInspectorRelUrl = deriveRelativeUrl(requestUri, dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
+            final String correctInspectorRelUrl = deriveRelativeUrl(requestUri, dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath);
             String correctInspectorUrl;
             try {
                 correctInspectorUrl = deriveUrl(scheme, host, derivePort(correctInspectorPlatform), correctInspectorRelUrl);
@@ -69,10 +69,11 @@ public class ImageInspectorHandler {
         }
     }
 
-    private String deriveRelativeUrl(final String requestUri, final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir) {
-        final String relUrl = String.format("%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%b", deriveEndpoint(requestUri), ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath, ImageInspectorController.HUB_PROJECT_NAME_QUERY_PARAM,
+    private String deriveRelativeUrl(final String requestUri, final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir,
+            final String containerFileSystemOutputPath) {
+        final String relUrl = String.format("%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%b&%s=%s", deriveEndpoint(requestUri), ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath, ImageInspectorController.HUB_PROJECT_NAME_QUERY_PARAM,
                 hubProjectName, ImageInspectorController.HUB_PROJECT_VERSION_QUERY_PARAM, hubProjectVersion, ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, codeLocationPrefix,
-                ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, cleanupWorkingDir);
+                ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, cleanupWorkingDir, ImageInspectorController.CONTAINER_FILESYSTEM_PATH_PARAM, containerFileSystemOutputPath);
         logger.debug(String.format("relativeUrl for redirect: %s", relUrl));
         return relUrl;
     }
