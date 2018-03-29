@@ -35,10 +35,10 @@ public class ResponseFactory {
         return new ResponseEntity<>(bdio, HttpStatus.OK);
     }
 
-    public ResponseEntity<String> createResponse(final HttpStatus status, final String warning) {
+    public ResponseEntity<String> createResponse(final HttpStatus status, final String warning, final String body) {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Warning", warning);
-        return new ResponseEntity<>(null, headers, status);
+        return new ResponseEntity<>(body, headers, status);
     }
 
     public ResponseEntity<String> createRedirect(final String newUrl, final String warning) {

@@ -58,14 +58,16 @@ public class ImageInspectorHandler {
             try {
                 correctInspectorUrl = deriveUrl(scheme, host, derivePort(correctInspectorPlatform), correctInspectorRelUrl);
             } catch (final IntegrationException deriveUrlException) {
-                logger.error(String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage()), deriveUrlException);
-                return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, deriveUrlException.getMessage());
+                final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
+                logger.error(msg, deriveUrlException);
+                return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, deriveUrlException.getMessage(), msg);
             }
             final ResponseEntity<String> redirectResponse = responseFactory.createRedirect(correctInspectorUrl, e.getMessage());
             return redirectResponse;
         } catch (final Exception e) {
-            logger.error(String.format("Exception thrown while getting image packages: %s", e.getMessage()), e);
-            return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            final String msg = String.format("Exception thrown while getting image packages: %s", e.getMessage());
+            logger.error(msg, e);
+            return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), msg);
         }
     }
 
