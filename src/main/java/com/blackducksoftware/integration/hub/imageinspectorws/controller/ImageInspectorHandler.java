@@ -48,11 +48,12 @@ public class ImageInspectorHandler {
             final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath) {
         try {
             final String bdio = imageInspectorAction.getBdio(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath);
+            logger.info("Succeeded: Returning BDIO response");
             return responseFactory.createResponse(bdio);
-        } catch (final WrongInspectorOsException e) {
-            logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", e.getMessage()));
-            final ImageInspectorOsEnum correctInspectorPlatform = e.getcorrectInspectorOs();
-            final String dockerTarfilePath = e.getDockerTarfilePath();
+        } catch (final WrongInspectorOsException wrongOsException) {
+            logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", wrongOsException.getMessage()));
+            final ImageInspectorOsEnum correctInspectorPlatform = wrongOsException.getcorrectInspectorOs();
+            final String dockerTarfilePath = wrongOsException.getDockerTarfilePath();
             final String correctInspectorRelUrl = deriveRelativeUrl(requestUri, dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath);
             String correctInspectorUrl;
             try {
@@ -62,7 +63,7 @@ public class ImageInspectorHandler {
                 logger.error(msg, deriveUrlException);
                 return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, deriveUrlException.getMessage(), msg);
             }
-            final ResponseEntity<String> redirectResponse = responseFactory.createRedirect(correctInspectorUrl, e.getMessage());
+            final ResponseEntity<String> redirectResponse = responseFactory.createRedirect(correctInspectorUrl, wrongOsException.getMessage());
             return redirectResponse;
         } catch (final Exception e) {
             final String msg = String.format("Exception thrown while getting image packages: %s", e.getMessage());
