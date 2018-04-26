@@ -10,7 +10,7 @@ spec:
     image: blackducksoftware/hub-imageinspector-ws-alpine:@VERSION@
     volumeMounts:
     - name: inspector-shared-dir
-      mountPath: /opt/blackduck/hub-imageinspector-ws/shared
+      mountPath: /opt/blackduck/shared
     ports:
     - containerPort: 8080
       hostPort: 8080
@@ -24,7 +24,7 @@ spec:
     image: blackducksoftware/hub-imageinspector-ws-centos:@VERSION@
     volumeMounts:
     - name: inspector-shared-dir
-      mountPath: /opt/blackduck/hub-imageinspector-ws/shared
+      mountPath: /opt/blackduck/shared
     ports:
     - containerPort: 8081
       hostPort: 8081
@@ -38,7 +38,7 @@ spec:
     image: blackducksoftware/hub-imageinspector-ws-ubuntu:@VERSION@
     volumeMounts:
     - name: inspector-shared-dir
-      mountPath: /opt/blackduck/hub-imageinspector-ws/shared
+      mountPath: /opt/blackduck/shared
     ports:
     - containerPort: 8082
       hostPort: 8082

@@ -166,7 +166,7 @@ public class InMinikubeTest {
 
     @Test
     public void testAlpineOnAlpine() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar", clusterIp, PORT_ALPINE), 30);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar", clusterIp, PORT_ALPINE), 30);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("alpine_latest_lib_apk_APK"));
         assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
@@ -180,25 +180,25 @@ public class InMinikubeTest {
 
     @Test
     public void testAlpineOnUbuntu() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar", clusterIp, PORT_UBUNTU), 10);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar", clusterIp, PORT_UBUNTU), 10);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
-        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
+        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
                 PORT_ALPINE);
         assertTrue(getBdioOutputJoined.contains(String.format("%s", expectedRedirect)));
     }
 
     @Test
     public void testAlpineOnCentos() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar", clusterIp, PORT_CENTOS), 10);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar", clusterIp, PORT_CENTOS), 10);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
-        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
+        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
                 PORT_ALPINE);
         assertTrue(getBdioOutputJoined.contains(String.format("%s", expectedRedirect)));
     }
 
     @Test
     public void testFedoraOnCentos() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/fedora.tar", clusterIp, PORT_CENTOS), 120);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/fedora.tar", clusterIp, PORT_CENTOS), 120);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("file-libs/"));
         assertTrue(getBdioOutputJoined.contains("x86_64"));
@@ -207,7 +207,7 @@ public class InMinikubeTest {
 
     @Test
     public void testDebianOnUbuntu() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/debian.tar", clusterIp, PORT_UBUNTU), 120);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/debian.tar", clusterIp, PORT_UBUNTU), 120);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("libsemanage-common/"));
         assertTrue(getBdioOutputJoined.contains("amd64"));
@@ -217,7 +217,7 @@ public class InMinikubeTest {
 
     @Test
     public void testAlpineOnUbuntuFollowingRedirect() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i -L http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar", clusterIp, PORT_UBUNTU), 120);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i -L http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar", clusterIp, PORT_UBUNTU), 120);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("alpine_latest_lib_apk_APK"));
         assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
@@ -236,7 +236,7 @@ public class InMinikubeTest {
         final File outputFile = new File(outputDir, "alpinefs.tar.gz");
         outputFile.delete();
         assertFalse(outputFile.exists());
-        execCmd(String.format("curl -i \"http://%s:%s/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar&resultingcontainerfspath=/opt/blackduck/hub-imageinspector-ws/shared/output/alpinefs.tar.gz\"", clusterIp,
+        execCmd(String.format("curl -i \"http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar&resultingcontainerfspath=/opt/blackduck/shared/output/alpinefs.tar.gz\"", clusterIp,
                 PORT_ALPINE),
                 30);
         Thread.sleep(5000L); // TODO that this is necessary is somewhat of a concern
