@@ -13,11 +13,11 @@ spec:
       mountPath: /opt/blackduck/shared
     ports:
     - containerPort: 8080
-      hostPort: 9000
+      hostPort: 8080
     livenessProbe:
       httpGet:
         path: /health
-        port: 9000
+        port: 8080
       initialDelaySeconds: 120
       periodSeconds: 30
   - name: hub-imageinspector-ws-centos
@@ -27,11 +27,11 @@ spec:
       mountPath: /opt/blackduck/shared
     ports:
     - containerPort: 8081
-      hostPort: 9001
+      hostPort: 8081
     livenessProbe:
       httpGet:
         path: /health
-        port: 9001
+        port: 8081
       initialDelaySeconds: 120
       periodSeconds: 30
   - name: hub-imageinspector-ws-ubuntu
@@ -41,11 +41,11 @@ spec:
       mountPath: /opt/blackduck/shared
     ports:
     - containerPort: 8082
-      hostPort: 9002
+      hostPort: 8082
     livenessProbe:
       httpGet:
         path: /health
-        port: 9002
+        port: 8082
       initialDelaySeconds: 120
       periodSeconds: 30
   volumes:

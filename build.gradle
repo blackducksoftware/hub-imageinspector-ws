@@ -93,8 +93,6 @@ task buildKubeTestPodConfig(type: Copy) {
 
 task testPrep(dependsOn: buildKubeTestPodConfig) {}
 
-testIntegration.dependsOn testPrep
-
 //////////// Create Docker Containers ///////////
 task createApkDockerfileTasks() {
     linuxFlavorsApk.eachWithIndex {linuxFlavor, index ->
@@ -228,6 +226,9 @@ task createBuildDockerImageTasks() {
 
 task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_centos, buildDockerImage_ubuntu]) {
 }
+
+testIntegration.dependsOn testPrep
+testIntegration.dependsOn buildImages
 
 task dockerLogin(type: Exec) {
     commandLine "docker", "login", "--username", "$System.env.DOCKER_HUB_USER", "--password", "$System.env.DOCKER_HUB_PASSWORD"
