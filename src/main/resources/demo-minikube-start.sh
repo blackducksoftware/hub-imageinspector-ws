@@ -55,20 +55,20 @@ mkdir -p ${targetImageDir}
 #rm -f "${targetImageDir}/fedora.tar"
 #rm -f "${targetImageDir}/debian.tar"
 
-#echo "--------------------------------------------------------------"
-#echo "Pulling/saving the target images"
-#echo "--------------------------------------------------------------"
-#docker pull "alpine:latest"
-#docker save -o "${targetImageDir}/alpine.tar" "alpine:latest"
-#chmod a+r "${targetImageDir}/alpine.tar"
+echo "--------------------------------------------------------------"
+echo "Pulling/saving the target images"
+echo "--------------------------------------------------------------"
+docker pull "alpine:latest"
+docker save -o "${targetImageDir}/alpine.tar" "alpine:latest"
+chmod a+r "${targetImageDir}/alpine.tar"
 
-#docker pull "fedora:latest"
-#docker save -o "${targetImageDir}/fedora.tar" "fedora:latest"
-#chmod a+r "${targetImageDir}/fedora.tar"
+docker pull "fedora:latest"
+docker save -o "${targetImageDir}/fedora.tar" "fedora:latest"
+chmod a+r "${targetImageDir}/fedora.tar"
 
-#docker pull "debian:latest"
-#docker save -o "${targetImageDir}/debian.tar" "debian:latest"
-#chmod a+r "${targetImageDir}/debian.tar"
+docker pull "debian:latest"
+docker save -o "${targetImageDir}/debian.tar" "debian:latest"
+chmod a+r "${targetImageDir}/debian.tar"
 
 echo "--------------------------------------------------------------"
 echo "Creating service"
@@ -88,19 +88,19 @@ echo "Using service to get BDIO for alpine"
 echo "--------------------------------------------------------------"
 clusterIp=$(minikube ip)
 ##servicePort=$(kubectl describe services hub-imageinspector-ws|grep -v '^Type:'|grep NodePort|awk '{print $3}'|sed 's/\/TCP//')
-servicePort=8080
-cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/alpine.tar"
+servicePort=9000
+cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar"
 echo "${cmd}"
 ######$cmd
 echo "--------------------------------------------------------------"
 echo "Using service to get BDIO for fedora"
 echo "--------------------------------------------------------------"
-cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/fedora.tar"
+cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/shared/target/fedora.tar"
 echo "${cmd}"
 ######$cmd
 echo "--------------------------------------------------------------"
 echo "Using service to get BDIO for debian"
 echo "--------------------------------------------------------------"
-cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/hub-imageinspector-ws/shared/target/debian.tar"
+cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/shared/target/debian.tar"
 echo "${cmd}"
 ######$cmd

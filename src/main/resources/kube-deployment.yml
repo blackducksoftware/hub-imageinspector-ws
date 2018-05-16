@@ -16,47 +16,47 @@ spec:
     spec:
       containers:
       - name: hub-imageinspector-ws-alpine
-        image: blackducksoftware/hub-imageinspector-ws-alpine:1.0.1-SNAPSHOT
+        image: blackducksoftware/hub-imageinspector-ws-alpine:1.1.2-SNAPSHOT
         volumeMounts:
         - name: inspector-shared-dir
           mountPath: /opt/blackduck/shared
         ports:
         - containerPort: 8080
-          hostPort: 8080
+          hostPort: 9000
         livenessProbe:
           httpGet:
             path: /health
-            port: 8080
+            port: 9000
           initialDelaySeconds: 120
           periodSeconds: 120
           timeoutSeconds: 60
       - name: hub-imageinspector-ws-centos
-        image: blackducksoftware/hub-imageinspector-ws-centos:1.0.1-SNAPSHOT
+        image: blackducksoftware/hub-imageinspector-ws-centos:1.1.2-SNAPSHOT
         volumeMounts:
         - name: inspector-shared-dir
           mountPath: /opt/blackduck/shared
         ports:
         - containerPort: 8081
-          hostPort: 8081
+          hostPort: 9001
         livenessProbe:
           httpGet:
             path: /health
-            port: 8081
+            port: 9001
           initialDelaySeconds: 120
           periodSeconds: 120
           timeoutSeconds: 60
       - name: hub-imageinspector-ws-ubuntu
-        image: blackducksoftware/hub-imageinspector-ws-ubuntu:1.0.1-SNAPSHOT
+        image: blackducksoftware/hub-imageinspector-ws-ubuntu:1.1.2-SNAPSHOT
         volumeMounts:
         - name: inspector-shared-dir
           mountPath: /opt/blackduck/shared
         ports:
         - containerPort: 8082
-          hostPort: 8082
+          hostPort: 9002
         livenessProbe:
           httpGet:
             path: /health
-            port: 8082
+            port: 9002
           initialDelaySeconds: 120
           periodSeconds: 120
           timeoutSeconds: 60

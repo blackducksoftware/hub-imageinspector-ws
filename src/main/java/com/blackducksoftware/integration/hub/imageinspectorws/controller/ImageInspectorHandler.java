@@ -57,7 +57,7 @@ public class ImageInspectorHandler {
             final String correctInspectorRelUrl = deriveRelativeUrl(requestUri, dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath);
             String correctInspectorUrl;
             try {
-                correctInspectorUrl = deriveUrl(scheme, host, derivePort(correctInspectorPlatform), correctInspectorRelUrl);
+                correctInspectorUrl = deriveUrl(scheme, host, imageInspectorAction.derivePort(correctInspectorPlatform), correctInspectorRelUrl);
             } catch (final IntegrationException deriveUrlException) {
                 final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
                 logger.error(msg, deriveUrlException);
@@ -86,20 +86,6 @@ public class ImageInspectorHandler {
         final String endpoint = lastSlashIndex < 0 ? requestUri : requestUri.substring(lastSlashIndex + 1);
         logger.debug(String.format("Converted requestUri %s to endpoint %s", requestUri, endpoint));
         return endpoint;
-    }
-
-    // TODO this should be configurable
-    private int derivePort(final ImageInspectorOsEnum correctInspectorPlatform) throws IntegrationException {
-        switch (correctInspectorPlatform) {
-        case ALPINE:
-            return 8080;
-        case CENTOS:
-            return 8081;
-        case UBUNTU:
-            return 8082;
-        default:
-            throw new IntegrationException(String.format("Unexpected inspector platform: %s", correctInspectorPlatform.name()));
-        }
     }
 
     private String deriveUrl(final String scheme, final String host, final int port, final String relativeUrl) {

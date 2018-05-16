@@ -38,6 +38,7 @@ import com.blackducksoftware.integration.exception.IntegrationException;
 import com.blackducksoftware.integration.hub.bdio.BdioWriter;
 import com.blackducksoftware.integration.hub.bdio.model.SimpleBdioDocument;
 import com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorApi;
+import com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorOsEnum;
 import com.google.gson.Gson;
 
 @Component
@@ -56,6 +57,15 @@ public class ImageInspectorAction {
     @Value("${current.linux.distro:}")
     private String currentLinuxDistro;
 
+    @Value("${inspector.port.alpine:8080}")
+    private String inspectorPortAlpine;
+
+    @Value("${inspector.port.centos:8081}")
+    private String inspectorPortCentos;
+
+    @Value("${inspector.port.ubuntu:8082}")
+    private String inspectorPortUbuntu;
+
     public String getBdio(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath)
             throws IntegrationException, IOException, InterruptedException, CompressorException {
         final String msg = String.format("hub-imageinspector-ws v%s: dockerTarfilePath: %s, hubProjectName: %s, hubProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b", programVersion.getProgramVersion(), dockerTarfilePath,
@@ -68,5 +78,19 @@ public class ImageInspectorAction {
             writer.writeSimpleBdioDocument(bdio);
         }
         return bdioBytes.toString(StandardCharsets.UTF_8.name());
+    }
+
+    public int derivePort(final ImageInspectorOsEnum inspectorPlatform) throws IntegrationException {
+        logger.debug(String.format("Deriving port for inspector platform %s", inspectorPlatform.name()));
+        switch (inspectorPlatform) {
+        case ALPINE:
+            return Integer.parseInt(inspectorPortAlpine);
+        case CENTOS:
+            return Integer.parseInt(inspectorPortCentos);
+        case UBUNTU:
+            return Integer.parseInt(inspectorPortUbuntu);
+        default:
+            throw new IntegrationException(String.format("Unexpected inspector platform: %s", inspectorPlatform.name()));
+        }
     }
 }

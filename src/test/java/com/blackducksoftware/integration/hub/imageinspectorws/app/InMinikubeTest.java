@@ -33,9 +33,9 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 @Category(IntegrationTest.class)
 public class InMinikubeTest {
     private static final String POD_NAME = "hub-imageinspector-ws";
-    private static final String PORT_ALPINE = "8080";
-    private static final String PORT_CENTOS = "8081";
-    private static final String PORT_UBUNTU = "8082";
+    private static final String PORT_ALPINE = "9000";
+    private static final String PORT_CENTOS = "9001";
+    private static final String PORT_UBUNTU = "9002";
     private static KubernetesClient client;
     private static String clusterIp;
 

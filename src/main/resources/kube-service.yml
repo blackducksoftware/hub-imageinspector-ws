@@ -6,7 +6,7 @@ metadata:
     app: hub-imageinspector-ws
 spec:
   ports:
-  - port: 8080
+  - port: 9000
     protocol: TCP
   selector:
     app: hub-imageinspector-ws
