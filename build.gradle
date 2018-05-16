@@ -117,7 +117,7 @@ task createApkDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8080", "--current.linux.distro=${linuxFlavorDirName}"
+            defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8080", "--current.linux.distro=${linuxFlavorDirName}"
         }
     }
 }
@@ -143,7 +143,7 @@ task createRpmDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8081", "--current.linux.distro=${linuxFlavorDirName}"
+            defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8081", "--current.linux.distro=${linuxFlavorDirName}"
         }
     }
 }
@@ -172,7 +172,7 @@ task createDpkgDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
             user '10001'
-            entryPoint "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=${linuxFlavorDirName}"
+            defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=${linuxFlavorDirName}"
         }
     }
 }
