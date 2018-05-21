@@ -28,6 +28,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorOsEnum;
+
 @Component
 public class ResponseFactory {
 
@@ -41,10 +43,10 @@ public class ResponseFactory {
         return new ResponseEntity<>(body, headers, status);
     }
 
-    public ResponseEntity<String> createRedirect(final String newUrl, final String warning) {
+    public ResponseEntity<String> createRedirect(final ImageInspectorOsEnum newInspectorOs, final String newUrl, final String warning) {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Location", newUrl);
         headers.add("Warning", warning);
-        return new ResponseEntity<>(null, headers, HttpStatus.FOUND);
+        return new ResponseEntity<>(newInspectorOs.name(), headers, HttpStatus.FOUND);
     }
 }

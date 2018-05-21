@@ -63,7 +63,8 @@ public class ImageInspectorHandler {
                 logger.error(msg, deriveUrlException);
                 return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, deriveUrlException.getMessage(), msg);
             }
-            final ResponseEntity<String> redirectResponse = responseFactory.createRedirect(correctInspectorUrl, wrongOsException.getMessage());
+            final ResponseEntity<String> redirectResponse = responseFactory.createRedirect(wrongOsException.getcorrectInspectorOs(),
+                    correctInspectorUrl, wrongOsException.getMessage());
             return redirectResponse;
         } catch (final Exception e) {
             final String msg = String.format("Exception thrown while getting image packages: %s", e.getMessage());
