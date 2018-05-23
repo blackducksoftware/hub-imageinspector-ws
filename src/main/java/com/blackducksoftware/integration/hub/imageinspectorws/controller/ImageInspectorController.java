@@ -57,7 +57,7 @@ public class ImageInspectorController {
             @RequestParam(value = CODELOCATION_PREFIX_QUERY_PARAM, defaultValue = "") final String codeLocationPrefix,
             @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir,
             @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath) {
-        logger.info(String.format("**** Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath));
+        logger.info(String.format("Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath));
         return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir,
                 containerFileSystemPath);
     }
