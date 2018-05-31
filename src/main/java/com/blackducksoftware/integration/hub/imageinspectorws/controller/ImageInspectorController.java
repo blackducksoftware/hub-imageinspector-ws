@@ -34,9 +34,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.qos.logback.classic.Level;
+
 @RestController
 public class ImageInspectorController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final String BASE_LOGGER_NAME = "com.blackducksoftware";
+
     // Endpoint
     private static final String GET_BDIO_PATH = "/getbdio";
     // Mandatory query param
@@ -47,6 +51,7 @@ public class ImageInspectorController {
     static final String CODELOCATION_PREFIX_QUERY_PARAM = "codelocationprefix";
     static final String CLEANUP_WORKING_DIR_QUERY_PARAM = "cleanup";
     static final String CONTAINER_FILESYSTEM_PATH_PARAM = "resultingcontainerfspath";
+    static final String LOGGING_LEVEL_PARAM = "logginglevel";
 
     @Autowired
     private ImageInspectorHandler imageInspectorHandler;
@@ -56,9 +61,26 @@ public class ImageInspectorController {
             @RequestParam(value = HUB_PROJECT_NAME_QUERY_PARAM, defaultValue = "") final String hubProjectName, @RequestParam(value = HUB_PROJECT_VERSION_QUERY_PARAM, defaultValue = "") final String hubProjectVersion,
             @RequestParam(value = CODELOCATION_PREFIX_QUERY_PARAM, defaultValue = "") final String codeLocationPrefix,
             @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir,
-            @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath) {
-        logger.info(String.format("Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath));
+            @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath,
+            @RequestParam(value = LOGGING_LEVEL_PARAM, required = false, defaultValue = "INFO") final String loggingLevel) {
+        logger.info(String.format("Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s, loggingLevel=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath, loggingLevel));
+        setLoggingLevel(loggingLevel);
         return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir,
                 containerFileSystemPath);
+    }
+
+    private void setLoggingLevel(final String newLoggingLevel) {
+        logger.info(String.format("Setting logging level to %s", newLoggingLevel));
+        try {
+            final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(BASE_LOGGER_NAME);
+            root.setLevel(Level.toLevel(newLoggingLevel));
+            if (logger.isDebugEnabled()) {
+                logger.info("DEBUG logging is enabled");
+            } else {
+                logger.info("DEBUG logging is not enabled");
+            }
+        } catch (final Exception e) {
+            logger.error(String.format("Error setting logging level to %s: %s", newLoggingLevel, e.getMessage()));
+        }
     }
 }
