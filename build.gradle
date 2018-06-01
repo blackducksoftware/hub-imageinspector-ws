@@ -59,7 +59,7 @@ artifactory {
 
 repositories {
     jcenter()
-    mavenLocal()
+    //mavenLocal()
     mavenCentral()
 	// TEMP: pick up snapshots for dependency libs
     //maven {
