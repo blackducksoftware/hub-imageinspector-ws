@@ -19,7 +19,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-version =  '2.1.1'
+version =  '2.1.2-SNAPSHOT'
 def appName='hub-imageinspector-ws'
 
 apply plugin: 'com.blackducksoftware.integration.solution'
