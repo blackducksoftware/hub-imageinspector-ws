@@ -103,7 +103,8 @@ public class InMinikubeTest {
         assertNotNull("Unable to load pod config file", configInputStream);
         client.load(configInputStream).inNamespace("default").createOrReplace();
         Thread.sleep(10000L);
-        client.load(InMinikubeTest.class.getResourceAsStream("/kube-service.yml")).inNamespace("default").createOrReplace();
+        final InputStream serviceYamlIs = new FileInputStream("deployment/kubernetes/kube-service.yml");
+        client.load(serviceYamlIs).inNamespace("default").createOrReplace();
         Thread.sleep(5000L);
 
         final PodList podList = client.pods().inNamespace("default").list();

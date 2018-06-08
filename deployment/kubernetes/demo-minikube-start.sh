@@ -73,14 +73,14 @@ chmod a+r "${targetImageDir}/debian.tar"
 echo "--------------------------------------------------------------"
 echo "Creating service"
 echo "--------------------------------------------------------------"
-kubectl create -f src/main/resources/kube-service.yml
+kubectl create -f deployment/kubernetes/kube-service.yml
 echo "Pausing to give the new service time to start..."
 sleep 10
 
 echo "--------------------------------------------------------------"
 echo "Creating deployment"
 echo "--------------------------------------------------------------"
-kubectl create -f src/main/resources/kube-deployment.yml
+kubectl create -f deployment/kubernetes/kube-deployment.yml
 waitForPodToStart ${deploymentName}
 
 echo "--------------------------------------------------------------"
@@ -88,7 +88,7 @@ echo "Using service to get BDIO for alpine"
 echo "--------------------------------------------------------------"
 clusterIp=$(minikube ip)
 ##servicePort=$(kubectl describe services hub-imageinspector-ws|grep -v '^Type:'|grep NodePort|awk '{print $3}'|sed 's/\/TCP//')
-servicePort=9000
+servicePort=8080
 cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar"
 echo "${cmd}"
 ######$cmd
