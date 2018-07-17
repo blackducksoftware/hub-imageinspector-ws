@@ -174,7 +174,7 @@ public class InMinikubeTest {
         assertTrue(getBdioOutputJoined.contains("http:alpine/libc_utils"));
         assertTrue(getBdioOutputJoined.contains("musl/"));
         assertTrue(getBdioOutputJoined.contains("musl_utils/"));
-        assertTrue(getBdioOutputJoined.contains("libressl2.6-libssl/"));
+        assertTrue(getBdioOutputJoined.contains("libressl2.7-libssl/"));
         assertTrue(getBdioOutputJoined.contains("x86_64"));
         assertTrue(getBdioOutputJoined.endsWith("]"));
     }
@@ -225,7 +225,7 @@ public class InMinikubeTest {
         assertTrue(getBdioOutputJoined.contains("http:alpine/libc_utils"));
         assertTrue(getBdioOutputJoined.contains("musl/"));
         assertTrue(getBdioOutputJoined.contains("musl_utils/"));
-        assertTrue(getBdioOutputJoined.contains("libressl2.6-libssl/"));
+        assertTrue(getBdioOutputJoined.contains("libressl2.7-libssl/"));
         assertTrue(getBdioOutputJoined.contains("x86_64"));
         assertTrue(getBdioOutputJoined.endsWith("]"));
     }
