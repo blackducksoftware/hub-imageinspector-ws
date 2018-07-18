@@ -52,6 +52,8 @@ public class ImageInspectorController {
     static final String CLEANUP_WORKING_DIR_QUERY_PARAM = "cleanup";
     static final String CONTAINER_FILESYSTEM_PATH_PARAM = "resultingcontainerfspath";
     static final String LOGGING_LEVEL_PARAM = "logginglevel";
+    static final String IMAGE_REPO_PARAM = "imagerepo";
+    static final String IMAGE_TAG_PARAM = "imagetag";
 
     @Autowired
     private ImageInspectorHandler imageInspectorHandler;
@@ -62,10 +64,13 @@ public class ImageInspectorController {
             @RequestParam(value = CODELOCATION_PREFIX_QUERY_PARAM, defaultValue = "") final String codeLocationPrefix,
             @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir,
             @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath,
-            @RequestParam(value = LOGGING_LEVEL_PARAM, required = false, defaultValue = "INFO") final String loggingLevel) {
+            @RequestParam(value = LOGGING_LEVEL_PARAM, required = false, defaultValue = "INFO") final String loggingLevel,
+            @RequestParam(value = IMAGE_REPO_PARAM, required = false, defaultValue = "") final String givenImageRepo,
+            @RequestParam(value = IMAGE_TAG_PARAM, required = false, defaultValue = "") final String givenImageTag) {
         logger.info(String.format("Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s, loggingLevel=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath, loggingLevel));
         setLoggingLevel(loggingLevel);
-        return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir,
+        return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag,
+                cleanupWorkingDir,
                 containerFileSystemPath);
     }
 
