@@ -19,7 +19,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-version =  '2.1.4-SNAPSHOT'
+version =  '2.2.0-SNAPSHOT'
 def appName='hub-imageinspector-ws'
 
 apply plugin: 'com.blackducksoftware.integration.solution'
@@ -157,8 +157,8 @@ task createDpkgDockerfileTasks() {
             exposePort 8082
             runCommand 'apt-get update -y && \
                 apt install -y openjdk-8-jdk vim && \
+                apt-get install -y curl && \
                 apt-get install -y locales && apt-get -y clean'
-			//runCommand 'locale-gen "en_US.UTF-8"'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")

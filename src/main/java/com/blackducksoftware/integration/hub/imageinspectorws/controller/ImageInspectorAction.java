@@ -57,6 +57,17 @@ public class ImageInspectorAction {
     @Value("${current.linux.distro:}")
     private String currentLinuxDistro;
 
+    // In environments like OpenShift, each URL (route) may be different
+    @Value("${inspector.url.alpine:}")
+    private String inspectorUrlAlpine;
+
+    @Value("${inspector.url.centos:}")
+    private String inspectorUrlCentos;
+
+    @Value("${inspector.url.ubuntu:}")
+    private String inspectorUrlUbuntu;
+
+    // If the inspectorUrls are not specified, just the port is adjusted
     @Value("${inspector.port.alpine:8080}")
     private String inspectorPortAlpine;
 
@@ -81,6 +92,20 @@ public class ImageInspectorAction {
         return bdioBytes.toString(StandardCharsets.UTF_8.name());
     }
 
+    public String getConfiguredUrlForInspector(final ImageInspectorOsEnum inspectorPlatform) throws IntegrationException {
+        logger.debug(String.format("Getting configured URL for inspector platform %s", inspectorPlatform.name()));
+        switch (inspectorPlatform) {
+        case ALPINE:
+            return inspectorUrlAlpine;
+        case CENTOS:
+            return inspectorUrlCentos;
+        case UBUNTU:
+            return inspectorUrlUbuntu;
+        default:
+            throw new IntegrationException(String.format("Unexpected inspector platform: %s", inspectorPlatform.name()));
+        }
+    }
+
     public int derivePort(final ImageInspectorOsEnum inspectorPlatform) throws IntegrationException {
         logger.debug(String.format("Deriving port for inspector platform %s", inspectorPlatform.name()));
         switch (inspectorPlatform) {
@@ -94,4 +119,5 @@ public class ImageInspectorAction {
             throw new IntegrationException(String.format("Unexpected inspector platform: %s", inspectorPlatform.name()));
         }
     }
+
 }

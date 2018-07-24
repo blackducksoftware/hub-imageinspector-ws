@@ -218,7 +218,7 @@ public class InMinikubeTest {
 
     @Test
     public void testAlpineOnUbuntuFollowingRedirect() throws InterruptedException, IntegrationException, IOException {
-        final String getBdioOutputJoined = execCmd(String.format("curl -i -L http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar", clusterIp, PORT_UBUNTU), 120);
+        final String getBdioOutputJoined = execCmd(String.format("curl -i -L http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar\\&logginglevel=DEBUG", clusterIp, PORT_UBUNTU), 120);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("alpine_latest_lib_apk_APK"));
         assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));

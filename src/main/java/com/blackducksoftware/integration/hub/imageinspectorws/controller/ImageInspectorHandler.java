@@ -23,6 +23,10 @@
  */
 package com.blackducksoftware.integration.hub.imageinspectorws.controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,17 +58,18 @@ public class ImageInspectorHandler {
             logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", wrongOsException.getMessage()));
             final ImageInspectorOsEnum correctInspectorPlatform = wrongOsException.getcorrectInspectorOs();
             final String dockerTarfilePath = wrongOsException.getDockerTarfilePath();
-            final String correctInspectorRelUrl = deriveRelativeUrl(requestUri, dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath);
-            String correctInspectorUrl;
+            URI correctInspectorUri;
             try {
-                correctInspectorUrl = deriveUrl(scheme, host, imageInspectorAction.derivePort(correctInspectorPlatform), correctInspectorRelUrl);
+                correctInspectorUri = adjustUrl(scheme, host, requestUri, dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath,
+                        correctInspectorPlatform);
             } catch (final IntegrationException deriveUrlException) {
                 final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
                 logger.error(msg, deriveUrlException);
                 return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, deriveUrlException.getMessage(), msg);
             }
+
             final ResponseEntity<String> redirectResponse = responseFactory.createRedirect(wrongOsException.getcorrectInspectorOs(),
-                    correctInspectorUrl, wrongOsException.getMessage());
+                    correctInspectorUri.toString(), wrongOsException.getMessage());
             return redirectResponse;
         } catch (final Exception e) {
             final String msg = String.format("Exception thrown while getting image packages: %s", e.getMessage());
@@ -73,27 +78,32 @@ public class ImageInspectorHandler {
         }
     }
 
-    private String deriveRelativeUrl(final String requestUri, final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final boolean cleanupWorkingDir,
-            final String containerFileSystemOutputPath) {
-        final String relUrl = String.format("%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%b&%s=%s", deriveEndpoint(requestUri), ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath, ImageInspectorController.HUB_PROJECT_NAME_QUERY_PARAM,
+    private URI adjustUrl(final String scheme, final String host, final String requestUriString, final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion,
+            final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath, final ImageInspectorOsEnum correctInspectorPlatform) throws IntegrationException {
+        final String query = String.format("%s=%s&%s=%s&%s=%s&%s=%s&%s=%b&%s=%s", ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath, ImageInspectorController.HUB_PROJECT_NAME_QUERY_PARAM,
                 hubProjectName, ImageInspectorController.HUB_PROJECT_VERSION_QUERY_PARAM, hubProjectVersion, ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, codeLocationPrefix,
-                ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, cleanupWorkingDir, ImageInspectorController.CONTAINER_FILESYSTEM_PATH_PARAM, containerFileSystemOutputPath);
-        logger.debug(String.format("relativeUrl for redirect: %s", relUrl));
-        return relUrl;
+                ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, cleanupWorkingDir, ImageInspectorController.CONTAINER_FILESYSTEM_PATH_PARAM, containerFileSystemPath);
+        URI adjustedUri;
+        URI requestUri;
+        try {
+            requestUri = new URI(requestUriString);
+            final String inspectorBaseUrl = imageInspectorAction.getConfiguredUrlForInspector(correctInspectorPlatform);
+            if (StringUtils.isBlank(inspectorBaseUrl)) {
+                logger.debug(String.format("Deriving redirect URL from request scheme (%s), host (%s), inspector platform (%s) plus request path (%s) and query (%s)", scheme, host, correctInspectorPlatform.toString(), requestUri.getPath(),
+                        query));
+                final int port = imageInspectorAction.derivePort(correctInspectorPlatform);
+                adjustedUri = new URI(scheme, null, host, port, requestUri.getPath(), query, null);
+                logger.debug(String.format("adjusted URL: %s", adjustedUri.toString()));
+            } else {
+                logger.debug(String.format("Deriving redirect URL from configured platform-specific (%s) inspector base URL (%s) plus request path (%s) and query (%s)", correctInspectorPlatform.toString(), inspectorBaseUrl,
+                        requestUri.getPath(), query));
+                final URI inspectorBaseUri = new URI(inspectorBaseUrl);
+                adjustedUri = new URI(inspectorBaseUri.getScheme(), null, inspectorBaseUri.getHost(), inspectorBaseUri.getPort(), requestUri.getPath(), query, null);
+                logger.debug(String.format("adjusted URL: %s", adjustedUri.toString()));
+            }
+        } catch (final URISyntaxException e) {
+            throw new IntegrationException(String.format("Error adjusting url %s for redirect", requestUriString), e);
+        }
+        return adjustedUri;
     }
-
-    private String deriveEndpoint(final String requestUri) {
-        final int lastSlashIndex = requestUri.lastIndexOf('/');
-        final String endpoint = lastSlashIndex < 0 ? requestUri : requestUri.substring(lastSlashIndex + 1);
-        logger.debug(String.format("Converted requestUri %s to endpoint %s", requestUri, endpoint));
-        return endpoint;
-    }
-
-    private String deriveUrl(final String scheme, final String host, final int port, final String relativeUrl) {
-        final String slashLessRelativeUrl = relativeUrl.startsWith("/") ? relativeUrl.substring(1) : relativeUrl;
-        final String url = String.format("%s://%s:%d/%s", scheme, host, port, slashLessRelativeUrl);
-        logger.debug(String.format("deriveUrl() returning: %s", url));
-        return url;
-    }
-
 }
