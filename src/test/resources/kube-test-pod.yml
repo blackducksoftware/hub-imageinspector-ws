@@ -8,6 +8,8 @@ spec:
   containers:
   - name: hub-imageinspector-ws-alpine
     image: blackducksoftware/hub-imageinspector-ws-alpine:@VERSION@
+    command: ["java"]
+    args: ["-jar", "/opt/blackduck/hub-imageinspector-ws/hub-imageinspector-ws.jar", "--server.port=8080", "--current.linux.distro=alpine", "--bdio.preferred.forge.disabled=true"]
     volumeMounts:
     - name: inspector-shared-dir
       mountPath: /opt/blackduck/shared
@@ -22,6 +24,8 @@ spec:
       periodSeconds: 30
   - name: hub-imageinspector-ws-centos
     image: blackducksoftware/hub-imageinspector-ws-centos:@VERSION@
+    command: ["java"]
+    args: ["-jar", "/opt/blackduck/hub-imageinspector-ws/hub-imageinspector-ws.jar", "--server.port=8081", "--current.linux.distro=centos", "--bdio.preferred.forge.disabled=true"]
     volumeMounts:
     - name: inspector-shared-dir
       mountPath: /opt/blackduck/shared
@@ -36,6 +40,8 @@ spec:
       periodSeconds: 30
   - name: hub-imageinspector-ws-ubuntu
     image: blackducksoftware/hub-imageinspector-ws-ubuntu:@VERSION@
+    command: ["java"]
+    args: ["-jar", "/opt/blackduck/hub-imageinspector-ws/hub-imageinspector-ws.jar", "--server.port=8082", "--current.linux.distro=ubuntu", "--bdio.preferred.forge.disabled=true"]
     volumeMounts:
     - name: inspector-shared-dir
       mountPath: /opt/blackduck/shared

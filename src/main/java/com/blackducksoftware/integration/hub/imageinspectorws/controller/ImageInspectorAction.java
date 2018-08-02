@@ -77,6 +77,9 @@ public class ImageInspectorAction {
     @Value("${inspector.port.ubuntu:8082}")
     private String inspectorPortUbuntu;
 
+    @Value("${bdio.preferred.forge.disabled:false}")
+    private boolean preferredForgeDisabled;
+
     public String getBdio(final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion, final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag,
             final boolean cleanupWorkingDir, final String containerFileSystemPath)
             throws IntegrationException, IOException, InterruptedException, CompressorException {
@@ -84,7 +87,8 @@ public class ImageInspectorAction {
                 hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir);
         logger.info(msg);
         logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
-        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, cleanupWorkingDir, containerFileSystemPath, currentLinuxDistro);
+        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, containerFileSystemPath, currentLinuxDistro, cleanupWorkingDir,
+                preferredForgeDisabled);
         final ByteArrayOutputStream bdioBytes = new ByteArrayOutputStream();
         try (BdioWriter writer = new BdioWriter(gson, bdioBytes)) {
             writer.writeSimpleBdioDocument(bdio);
