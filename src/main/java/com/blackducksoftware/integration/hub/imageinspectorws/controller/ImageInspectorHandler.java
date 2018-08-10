@@ -48,10 +48,10 @@ public class ImageInspectorHandler {
     @Autowired
     private ResponseFactory responseFactory;
 
-    public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String tarFilePath, final String hubProjectName, final String hubProjectVersion,
+    public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String tarFilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
             final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag, final boolean cleanupWorkingDir, final String containerFileSystemPath) {
         try {
-            final String bdio = imageInspectorAction.getBdio(tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, cleanupWorkingDir, containerFileSystemPath);
+            final String bdio = imageInspectorAction.getBdio(tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, cleanupWorkingDir, containerFileSystemPath);
             logger.info("Succeeded: Returning BDIO response");
             return responseFactory.createResponse(bdio);
         } catch (final WrongInspectorOsException wrongOsException) {
@@ -60,7 +60,7 @@ public class ImageInspectorHandler {
             final String dockerTarfilePath = wrongOsException.getDockerTarfilePath();
             URI correctInspectorUri;
             try {
-                correctInspectorUri = adjustUrl(scheme, host, requestUri, dockerTarfilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath,
+                correctInspectorUri = adjustUrl(scheme, host, requestUri, dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath,
                         correctInspectorPlatform);
             } catch (final IntegrationException deriveUrlException) {
                 final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
@@ -78,10 +78,10 @@ public class ImageInspectorHandler {
         }
     }
 
-    private URI adjustUrl(final String scheme, final String host, final String requestUriString, final String dockerTarfilePath, final String hubProjectName, final String hubProjectVersion,
+    private URI adjustUrl(final String scheme, final String host, final String requestUriString, final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
             final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath, final ImageInspectorOsEnum correctInspectorPlatform) throws IntegrationException {
-        final String query = String.format("%s=%s&%s=%s&%s=%s&%s=%s&%s=%b&%s=%s", ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath, ImageInspectorController.HUB_PROJECT_NAME_QUERY_PARAM,
-                hubProjectName, ImageInspectorController.HUB_PROJECT_VERSION_QUERY_PARAM, hubProjectVersion, ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, codeLocationPrefix,
+        final String query = String.format("%s=%s&%s=%s&%s=%s&%s=%s&%s=%b&%s=%s", ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath, ImageInspectorController.BLACKDUCK_PROJECT_NAME_QUERY_PARAM,
+                blackDuckProjectName, ImageInspectorController.BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, blackDuckProjectVersion, ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, codeLocationPrefix,
                 ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, cleanupWorkingDir, ImageInspectorController.CONTAINER_FILESYSTEM_PATH_PARAM, containerFileSystemPath);
         URI adjustedUri;
         URI requestUri;

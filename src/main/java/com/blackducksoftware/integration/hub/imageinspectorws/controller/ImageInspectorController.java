@@ -46,8 +46,8 @@ public class ImageInspectorController {
     // Mandatory query param
     static final String TARFILE_PATH_QUERY_PARAM = "tarfile";
     // Optional query params
-    static final String HUB_PROJECT_NAME_QUERY_PARAM = "hubprojectname";
-    static final String HUB_PROJECT_VERSION_QUERY_PARAM = "hubprojectversion";
+    static final String BLACKDUCK_PROJECT_NAME_QUERY_PARAM = "blackduckprojectname";
+    static final String BLACKDUCK_PROJECT_VERSION_QUERY_PARAM = "blackduckprojectversion";
     static final String CODELOCATION_PREFIX_QUERY_PARAM = "codelocationprefix";
     static final String CLEANUP_WORKING_DIR_QUERY_PARAM = "cleanup";
     static final String CONTAINER_FILESYSTEM_PATH_PARAM = "resultingcontainerfspath";
@@ -60,7 +60,7 @@ public class ImageInspectorController {
 
     @RequestMapping(path = GET_BDIO_PATH, method = RequestMethod.GET)
     public ResponseEntity<String> getBdio(final HttpServletRequest request, @RequestParam(value = TARFILE_PATH_QUERY_PARAM) final String tarFilePath,
-            @RequestParam(value = HUB_PROJECT_NAME_QUERY_PARAM, defaultValue = "") final String hubProjectName, @RequestParam(value = HUB_PROJECT_VERSION_QUERY_PARAM, defaultValue = "") final String hubProjectVersion,
+            @RequestParam(value = BLACKDUCK_PROJECT_NAME_QUERY_PARAM, defaultValue = "") final String hubProjectName, @RequestParam(value = BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, defaultValue = "") final String hubProjectVersion,
             @RequestParam(value = CODELOCATION_PREFIX_QUERY_PARAM, defaultValue = "") final String codeLocationPrefix,
             @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir,
             @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath,
