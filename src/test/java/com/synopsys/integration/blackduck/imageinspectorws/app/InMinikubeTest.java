@@ -1,4 +1,4 @@
-package com.blackducksoftware.integration.hub.imageinspectorws.app;
+package com.synopsys.integration.blackduck.imageinspectorws.app;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -21,7 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import com.blackducksoftware.integration.exception.IntegrationException;
+import com.synopsys.integration.exception.IntegrationException;
 import com.synopsys.integration.test.annotation.IntegrationTest;
 
 import io.fabric8.kubernetes.api.model.PodList;
@@ -96,7 +96,7 @@ public class InMinikubeTest {
 
         InputStream configInputStream = InMinikubeTest.class.getResourceAsStream("kube-test-pod.yml");
         if (configInputStream == null) {
-            final File configFile = new File("build/classes/java/test/com/blackducksoftware/integration/hub/imageinspectorws/app/kube-test-pod.yml");
+            final File configFile = new File("build/classes/java/test/com/synopsys/integration/blackduck/imageinspectorws/app/kube-test-pod.yml");
             assertTrue("Unable to find pod config file", configFile.exists());
             configInputStream = new FileInputStream(configFile);
         }
@@ -183,7 +183,7 @@ public class InMinikubeTest {
     public void testAlpineOnUbuntu() throws InterruptedException, IntegrationException, IOException {
         final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar", clusterIp, PORT_UBUNTU), 10);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
-        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
+        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar&blackduckprojectname=&blackduckprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
                 PORT_ALPINE);
         assertTrue(getBdioOutputJoined.contains(String.format("%s", expectedRedirect)));
     }
@@ -192,7 +192,7 @@ public class InMinikubeTest {
     public void testAlpineOnCentos() throws InterruptedException, IntegrationException, IOException {
         final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar", clusterIp, PORT_CENTOS), 10);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
-        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar&hubprojectname=&hubprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
+        final String expectedRedirect = String.format("Location: http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar&blackduckprojectname=&blackduckprojectversion=&codelocationprefix=&cleanup=true", clusterIp,
                 PORT_ALPINE);
         assertTrue(getBdioOutputJoined.contains(String.format("%s", expectedRedirect)));
     }

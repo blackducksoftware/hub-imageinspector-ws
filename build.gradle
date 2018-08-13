@@ -19,7 +19,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-version =  '2.2.2-SNAPSHOT'
+version =  '3.0.0-SNAPSHOT'
 def appName='hub-imageinspector-ws'
 
 apply plugin: 'com.blackducksoftware.integration.solution'
@@ -71,7 +71,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile 'com.blackducksoftware.integration:hub-imageinspector-lib:4.0.1'
+    compile 'com.blackducksoftware.integration:hub-imageinspector-lib:5.0.0-SNAPSHOT'
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("io.prometheus:simpleclient_spring_boot:0.2.0")
@@ -87,7 +87,7 @@ dependencies {
 // System.getProperty("user.dir")
 task buildKubeTestPodConfig(type: Copy) {
 	from 'src/test/resources/kube-test-pod.yml'
-	into 'build/classes/java/test/com/blackducksoftware/integration/hub/imageinspectorws/app'
+	into 'build/classes/java/test/com/synopsys/integration/blackduck/imageinspectorws/app'
 	filter(ReplaceTokens, tokens: [CURRENT_DIR: System.getProperty("user.dir"), VERSION: version])
 }
 

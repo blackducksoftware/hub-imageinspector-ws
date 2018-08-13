@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.imageinspectorws.app;
+package com.synopsys.integration.blackduck.imageinspectorws.app;
 
 import javax.annotation.PostConstruct;
 

@@ -21,29 +21,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.imageinspectorws.controller;
+package com.synopsys.integration.blackduck.imageinspectorws.app;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+@SpringBootApplication(scanBasePackages = { "com.synopsys.integration.blackduck.imageinspector", "com.synopsys.integration.blackduck.imageinspectorws" })
+public class Application {
 
-@Component
-public class ProgramVersion {
-    private final Logger logger = LoggerFactory.getLogger(ProgramVersion.class);
-    private String programVersion;
-
-    public String getProgramVersion() throws IOException {
-        if (programVersion == null) {
-            final Properties props = new Properties();
-            final InputStream stream = this.getClass().getClassLoader().getResourceAsStream("version.properties");
-            props.load(stream);
-            programVersion = props.getProperty("program.version");
-            logger.debug(String.format("programVersion: %s", programVersion));
-        }
-        return programVersion;
+    public static void main(final String[] args) {
+        SpringApplication.run(Application.class, args);
     }
 }

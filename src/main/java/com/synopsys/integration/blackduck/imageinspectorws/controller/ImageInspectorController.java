@@ -21,7 +21,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.imageinspectorws.controller;
+package com.synopsys.integration.blackduck.imageinspectorws.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -60,7 +60,8 @@ public class ImageInspectorController {
 
     @RequestMapping(path = GET_BDIO_PATH, method = RequestMethod.GET)
     public ResponseEntity<String> getBdio(final HttpServletRequest request, @RequestParam(value = TARFILE_PATH_QUERY_PARAM) final String tarFilePath,
-            @RequestParam(value = BLACKDUCK_PROJECT_NAME_QUERY_PARAM, defaultValue = "") final String hubProjectName, @RequestParam(value = BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, defaultValue = "") final String hubProjectVersion,
+            @RequestParam(value = BLACKDUCK_PROJECT_NAME_QUERY_PARAM, defaultValue = "") final String blackDuckProjectName,
+            @RequestParam(value = BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, defaultValue = "") final String blackDuckProjectVersion,
             @RequestParam(value = CODELOCATION_PREFIX_QUERY_PARAM, defaultValue = "") final String codeLocationPrefix,
             @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir,
             @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath,
@@ -69,7 +70,8 @@ public class ImageInspectorController {
             @RequestParam(value = IMAGE_TAG_PARAM, required = false, defaultValue = "") final String givenImageTag) {
         logger.info(String.format("Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s, loggingLevel=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath, loggingLevel));
         setLoggingLevel(loggingLevel);
-        return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, hubProjectName, hubProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag,
+        return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo,
+                givenImageTag,
                 cleanupWorkingDir,
                 containerFileSystemPath);
     }

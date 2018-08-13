@@ -21,14 +21,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.blackducksoftware.integration.hub.imageinspectorws.controller;
+package com.synopsys.integration.blackduck.imageinspectorws.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.blackducksoftware.integration.hub.imageinspector.api.ImageInspectorOsEnum;
+import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
 
 @Component
 public class ResponseFactory {
