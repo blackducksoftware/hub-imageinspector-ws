@@ -1,7 +1,7 @@
 #!/bin/bash
 
-deploymentName=hub-imageinspector-ws
-serviceName=hub-imageinspector-ws
+deploymentName=blackduck-imageinspector
+serviceName=blackduck-imageinspector
 
 echo "--------------------------------------------------------------"
 echo "Deleting deployment, service"

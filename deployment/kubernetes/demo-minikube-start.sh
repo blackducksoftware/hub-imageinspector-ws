@@ -2,8 +2,8 @@
 
 targetImageDir=~/tmp/shared/target
 
-deploymentName=hub-imageinspector-ws
-serviceName=hub-imageinspector-ws
+deploymentName=blackduck-imageinspector
+serviceName=blackduck-imageinspector
 
 function ensureKubeRunning() {
 	kubeRunning=$(minikube status | grep "minikube: Running" | wc -l)
@@ -87,7 +87,7 @@ echo "--------------------------------------------------------------"
 echo "Using service to get BDIO for alpine"
 echo "--------------------------------------------------------------"
 clusterIp=$(minikube ip)
-##servicePort=$(kubectl describe services hub-imageinspector-ws|grep -v '^Type:'|grep NodePort|awk '{print $3}'|sed 's/\/TCP//')
+##servicePort=$(kubectl describe services blackduck-imageinspector|grep -v '^Type:'|grep NodePort|awk '{print $3}'|sed 's/\/TCP//')
 servicePort=8080
 cmd="curl -i http://${clusterIp}:${servicePort}/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar"
 echo "${cmd}"

@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: hub-imageinspector-ws
+  name: blackduck-imageinspector
   labels:
-    app: hub-imageinspector-ws
+    app: blackduck-imageinspector
 spec:
   containers:
-  - name: hub-imageinspector-ws-alpine
-    image: blackducksoftware/hub-imageinspector-ws-alpine:@VERSION@
+  - name: blackduck-imageinspector-alpine
+    image: blackducksoftware/blackduck-imageinspector-alpine:@VERSION@
     volumeMounts:
     - name: inspector-shared-dir
       mountPath: /opt/blackduck/shared
@@ -20,8 +20,8 @@ spec:
         port: 8080
       initialDelaySeconds: 120
       periodSeconds: 30
-  - name: hub-imageinspector-ws-centos
-    image: blackducksoftware/hub-imageinspector-ws-centos:@VERSION@
+  - name: blackduck-imageinspector-centos
+    image: blackducksoftware/blackduck-imageinspector-centos:@VERSION@
     volumeMounts:
     - name: inspector-shared-dir
       mountPath: /opt/blackduck/shared
@@ -34,8 +34,8 @@ spec:
         port: 8081
       initialDelaySeconds: 120
       periodSeconds: 30
-  - name: hub-imageinspector-ws-ubuntu
-    image: blackducksoftware/hub-imageinspector-ws-ubuntu:@VERSION@
+  - name: blackduck-imageinspector-ubuntu
+    image: blackducksoftware/blackduck-imageinspector-ubuntu:@VERSION@
     volumeMounts:
     - name: inspector-shared-dir
       mountPath: /opt/blackduck/shared

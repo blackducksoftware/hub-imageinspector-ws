@@ -20,7 +20,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 version =  '3.0.0-SNAPSHOT'
-def appName='hub-imageinspector-ws'
+def appName='blackduck-imageinspector'
 
 apply plugin: 'com.blackducksoftware.integration.solution'
 apply plugin: 'com.bmuschko.docker-remote-api'
@@ -36,7 +36,7 @@ def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
 
 String blackduckDir = "/opt/blackduck"
 String imagePgmDir = "${blackduckDir}/${appName}"
-String dockerInspectorDir = "${blackduckDir}/hub-docker-inspector"
+String dockerInspectorDir = "${blackduckDir}/blackduck-docker-inspector"
 
 final def versionFile = new File("${projectDir}/src/main/resources/version.properties")
 versionFile.delete()
