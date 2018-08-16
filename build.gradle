@@ -140,6 +140,8 @@ task createRpmDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/output"
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
+            runCommand "localedef -c -f UTF-8 -i en_US en_US.UTF-8"
+            environmentVariable('LANG', 'en_US.UTF-8')
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8081", "--current.linux.distro=${linuxFlavorDirName}"
         }
@@ -156,7 +158,7 @@ task createDpkgDockerfileTasks() {
             maintainer 'Black Duck Software'
             exposePort 8082
             runCommand 'apt-get update -y && \
-                apt install -y openjdk-8-jdk vim && \
+                apt-get install -y openjdk-8-jdk vim && \
                 apt-get install -y curl && \
                 apt-get install -y locales && apt-get -y clean'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
@@ -169,6 +171,8 @@ task createDpkgDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/output"
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
+            runCommand 'locale-gen "en_US.UTF-8"'
+            environmentVariable('LANG', 'en_US.UTF-8')
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=${linuxFlavorDirName}"
         }
