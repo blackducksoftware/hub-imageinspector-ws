@@ -153,6 +153,8 @@ task createRpmDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/output"
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
+            runCommand "localedef -c -f UTF-8 -i en_US en_US.UTF-8"
+            environmentVariable('LANG', 'en_US.UTF-8')
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8081", "--current.linux.distro=${linuxFlavorDirName}"
         }
