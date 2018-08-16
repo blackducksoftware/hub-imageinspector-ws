@@ -7,7 +7,13 @@ buildscript {
         maven { url 'https://plugins.gradle.org/m2/' }
     }
     dependencies {
-        classpath 'com.blackducksoftware.integration:common-gradle-plugin:0.0.+'
+        configurations.all {
+            resolutionStrategy {
+                force 'com.blackducksoftware.integration:integration-test-common:3.1.3'
+                force 'com.blackducksoftware.integration:integration-common-rest:10.1.1'
+            }
+        }
+        classpath 'com.blackducksoftware.integration:common-gradle-plugin:0.0.38'
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE")
         classpath 'com.bmuschko:gradle-docker-plugin:3.0.6'
     }
@@ -83,6 +89,13 @@ dependencies {
     testCompile 'io.fabric8:kubernetes-model:2.0.8'
 }
 
+configurations.all {
+    resolutionStrategy {
+        force 'com.blackducksoftware.integration:integration-test-common:3.1.3'
+        force 'com.blackducksoftware.integration:integration-common-rest:10.1.1'
+    }
+}
+
 // Prepare test config file
 // System.getProperty("user.dir")
 task buildKubeTestPodConfig(type: Copy) {
@@ -156,7 +169,7 @@ task createDpkgDockerfileTasks() {
             maintainer 'Black Duck Software'
             exposePort 8082
             runCommand 'apt-get update -y && \
-                apt install -y openjdk-8-jdk vim && \
+                apt-get install -y openjdk-8-jdk vim && \
                 apt-get install -y curl && \
                 apt-get install -y locales && apt-get -y clean'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
@@ -169,6 +182,8 @@ task createDpkgDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/output"
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
+            runCommand 'locale-gen "en_US.UTF-8"'
+            environmentVariable('LANG', 'en_US.UTF-8')
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=${linuxFlavorDirName}"
         }
