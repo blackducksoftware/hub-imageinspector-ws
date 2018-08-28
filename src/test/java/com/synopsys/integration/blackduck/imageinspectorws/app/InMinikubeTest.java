@@ -75,23 +75,23 @@ public class InMinikubeTest {
             dir.mkdirs();
         }
         dir.setWritable(true, false); // Make dir writeable by all
-        if (!new File("./build/test/shared/target/alpine.tar").exists()) {
+        final File alpineTarFile = new File("./build/test/shared/target/alpine.tar");
+        if (!alpineTarFile.exists()) {
             execCmd("docker pull alpine:latest", 120, dockerEnv);
             execCmd("docker save -o build/test/shared/target/alpine.tar alpine:latest", 20, dockerEnv);
-            // TODO don't exec here
-            execCmd("chmod a+r build/test/shared/target/alpine.tar", 5);
+            alpineTarFile.setReadable(true, false);
         }
-        if (!new File("./build/test/shared/target/debian.tar").exists()) {
+        final File debianTarFile = new File("./build/test/shared/target/debian.tar");
+        if (!debianTarFile.exists()) {
             execCmd("docker pull debian:latest", 120, dockerEnv);
             execCmd("docker save -o build/test/shared/target/debian.tar debian:latest", 20, dockerEnv);
-            // TODO don't exec here
-            execCmd("chmod a+r build/test/shared/target/debian.tar", 5);
+            debianTarFile.setReadable(true, false);
         }
-        if (!new File("./build/test/shared/target/fedora.tar").exists()) {
+        final File fedoraTarFile = new File("./build/test/shared/target/fedora.tar");
+        if (!fedoraTarFile.exists()) {
             execCmd("docker pull fedora:latest", 120, dockerEnv);
             execCmd("docker save -o build/test/shared/target/fedora.tar fedora:latest", 20, dockerEnv);
-            // TODO don't exec here
-            execCmd("chmod a+r build/test/shared/target/fedora.tar", 5);
+            fedoraTarFile.setReadable(true, false);
         }
 
         InputStream configInputStream = InMinikubeTest.class.getResourceAsStream("kube-test-pod.yml");
@@ -232,7 +232,6 @@ public class InMinikubeTest {
 
     @Test
     public void testContainerFileSystemGeneration() throws InterruptedException, IntegrationException, IOException {
-        // TODO you've got the same dirs hard coded all over this file!
         final File outputDir = new File("./build/test/shared/output");
         final File outputFile = new File(outputDir, "alpinefs.tar.gz");
         outputFile.delete();
@@ -240,7 +239,7 @@ public class InMinikubeTest {
         execCmd(String.format("curl -i \"http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar&resultingcontainerfspath=/opt/blackduck/shared/output/alpinefs.tar.gz\"", clusterIp,
                 PORT_ALPINE),
                 30);
-        Thread.sleep(5000L); // TODO that this is necessary is somewhat of a concern
+        Thread.sleep(5000L);
         assertTrue(outputFile.exists());
         execCmd(String.format("tar tvf %s", outputFile.getAbsolutePath()), 30);
     }
