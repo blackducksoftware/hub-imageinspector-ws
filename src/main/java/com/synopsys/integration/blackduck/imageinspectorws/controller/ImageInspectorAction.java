@@ -80,7 +80,7 @@ public class ImageInspectorAction {
     public String getBdio(final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion, final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag,
             final boolean cleanupWorkingDir, final String containerFileSystemPath)
             throws IntegrationException, IOException, InterruptedException, CompressorException {
-        final String msg = String.format("hub-imageinspector-ws v%s: dockerTarfilePath: %s, blackDuckProjectName: %s, blackDuckProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b", programVersion.getProgramVersion(),
+        final String msg = String.format("Black Duck Image Inspector v%s: dockerTarfilePath: %s, blackDuckProjectName: %s, blackDuckProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b", programVersion.getProgramVersion(),
                 dockerTarfilePath,
                 blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir);
         logger.info(msg);
