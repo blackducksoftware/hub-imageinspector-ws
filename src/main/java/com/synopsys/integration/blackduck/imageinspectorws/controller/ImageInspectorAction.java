@@ -85,7 +85,9 @@ public class ImageInspectorAction {
                 blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir);
         logger.info(msg);
         logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
-        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, cleanupWorkingDir, containerFileSystemPath, currentLinuxDistro);
+        final boolean usePreferredAliasNamespaceForge = false;
+        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, cleanupWorkingDir, usePreferredAliasNamespaceForge,
+                containerFileSystemPath, currentLinuxDistro);
         final ByteArrayOutputStream bdioBytes = new ByteArrayOutputStream();
         try (BdioWriter writer = new BdioWriter(gson, bdioBytes)) {
             writer.writeSimpleBdioDocument(bdio);
