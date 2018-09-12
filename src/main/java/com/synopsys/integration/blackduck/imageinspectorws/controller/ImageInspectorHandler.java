@@ -49,9 +49,10 @@ public class ImageInspectorHandler {
     private ResponseFactory responseFactory;
 
     public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String tarFilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
-            final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag, final boolean cleanupWorkingDir, final String containerFileSystemPath) {
+            final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag, final boolean cleanupWorkingDir, final boolean usePreferredAliasNamespaceForge, final String containerFileSystemPath) {
         try {
-            final String bdio = imageInspectorAction.getBdio(tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, cleanupWorkingDir, containerFileSystemPath);
+            final String bdio = imageInspectorAction.getBdio(tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, cleanupWorkingDir, usePreferredAliasNamespaceForge,
+                    containerFileSystemPath);
             logger.info("Succeeded: Returning BDIO response");
             return responseFactory.createResponse(bdio);
         } catch (final WrongInspectorOsException wrongOsException) {
@@ -60,7 +61,7 @@ public class ImageInspectorHandler {
             final String dockerTarfilePath = wrongOsException.getDockerTarfilePath();
             URI correctInspectorUri;
             try {
-                correctInspectorUri = adjustUrl(scheme, host, requestUri, dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath,
+                correctInspectorUri = adjustUrl(scheme, host, requestUri, dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir, usePreferredAliasNamespaceForge, containerFileSystemPath,
                         correctInspectorPlatform);
             } catch (final IntegrationException deriveUrlException) {
                 final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
@@ -79,10 +80,18 @@ public class ImageInspectorHandler {
     }
 
     private URI adjustUrl(final String scheme, final String host, final String requestUriString, final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
-            final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath, final ImageInspectorOsEnum correctInspectorPlatform) throws IntegrationException {
-        final String query = String.format("%s=%s&%s=%s&%s=%s&%s=%s&%s=%b&%s=%s", ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath, ImageInspectorController.BLACKDUCK_PROJECT_NAME_QUERY_PARAM,
-                blackDuckProjectName, ImageInspectorController.BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, blackDuckProjectVersion, ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, codeLocationPrefix,
-                ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, cleanupWorkingDir, ImageInspectorController.CONTAINER_FILESYSTEM_PATH_PARAM, containerFileSystemPath);
+            final String codeLocationPrefix, final boolean cleanupWorkingDir, final boolean usePreferredAliasNamespaceForge, final String containerFileSystemPath, final ImageInspectorOsEnum correctInspectorPlatform)
+            throws IntegrationException {
+        logger.info("******* Building query with StringBuilder");
+        final StringBuilder querySb = new StringBuilder();
+        querySb.append(String.format("%s=%s", ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath));
+        querySb.append(String.format("&%s=%s", ImageInspectorController.BLACKDUCK_PROJECT_NAME_QUERY_PARAM, blackDuckProjectName));
+        querySb.append(String.format("&%s=%s", ImageInspectorController.BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, blackDuckProjectVersion));
+        querySb.append(String.format("&%s=%s", ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, codeLocationPrefix));
+        querySb.append(String.format("&%s=%b", ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, cleanupWorkingDir));
+        querySb.append(String.format("&%s=%b", ImageInspectorController.USE_PREFERRED_ALIAS_NAMESPACE_FORGE_PARAM, usePreferredAliasNamespaceForge));
+        querySb.append(String.format("&%s=%s", ImageInspectorController.CONTAINER_FILESYSTEM_PATH_PARAM, containerFileSystemPath));
+        final String query = querySb.toString();
         URI adjustedUri;
         URI requestUri;
         try {

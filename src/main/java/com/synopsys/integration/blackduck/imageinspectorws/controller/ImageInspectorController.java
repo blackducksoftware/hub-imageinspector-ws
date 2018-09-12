@@ -50,6 +50,7 @@ public class ImageInspectorController {
     static final String BLACKDUCK_PROJECT_VERSION_QUERY_PARAM = "blackduckprojectversion";
     static final String CODELOCATION_PREFIX_QUERY_PARAM = "codelocationprefix";
     static final String CLEANUP_WORKING_DIR_QUERY_PARAM = "cleanup";
+    static final String USE_PREFERRED_ALIAS_NAMESPACE_FORGE_PARAM = "forgederivedfromdistro";
     static final String CONTAINER_FILESYSTEM_PATH_PARAM = "resultingcontainerfspath";
     static final String LOGGING_LEVEL_PARAM = "logginglevel";
     static final String IMAGE_REPO_PARAM = "imagerepo";
@@ -64,6 +65,7 @@ public class ImageInspectorController {
             @RequestParam(value = BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, defaultValue = "") final String blackDuckProjectVersion,
             @RequestParam(value = CODELOCATION_PREFIX_QUERY_PARAM, defaultValue = "") final String codeLocationPrefix,
             @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir,
+            @RequestParam(value = USE_PREFERRED_ALIAS_NAMESPACE_FORGE_PARAM, required = false, defaultValue = "false") final boolean usePreferredAliasNamespaceForge,
             @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath,
             @RequestParam(value = LOGGING_LEVEL_PARAM, required = false, defaultValue = "INFO") final String loggingLevel,
             @RequestParam(value = IMAGE_REPO_PARAM, required = false, defaultValue = "") final String givenImageRepo,
@@ -72,7 +74,7 @@ public class ImageInspectorController {
         setLoggingLevel(loggingLevel);
         return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo,
                 givenImageTag,
-                cleanupWorkingDir,
+                cleanupWorkingDir, usePreferredAliasNamespaceForge,
                 containerFileSystemPath);
     }
 
