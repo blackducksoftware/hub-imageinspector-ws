@@ -82,7 +82,6 @@ public class ImageInspectorHandler {
     private URI adjustUrl(final String scheme, final String host, final String requestUriString, final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
             final String codeLocationPrefix, final boolean cleanupWorkingDir, final boolean usePreferredAliasNamespaceForge, final String containerFileSystemPath, final ImageInspectorOsEnum correctInspectorPlatform)
             throws IntegrationException {
-        logger.info("******* Building query with StringBuilder");
         final StringBuilder querySb = new StringBuilder();
         querySb.append(String.format("%s=%s", ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath));
         querySb.append(String.format("&%s=%s", ImageInspectorController.BLACKDUCK_PROJECT_NAME_QUERY_PARAM, blackDuckProjectName));
