@@ -169,9 +169,9 @@ public class InMinikubeTest {
     public void testAlpineOnAlpine() throws InterruptedException, IntegrationException, IOException {
         final String getBdioOutputJoined = execCmd(String.format("curl -i http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar", clusterIp, PORT_ALPINE), 30);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
-        assertTrue(getBdioOutputJoined.contains("alpine_latest_lib_apk_APK"));
+        assertTrue(getBdioOutputJoined.contains("alpine_latest_APK"));
         assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
-        assertTrue(getBdioOutputJoined.contains("http:alpine/libc_utils"));
+        assertTrue(getBdioOutputJoined.contains("http:@alpine/libc_utils"));
         assertTrue(getBdioOutputJoined.contains("musl/"));
         assertTrue(getBdioOutputJoined.contains("musl_utils/"));
         assertTrue(getBdioOutputJoined.contains("libressl2.7-libssl/"));
@@ -220,9 +220,9 @@ public class InMinikubeTest {
     public void testAlpineOnUbuntuFollowingRedirect() throws InterruptedException, IntegrationException, IOException {
         final String getBdioOutputJoined = execCmd(String.format("curl -i -L http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar\\&logginglevel=DEBUG", clusterIp, PORT_UBUNTU), 120);
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
-        assertTrue(getBdioOutputJoined.contains("alpine_latest_lib_apk_APK"));
+        assertTrue(getBdioOutputJoined.contains("alpine_latest_APK"));
         assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
-        assertTrue(getBdioOutputJoined.contains("http:alpine/libc_utils"));
+        assertTrue(getBdioOutputJoined.contains("http:@alpine/libc_utils"));
         assertTrue(getBdioOutputJoined.contains("musl/"));
         assertTrue(getBdioOutputJoined.contains("musl_utils/"));
         assertTrue(getBdioOutputJoined.contains("libressl2.7-libssl/"));

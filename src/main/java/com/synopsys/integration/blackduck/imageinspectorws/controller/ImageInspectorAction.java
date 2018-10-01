@@ -78,15 +78,15 @@ public class ImageInspectorAction {
     private String inspectorPortUbuntu;
 
     public String getBdio(final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion, final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag,
-            final boolean cleanupWorkingDir, final boolean usePreferredAliasNamespaceForge, final String containerFileSystemPath)
+            final boolean cleanupWorkingDir, final String containerFileSystemPath)
             throws IntegrationException, IOException, InterruptedException, CompressorException {
-        final String msg = String.format("Black Duck Image Inspector v%s: dockerTarfilePath: %s, blackDuckProjectName: %s, blackDuckProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b, usePreferredAliasNamespaceForge: %b",
+        final String msg = String.format("Black Duck Image Inspector v%s: dockerTarfilePath: %s, blackDuckProjectName: %s, blackDuckProjectVersion: %s, codeLocationPrefix: %s, cleanupWorkingDir: %b",
                 programVersion.getProgramVersion(),
                 dockerTarfilePath,
-                blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir, usePreferredAliasNamespaceForge);
+                blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir);
         logger.info(msg);
         logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
-        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, cleanupWorkingDir, usePreferredAliasNamespaceForge,
+        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, cleanupWorkingDir,
                 containerFileSystemPath, currentLinuxDistro);
         final ByteArrayOutputStream bdioBytes = new ByteArrayOutputStream();
         try (BdioWriter writer = new BdioWriter(gson, bdioBytes)) {
