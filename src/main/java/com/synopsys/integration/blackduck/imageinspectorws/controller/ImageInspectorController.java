@@ -39,7 +39,7 @@ import ch.qos.logback.classic.Level;
 @RestController
 public class ImageInspectorController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String BASE_LOGGER_NAME = "com.blackducksoftware";
+    private static final String BASE_LOGGER_NAME = "com.synopsys";
 
     // Endpoint
     private static final String GET_BDIO_PATH = "/getbdio";
@@ -73,7 +73,8 @@ public class ImageInspectorController {
         return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo,
                 givenImageTag,
                 cleanupWorkingDir,
-                containerFileSystemPath);
+                containerFileSystemPath,
+                loggingLevel);
     }
 
     private void setLoggingLevel(final String newLoggingLevel) {
