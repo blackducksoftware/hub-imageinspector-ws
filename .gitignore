@@ -11,3 +11,5 @@
 /testBdio
 /test/
 /*.iml
+/.idea/
+/out/
