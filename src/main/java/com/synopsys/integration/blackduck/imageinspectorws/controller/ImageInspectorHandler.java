@@ -58,10 +58,9 @@ public class ImageInspectorHandler {
         } catch (final WrongInspectorOsException wrongOsException) {
             logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", wrongOsException.getMessage()));
             final ImageInspectorOsEnum correctInspectorPlatform = wrongOsException.getcorrectInspectorOs();
-            final String dockerTarfilePath = wrongOsException.getDockerTarfilePath();
             URI correctInspectorUri;
             try {
-                correctInspectorUri = adjustUrl(scheme, host, requestUri, dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath,
+                correctInspectorUri = adjustUrl(scheme, host, requestUri, tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath,
                         correctInspectorPlatform, loggingLevel);
             } catch (final IntegrationException deriveUrlException) {
                 final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
