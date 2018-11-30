@@ -49,9 +49,9 @@ public class ImageInspectorHandler {
     private ResponseFactory responseFactory;
 
     public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String tarFilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
-            final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag, final boolean cleanupWorkingDir, final String containerFileSystemPath, final String loggingLevel) {
+            final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag, final boolean organizeComponentsByLayer, final boolean includeRemovedComponents, final boolean cleanupWorkingDir, final String containerFileSystemPath, final String loggingLevel) {
         try {
-            final String bdio = imageInspectorAction.getBdio(tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, cleanupWorkingDir,
+            final String bdio = imageInspectorAction.getBdio(tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
                     containerFileSystemPath);
             logger.info("Succeeded: Returning BDIO response");
             return responseFactory.createResponse(bdio);

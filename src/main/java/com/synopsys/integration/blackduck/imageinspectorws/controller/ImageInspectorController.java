@@ -49,6 +49,8 @@ public class ImageInspectorController {
     static final String BLACKDUCK_PROJECT_NAME_QUERY_PARAM = "blackduckprojectname";
     static final String BLACKDUCK_PROJECT_VERSION_QUERY_PARAM = "blackduckprojectversion";
     static final String CODELOCATION_PREFIX_QUERY_PARAM = "codelocationprefix";
+    static final String ORGANIZE_COMPONENTS_BY_LAYER_QUERY_PARAM = "organizecomponentsbylayer";
+    static final String INCLUDE_REMOVED_COMPONENTS_QUERY_PARAM = "includeremovedcomponents";
     static final String CLEANUP_WORKING_DIR_QUERY_PARAM = "cleanup";
     static final String CONTAINER_FILESYSTEM_PATH_PARAM = "resultingcontainerfspath";
     static final String LOGGING_LEVEL_PARAM = "logginglevel";
@@ -60,21 +62,23 @@ public class ImageInspectorController {
 
     @RequestMapping(path = GET_BDIO_PATH, method = RequestMethod.GET)
     public ResponseEntity<String> getBdio(final HttpServletRequest request, @RequestParam(value = TARFILE_PATH_QUERY_PARAM) final String tarFilePath,
-            @RequestParam(value = BLACKDUCK_PROJECT_NAME_QUERY_PARAM, defaultValue = "") final String blackDuckProjectName,
-            @RequestParam(value = BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, defaultValue = "") final String blackDuckProjectVersion,
-            @RequestParam(value = CODELOCATION_PREFIX_QUERY_PARAM, defaultValue = "") final String codeLocationPrefix,
-            @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir,
-            @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath,
-            @RequestParam(value = LOGGING_LEVEL_PARAM, required = false, defaultValue = "INFO") final String loggingLevel,
-            @RequestParam(value = IMAGE_REPO_PARAM, required = false, defaultValue = "") final String givenImageRepo,
-            @RequestParam(value = IMAGE_TAG_PARAM, required = false, defaultValue = "") final String givenImageTag) {
+        @RequestParam(value = BLACKDUCK_PROJECT_NAME_QUERY_PARAM, defaultValue = "") final String blackDuckProjectName,
+        @RequestParam(value = BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, defaultValue = "") final String blackDuckProjectVersion,
+        @RequestParam(value = CODELOCATION_PREFIX_QUERY_PARAM, defaultValue = "") final String codeLocationPrefix,
+        @RequestParam(value = ORGANIZE_COMPONENTS_BY_LAYER_QUERY_PARAM, required = false, defaultValue = "false") final boolean organizeComponentsByLayer,
+        @RequestParam(value = INCLUDE_REMOVED_COMPONENTS_QUERY_PARAM, required = false, defaultValue = "false") final boolean includeRemovedComponents,
+        @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir,
+        @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath,
+        @RequestParam(value = LOGGING_LEVEL_PARAM, required = false, defaultValue = "INFO") final String loggingLevel,
+        @RequestParam(value = IMAGE_REPO_PARAM, required = false, defaultValue = "") final String givenImageRepo,
+        @RequestParam(value = IMAGE_TAG_PARAM, required = false, defaultValue = "") final String givenImageTag) {
         logger.info(String.format("Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s, loggingLevel=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath, loggingLevel));
         setLoggingLevel(loggingLevel);
         return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo,
-                givenImageTag,
-                cleanupWorkingDir,
-                containerFileSystemPath,
-                loggingLevel);
+            givenImageTag,
+            organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
+            containerFileSystemPath,
+            loggingLevel);
     }
 
     private void setLoggingLevel(final String newLoggingLevel) {
