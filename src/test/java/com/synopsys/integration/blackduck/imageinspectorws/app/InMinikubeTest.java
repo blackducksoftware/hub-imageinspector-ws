@@ -1,9 +1,8 @@
 package com.synopsys.integration.blackduck.imageinspectorws.app;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,21 +15,21 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.test.annotation.IntegrationTest;
 
 import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceList;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
-@Category(IntegrationTest.class)
+
+@Tag("integration")
 public class InMinikubeTest {
     private static final String POD_NAME = "blackduck-imageinspector";
     private static final String PORT_ALPINE = "8080";
@@ -39,13 +38,13 @@ public class InMinikubeTest {
     private static KubernetesClient client;
     private static String clusterIp;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
 
         final String kubeStatusOutputJoined = execCmd("minikube status", 15);
         System.out.println(String.format("kubeStatusOutputJoined: %s", kubeStatusOutputJoined));
-        assertTrue("Minikube is not running", kubeStatusOutputJoined.contains("minikube: Running"));
-        assertTrue("Minikube is not running", kubeStatusOutputJoined.contains("cluster: Running"));
+        assertTrue(kubeStatusOutputJoined.contains("minikube: Running"));
+        assertTrue(kubeStatusOutputJoined.contains("cluster: Running"));
 
         final String[] ipOutput = execCmd("minikube ip", 10).split("\n");
         clusterIp = ipOutput[0];
@@ -97,10 +96,9 @@ public class InMinikubeTest {
         InputStream configInputStream = InMinikubeTest.class.getResourceAsStream("kube-test-pod.yml");
         if (configInputStream == null) {
             final File configFile = new File("build/classes/java/test/com/synopsys/integration/blackduck/imageinspectorws/app/kube-test-pod.yml");
-            assertTrue("Unable to find pod config file", configFile.exists());
+            assertTrue(configFile.exists());
             configInputStream = new FileInputStream(configFile);
         }
-        assertNotNull("Unable to load pod config file", configInputStream);
         client.load(configInputStream).inNamespace("default").createOrReplace();
         Thread.sleep(10000L);
         final InputStream serviceYamlIs = new FileInputStream("deployment/kubernetes/kube-service.yml");
@@ -116,15 +114,15 @@ public class InMinikubeTest {
             System.out.printf("Service: %s; app: %s\n", service.getMetadata().getName(), service.getMetadata().getLabels().get("app"));
         }
         Thread.sleep(20000L);
-        assertTrue("never got a successful alpine service health check", isServiceHealthy(PORT_ALPINE));
-        assertTrue("never got a successful centos service health check", isServiceHealthy(PORT_CENTOS));
-        assertTrue("never got a successful ubuntu service health check", isServiceHealthy(PORT_UBUNTU));
+        assertTrue(isServiceHealthy(PORT_ALPINE));
+        assertTrue(isServiceHealthy(PORT_CENTOS));
+        assertTrue(isServiceHealthy(PORT_UBUNTU));
         System.out.println("The service is ready");
 
         Thread.sleep(20000L);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownAfterClass() {
         if (client != null) {
             client.close();
