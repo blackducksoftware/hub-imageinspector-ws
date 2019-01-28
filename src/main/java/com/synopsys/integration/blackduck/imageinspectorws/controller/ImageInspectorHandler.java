@@ -61,7 +61,7 @@ public class ImageInspectorHandler {
             URI correctInspectorUri;
             try {
                 correctInspectorUri = adjustUrl(scheme, host, requestUri, tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath,
-                        correctInspectorPlatform, loggingLevel);
+                        correctInspectorPlatform, loggingLevel, givenImageRepo, givenImageTag);
             } catch (final IntegrationException deriveUrlException) {
                 final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
                 logger.error(msg, deriveUrlException);
@@ -79,7 +79,8 @@ public class ImageInspectorHandler {
     }
 
     private URI adjustUrl(final String scheme, final String host, final String requestUriString, final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
-            final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath, final ImageInspectorOsEnum correctInspectorPlatform, final String loggingLevel)
+            final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath, final ImageInspectorOsEnum correctInspectorPlatform, final String loggingLevel,
+        final String givenImageRepo, final String givenImageTag)
             throws IntegrationException {
         final StringBuilder querySb = new StringBuilder();
         querySb.append(String.format("%s=%s", ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath));
@@ -89,6 +90,8 @@ public class ImageInspectorHandler {
         querySb.append(String.format("&%s=%b", ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, cleanupWorkingDir));
         querySb.append(String.format("&%s=%s", ImageInspectorController.CONTAINER_FILESYSTEM_PATH_PARAM, containerFileSystemPath));
         querySb.append(String.format("&%s=%s", ImageInspectorController.LOGGING_LEVEL_PARAM, loggingLevel));
+        querySb.append(String.format("&%s=%s", ImageInspectorController.IMAGE_REPO_PARAM, givenImageRepo));
+        querySb.append(String.format("&%s=%s", ImageInspectorController.IMAGE_TAG_PARAM, givenImageTag));
         final String query = querySb.toString();
         URI adjustedUri;
         URI requestUri;
