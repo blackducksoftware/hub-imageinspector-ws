@@ -23,6 +23,7 @@
  */
 package com.synopsys.integration.blackduck.imageinspectorws.controller;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -48,10 +49,18 @@ public class ImageInspectorHandler {
     @Autowired
     private ResponseFactory responseFactory;
 
-    public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String tarFilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
+    @Autowired
+    private ProgramVersion programVersion;
+
+    public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
             final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag, final boolean organizeComponentsByLayer, final boolean includeRemovedComponents, final boolean cleanupWorkingDir, final String containerFileSystemPath, final String loggingLevel) {
         try {
-            final String bdio = imageInspectorAction.getBdio(tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
+            final String msg = String.format("Black Duck Image Inspector v%s: dockerTarfilePath: %s, blackDuckProjectName: %s, blackDuckProjectVersion: %s, codeLocationPrefix: %s, organizeComponentsByLayer: %b, includeRemovedComponents: %b, cleanupWorkingDir: %b",
+                programVersion.getProgramVersion(),
+                dockerTarfilePath,
+                blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir);
+            logger.info(msg);
+            final String bdio = imageInspectorAction.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
                     containerFileSystemPath);
             logger.info("Succeeded: Returning BDIO response");
             return responseFactory.createResponse(bdio);
@@ -60,7 +69,7 @@ public class ImageInspectorHandler {
             final ImageInspectorOsEnum correctInspectorPlatform = wrongOsException.getcorrectInspectorOs();
             URI correctInspectorUri;
             try {
-                correctInspectorUri = adjustUrl(scheme, host, requestUri, tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath,
+                correctInspectorUri = adjustUrl(scheme, host, requestUri, dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath,
                         correctInspectorPlatform, loggingLevel, givenImageRepo, givenImageTag);
             } catch (final IntegrationException deriveUrlException) {
                 final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
@@ -73,6 +82,16 @@ public class ImageInspectorHandler {
             return redirectResponse;
         } catch (final Exception e) {
             final String msg = String.format("Exception thrown while getting image packages: %s", e.getMessage());
+            logger.error(msg, e);
+            return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), msg);
+        }
+    }
+
+    public ResponseEntity<String> getServiceVersion() {
+        try {
+            return responseFactory.createResponse(programVersion.getProgramVersion());
+        } catch (final Exception e) {
+            final String msg = String.format("Exception thrown while getting service version: %s", e.getMessage());
             logger.error(msg, e);
             return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), msg);
         }

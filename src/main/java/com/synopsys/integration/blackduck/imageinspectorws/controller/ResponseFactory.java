@@ -33,8 +33,8 @@ import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorOsEnu
 @Component
 public class ResponseFactory {
 
-    public ResponseEntity<String> createResponse(final String bdio) {
-        return new ResponseEntity<>(bdio, HttpStatus.OK);
+    public ResponseEntity<String> createResponse(final String body) {
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     public ResponseEntity<String> createResponse(final HttpStatus status, final String warning, final String body) {

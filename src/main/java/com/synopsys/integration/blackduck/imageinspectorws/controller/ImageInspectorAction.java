@@ -49,9 +49,6 @@ public class ImageInspectorAction {
     ImageInspectorApi api;
 
     @Autowired
-    private ProgramVersion programVersion;
-
-    @Autowired
     private Gson gson;
 
     @Value("${current.linux.distro:}")
@@ -81,11 +78,6 @@ public class ImageInspectorAction {
         final boolean organizeComponentsByLayer, final boolean includeRemovedComponents,
         final boolean cleanupWorkingDir, final String containerFileSystemPath)
             throws IntegrationException, IOException, InterruptedException, CompressorException {
-        final String msg = String.format("Black Duck Image Inspector v%s: dockerTarfilePath: %s, blackDuckProjectName: %s, blackDuckProjectVersion: %s, codeLocationPrefix: %s, organizeComponentsByLayer: %b, includeRemovedComponents: %b, cleanupWorkingDir: %b",
-                programVersion.getProgramVersion(),
-                dockerTarfilePath,
-                blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir);
-        logger.info(msg);
         logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
         final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag,
             organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,

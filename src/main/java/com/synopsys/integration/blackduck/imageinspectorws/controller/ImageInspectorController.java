@@ -41,8 +41,9 @@ public class ImageInspectorController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String BASE_LOGGER_NAME = "com.synopsys";
 
-    // Endpoint
+    // Endpoints
     private static final String GET_BDIO_PATH = "/getbdio";
+    private static final String GET_SERVICE_VERSION = "/getversion";
     // Mandatory query param
     static final String TARFILE_PATH_QUERY_PARAM = "tarfile";
     // Optional query params
@@ -79,6 +80,12 @@ public class ImageInspectorController {
             organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
             containerFileSystemPath,
             loggingLevel);
+    }
+
+    @RequestMapping(path = GET_SERVICE_VERSION, method = RequestMethod.GET)
+    public ResponseEntity<String> getServiceVersion(final HttpServletRequest request) {
+        logger.info(String.format("Endpoint %s called", GET_SERVICE_VERSION));
+        return imageInspectorHandler.getServiceVersion();
     }
 
     private void setLoggingLevel(final String newLoggingLevel) {
