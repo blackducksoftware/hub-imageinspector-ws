@@ -57,6 +57,7 @@ public class ImageInspectorController {
     static final String LOGGING_LEVEL_PARAM = "logginglevel";
     static final String IMAGE_REPO_PARAM = "imagerepo";
     static final String IMAGE_TAG_PARAM = "imagetag";
+    static final String BASE_IMAGE_TOP_LAYER_ID_PARAM = "baseimagetoplayerid";
 
     @Autowired
     private ImageInspectorHandler imageInspectorHandler;
@@ -72,14 +73,15 @@ public class ImageInspectorController {
         @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath,
         @RequestParam(value = LOGGING_LEVEL_PARAM, required = false, defaultValue = "INFO") final String loggingLevel,
         @RequestParam(value = IMAGE_REPO_PARAM, required = false, defaultValue = "") final String givenImageRepo,
-        @RequestParam(value = IMAGE_TAG_PARAM, required = false, defaultValue = "") final String givenImageTag) {
-        logger.info(String.format("Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s, loggingLevel=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath, loggingLevel));
+        @RequestParam(value = IMAGE_TAG_PARAM, required = false, defaultValue = "") final String givenImageTag,
+        @RequestParam(value = BASE_IMAGE_TOP_LAYER_ID_PARAM, required = false, defaultValue = "") final String baseImageTopLayerId) {
+        logger.info(String.format("Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s, loggingLevel=%s, baseImageTopLayerId=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath, loggingLevel, baseImageTopLayerId));
         setLoggingLevel(loggingLevel);
         return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo,
             givenImageTag,
             organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
             containerFileSystemPath,
-            loggingLevel);
+            loggingLevel, baseImageTopLayerId);
     }
 
     @RequestMapping(path = GET_SERVICE_VERSION, method = RequestMethod.GET)
