@@ -23,7 +23,6 @@
  */
 package com.synopsys.integration.blackduck.imageinspectorws.controller;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -54,7 +53,7 @@ public class ImageInspectorHandler {
 
     public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
             final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag, final boolean organizeComponentsByLayer, final boolean includeRemovedComponents, final boolean cleanupWorkingDir, final String containerFileSystemPath, final String loggingLevel,
-            final String baseImageTopLayerId) {
+            final String platformTopLayerId) {
         try {
             final String msg = String.format("Black Duck Image Inspector v%s: dockerTarfilePath: %s, blackDuckProjectName: %s, blackDuckProjectVersion: %s, codeLocationPrefix: %s, organizeComponentsByLayer: %b, includeRemovedComponents: %b, cleanupWorkingDir: %b",
                 programVersion.getProgramVersion(),
@@ -62,7 +61,7 @@ public class ImageInspectorHandler {
                 blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir);
             logger.info(msg);
             final String bdio = imageInspectorAction.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
-                    containerFileSystemPath, baseImageTopLayerId);
+                    containerFileSystemPath, platformTopLayerId);
             logger.info("Succeeded: Returning BDIO response");
             return responseFactory.createResponse(bdio);
         } catch (final WrongInspectorOsException wrongOsException) {
@@ -71,7 +70,7 @@ public class ImageInspectorHandler {
             URI correctInspectorUri;
             try {
                 correctInspectorUri = adjustUrl(scheme, host, requestUri, dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath,
-                        correctInspectorPlatform, loggingLevel, givenImageRepo, givenImageTag, baseImageTopLayerId);
+                        correctInspectorPlatform, loggingLevel, givenImageRepo, givenImageTag, platformTopLayerId);
             } catch (final IntegrationException deriveUrlException) {
                 final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
                 logger.error(msg, deriveUrlException);
@@ -100,7 +99,7 @@ public class ImageInspectorHandler {
 
     private URI adjustUrl(final String scheme, final String host, final String requestUriString, final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
             final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath, final ImageInspectorOsEnum correctInspectorPlatform, final String loggingLevel,
-        final String givenImageRepo, final String givenImageTag, final String baseImageTopLayerId)
+        final String givenImageRepo, final String givenImageTag, final String platformTopLayerId)
             throws IntegrationException {
         final StringBuilder querySb = new StringBuilder();
         querySb.append(String.format("%s=%s", ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath));
@@ -112,7 +111,7 @@ public class ImageInspectorHandler {
         querySb.append(String.format("&%s=%s", ImageInspectorController.LOGGING_LEVEL_PARAM, loggingLevel));
         querySb.append(String.format("&%s=%s", ImageInspectorController.IMAGE_REPO_PARAM, givenImageRepo));
         querySb.append(String.format("&%s=%s", ImageInspectorController.IMAGE_TAG_PARAM, givenImageTag));
-        querySb.append(String.format("&%s=%s", ImageInspectorController.BASE_IMAGE_TOP_LAYER_ID_PARAM, baseImageTopLayerId));
+        querySb.append(String.format("&%s=%s", ImageInspectorController.PLATFORM_TOP_LAYER_ID_PARAM, platformTopLayerId));
         // TODO shouldn't have to add each new param here too
         final String query = querySb.toString();
         URI adjustedUri;
