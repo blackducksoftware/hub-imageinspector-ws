@@ -19,7 +19,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-version =  '4.4.0-SNAPSHOT'
+version =  '4.4.0'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'com.blackducksoftware.integration.solution'
@@ -67,7 +67,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile 'com.blackducksoftware.integration:hub-imageinspector-lib:9.0.0-SNAPSHOT'
+    compile 'com.blackducksoftware.integration:hub-imageinspector-lib:9.0.0'
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("io.prometheus:simpleclient_spring_boot:0.2.0")
