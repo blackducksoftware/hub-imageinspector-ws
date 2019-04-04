@@ -54,12 +54,12 @@ Supported package manager database formats: apk, dpkg (which apt also uses), and
 ### Other ImageInspector Service Endpoints ###
 
 ```
-GET /trace # get history of http requests
-GET /health # check the health of the service
-GET /metrics # get Spring Boot-generated metrics in JSON format
-GET /prometheus # get Prometheus-generated metrics in Prometheus format
+GET /health # check the health of the service in JSON format.
+GET /httptrace # a list of requests to the service in JSON format.
+GET /metrics # get Spring Boot-generated metrics endpoints in JSON format. Request metric value with /metrics/<metric name>
+GET /prometheus # get Prometheus-generated metrics in Prometheus format.
 GET /loggers # get list of loggers
-POST /loggers/<logger> # Example: curl -i -X POST -H 'Content-Type: application/json' -d '{"configuredLevel": "TRACE"}' http://<IP>:8080/loggers/com.blackducksoftware
+POST /loggers/<logger> # Example: curl -i -X POST -H 'Content-Type: application/json' -d '{"configuredLevel": "TRACE"}' http://<IP>:8080/loggers/com.synopsys
 ```
 
 ### Optimizing Performance ###
