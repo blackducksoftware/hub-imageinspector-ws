@@ -74,6 +74,7 @@ dependencies {
     implementation 'com.blackducksoftware.integration:blackduck-common:42.1.0'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'org.apache.commons:commons-exec:1.3'
