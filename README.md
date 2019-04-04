@@ -20,10 +20,12 @@ The Docker images (blackducksoftware/hub-imageinspector-ws-alpine, blackducksoft
 GET /getbdio
 * Mandatory query param: tarfile=`<path to Docker image tarfile>`
 * Optional query params:
-** hubprojectname=`<Hub project name>`
-** hubprojectversion=`<Hub project version>`
-** codelocationprefix=`<Hub CodeLocation name prefix>`
-** cleanup=`<cleanup working dirs when done: true or false; default: true>`
+```
+hubprojectname=<Hub project name>
+hubprojectversion=<Hub project version>
+codelocationprefix=<Hub CodeLocation name prefix>
+cleanup=<cleanup working dirs when done: true or false; default: true>
+```
 
 ### Trying hub-imageinspector-ws in a Kubernetes (minikube) environment ##
 
