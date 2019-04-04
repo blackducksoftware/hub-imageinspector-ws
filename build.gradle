@@ -7,19 +7,22 @@ buildscript {
         maven { url 'https://plugins.gradle.org/m2/' }
     }
     dependencies {
-	classpath "com.blackducksoftware.integration:common-gradle-plugin:0.0.+"
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE")
+	    classpath "com.blackducksoftware.integration:common-gradle-plugin:0.0.+"
         classpath 'com.bmuschko:gradle-docker-plugin:3.0.6'
     }
 }
 
+plugins {
+    id 'org.springframework.boot' version '2.1.4.RELEASE'
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'org.springframework.boot'
+apply plugin: "io.spring.dependency-management"
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-version =  '4.4.1-SNAPSHOT'
+version =  '5.0.0-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'com.blackducksoftware.integration.solution'
@@ -67,16 +70,15 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile 'com.blackducksoftware.integration:hub-imageinspector-lib:9.0.0'
-    compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-actuator")
-    compile("io.prometheus:simpleclient_spring_boot:0.2.0")
-    compile("io.prometheus:simpleclient_hotspot:0.2.0")
-    compile("io.prometheus:simpleclient_dropwizard:0.2.0")
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile 'org.apache.commons:commons-exec:1.3'
-    testCompile 'io.fabric8:kubernetes-client:3.1.8'
-    testCompile 'io.fabric8:kubernetes-model:2.0.8'
+    implementation 'com.blackducksoftware.integration:hub-imageinspector-lib:9.0.1-SNAPSHOT'
+    implementation 'com.blackducksoftware.integration:blackduck-common:42.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation 'org.apache.commons:commons-exec:1.3'
+    testImplementation 'io.fabric8:kubernetes-client:3.1.8'
+    testImplementation 'io.fabric8:kubernetes-model:2.0.8'
 }
 
 // Prepare test config file
