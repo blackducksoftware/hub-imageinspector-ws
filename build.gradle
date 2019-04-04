@@ -70,7 +70,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    implementation 'com.blackducksoftware.integration:hub-imageinspector-lib:9.0.1-SNAPSHOT'
+    implementation 'com.blackducksoftware.integration:hub-imageinspector-lib:9.0.2-SNAPSHOT'
     implementation 'com.blackducksoftware.integration:blackduck-common:42.1.0'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
