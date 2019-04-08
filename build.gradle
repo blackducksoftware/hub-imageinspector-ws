@@ -22,7 +22,7 @@ apply plugin: "io.spring.dependency-management"
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-version =  '4.4.2'
+version =  '4.4.3-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'com.blackducksoftware.integration.solution'
@@ -32,9 +32,9 @@ import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 // TODO these don't need to be arrays:
-def linuxFlavorsDpkg = ["ubuntu:16.04"]
-def linuxFlavorsRpm = ["centos:7.3.1611"]
-def linuxFlavorsApk = ["alpine:3.5"]
+def linuxFlavorsDpkg = ["ubuntu:latest"]
+def linuxFlavorsRpm = ["centos:latest"]
+def linuxFlavorsApk = ["alpine:latest"]
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
 
 String blackduckDir = "/opt/blackduck"

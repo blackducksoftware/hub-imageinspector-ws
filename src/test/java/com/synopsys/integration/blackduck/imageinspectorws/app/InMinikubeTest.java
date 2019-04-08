@@ -168,7 +168,7 @@ public class InMinikubeTest {
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("alpine_latest_APK"));
         assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
-        assertTrue(getBdioOutputJoined.contains("http:_alpine/libc_utils"));
+        assertTrue(getBdioOutputJoined.contains("http:alpine/libc_utils"));
         assertTrue(getBdioOutputJoined.contains("musl/"));
         assertTrue(getBdioOutputJoined.contains("musl_utils/"));
         assertTrue(getBdioOutputJoined.contains("libc_utils/"));
@@ -219,7 +219,7 @@ public class InMinikubeTest {
         System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
         assertTrue(getBdioOutputJoined.contains("alpine_latest_APK"));
         assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
-        assertTrue(getBdioOutputJoined.contains("http:_alpine/libc_utils"));
+        assertTrue(getBdioOutputJoined.contains("http:alpine/libc_utils"));
         assertTrue(getBdioOutputJoined.contains("musl/"));
         assertTrue(getBdioOutputJoined.contains("musl_utils/"));
         assertTrue(getBdioOutputJoined.contains("libc_utils/"));
