@@ -157,8 +157,7 @@ task createDpkgDockerfileTasks() {
             maintainer 'Black Duck Software'
             exposePort 8082
             runCommand 'apt-get update -y && \
-                apt-get install -y openjdk-8-jdk vim && \
-                apt-get install -y curl && \
+                apt-get install -y openjdk-8-jdk && \
                 apt-get install -y locales && apt-get -y clean'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
