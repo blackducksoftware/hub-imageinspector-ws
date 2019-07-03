@@ -22,7 +22,7 @@ apply plugin: "io.spring.dependency-management"
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-version =  '4.4.7-SNAPSHOT'
+version =  '4.4.7'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'com.blackducksoftware.integration.solution'
@@ -71,7 +71,7 @@ targetCompatibility = 1.8
 
 dependencies {
     implementation 'com.blackducksoftware.integration:blackduck-common:42.3.0'
-    implementation 'com.blackducksoftware.integration:hub-imageinspector-lib:9.0.4'
+    implementation 'com.blackducksoftware.integration:hub-imageinspector-lib:9.0.5'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation 'io.micrometer:micrometer-registry-prometheus'
