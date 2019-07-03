@@ -22,7 +22,7 @@ apply plugin: "io.spring.dependency-management"
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-version =  '4.4.7'
+version =  '4.4.8-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'com.blackducksoftware.integration.solution'
