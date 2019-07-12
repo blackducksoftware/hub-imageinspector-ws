@@ -51,7 +51,9 @@ public class ImageInspectorHandler {
     private ProgramVersion programVersion;
 
     public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
-            final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag, final boolean organizeComponentsByLayer, final boolean includeRemovedComponents, final boolean cleanupWorkingDir, final String containerFileSystemPath, final String loggingLevel,
+            final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag, final boolean organizeComponentsByLayer, final boolean includeRemovedComponents, final boolean cleanupWorkingDir,
+        final String containerFileSystemPath, final String containerFileSystemExcludedPathListString,
+        final String loggingLevel,
             final String platformTopLayerId) {
         try {
             final String msg = String.format("Black Duck Image Inspector v%s: dockerTarfilePath: %s, blackDuckProjectName: %s, blackDuckProjectVersion: %s, codeLocationPrefix: %s, organizeComponentsByLayer: %b, includeRemovedComponents: %b, cleanupWorkingDir: %b",
@@ -60,7 +62,8 @@ public class ImageInspectorHandler {
                 blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir);
             logger.info(msg);
             final String bdio = imageInspectorAction.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
-                    containerFileSystemPath, platformTopLayerId);
+                    containerFileSystemPath, containerFileSystemExcludedPathListString,
+                platformTopLayerId);
             logger.info("Succeeded: Returning BDIO response");
             return responseFactory.createResponse(bdio);
         } catch (final WrongInspectorOsException wrongOsException) {

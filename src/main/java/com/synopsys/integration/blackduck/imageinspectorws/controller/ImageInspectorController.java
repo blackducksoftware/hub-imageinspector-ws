@@ -53,6 +53,7 @@ public class ImageInspectorController {
     static final String INCLUDE_REMOVED_COMPONENTS_QUERY_PARAM = "includeremovedcomponents";
     static final String CLEANUP_WORKING_DIR_QUERY_PARAM = "cleanup";
     static final String CONTAINER_FILESYSTEM_PATH_PARAM = "resultingcontainerfspath";
+    static final String CONTAINER_FILESYSTEM_EXCLUDED_PATHS_PARAM = "resultingcontainerfsexcludedpaths";
     static final String LOGGING_LEVEL_PARAM = "logginglevel";
     static final String IMAGE_REPO_PARAM = "imagerepo";
     static final String IMAGE_TAG_PARAM = "imagetag";
@@ -70,6 +71,7 @@ public class ImageInspectorController {
         @RequestParam(value = INCLUDE_REMOVED_COMPONENTS_QUERY_PARAM, required = false, defaultValue = "false") final boolean includeRemovedComponents,
         @RequestParam(value = CLEANUP_WORKING_DIR_QUERY_PARAM, required = false, defaultValue = "true") final boolean cleanupWorkingDir,
         @RequestParam(value = CONTAINER_FILESYSTEM_PATH_PARAM, required = false, defaultValue = "") final String containerFileSystemPath,
+        @RequestParam(value = CONTAINER_FILESYSTEM_EXCLUDED_PATHS_PARAM, required = false, defaultValue = "") final String containerFileSystemExcludedPathListString,
         @RequestParam(value = LOGGING_LEVEL_PARAM, required = false, defaultValue = "INFO") final String loggingLevel,
         @RequestParam(value = IMAGE_REPO_PARAM, required = false, defaultValue = "") final String givenImageRepo,
         @RequestParam(value = IMAGE_TAG_PARAM, required = false, defaultValue = "") final String givenImageTag,
@@ -79,7 +81,7 @@ public class ImageInspectorController {
         return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo,
             givenImageTag,
             organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
-            containerFileSystemPath,
+            containerFileSystemPath, containerFileSystemExcludedPathListString,
             loggingLevel, platformTopLayerId);
     }
 

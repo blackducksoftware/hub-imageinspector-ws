@@ -75,12 +75,16 @@ public class ImageInspectorAction {
 
     public String getBdio(final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion, final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag,
         final boolean organizeComponentsByLayer, final boolean includeRemovedComponents,
-        final boolean cleanupWorkingDir, final String containerFileSystemPath, final String platformTopLayerId)
-            throws IntegrationException, IOException, InterruptedException, CompressorException {
+        final boolean cleanupWorkingDir,
+        final String containerFileSystemPath, final String containerFileSystemExcludedPathListString,
+        final String platformTopLayerId)
+            throws IntegrationException, IOException {
         logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
         final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag,
             organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
-                containerFileSystemPath, currentLinuxDistro, platformTopLayerId);
+                containerFileSystemPath,
+            containerFileSystemExcludedPathListString,
+            currentLinuxDistro, platformTopLayerId);
         final ByteArrayOutputStream bdioBytes = new ByteArrayOutputStream();
         try (BdioWriter writer = new BdioWriter(gson, bdioBytes)) {
             writer.writeSimpleBdioDocument(bdio);
