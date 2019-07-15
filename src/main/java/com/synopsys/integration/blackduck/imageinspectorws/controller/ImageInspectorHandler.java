@@ -71,7 +71,8 @@ public class ImageInspectorHandler {
             final ImageInspectorOsEnum correctInspectorPlatform = wrongOsException.getcorrectInspectorOs();
             URI correctInspectorUri;
             try {
-                correctInspectorUri = adjustUrl(scheme, host, requestUri, dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir, containerFileSystemPath,
+                correctInspectorUri = adjustUrl(scheme, host, requestUri, dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir,
+                    containerFileSystemPath, containerFileSystemExcludedPathListString,
                         correctInspectorPlatform, loggingLevel, givenImageRepo, givenImageTag, platformTopLayerId);
             } catch (final IntegrationException deriveUrlException) {
                 final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
@@ -100,7 +101,7 @@ public class ImageInspectorHandler {
     }
 
     private URI adjustUrl(final String scheme, final String host, final String requestUriString, final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
-            final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath, final ImageInspectorOsEnum correctInspectorPlatform, final String loggingLevel,
+            final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath, final String containerFileSystemExcludedPathListString, final ImageInspectorOsEnum correctInspectorPlatform, final String loggingLevel,
         final String givenImageRepo, final String givenImageTag, final String platformTopLayerId)
             throws IntegrationException {
         final StringBuilder querySb = new StringBuilder();
@@ -110,6 +111,7 @@ public class ImageInspectorHandler {
         querySb.append(String.format("&%s=%s", ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, codeLocationPrefix));
         querySb.append(String.format("&%s=%b", ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, cleanupWorkingDir));
         querySb.append(String.format("&%s=%s", ImageInspectorController.CONTAINER_FILESYSTEM_PATH_PARAM, containerFileSystemPath));
+        querySb.append(String.format("&%s=%s", ImageInspectorController.CONTAINER_FILESYSTEM_EXCLUDED_PATHS_PARAM, containerFileSystemExcludedPathListString));
         querySb.append(String.format("&%s=%s", ImageInspectorController.LOGGING_LEVEL_PARAM, loggingLevel));
         querySb.append(String.format("&%s=%s", ImageInspectorController.IMAGE_REPO_PARAM, givenImageRepo));
         querySb.append(String.format("&%s=%s", ImageInspectorController.IMAGE_TAG_PARAM, givenImageTag));
