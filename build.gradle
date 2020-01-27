@@ -33,7 +33,7 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 // TODO these don't need to be arrays:
 def linuxFlavorsDpkg = ["ubuntu:latest"]
-def linuxFlavorsRpm = ["centos:latest"]
+def linuxFlavorsRpm = ["centos:centos7"]
 def linuxFlavorsApk = ["alpine:latest"]
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
 
