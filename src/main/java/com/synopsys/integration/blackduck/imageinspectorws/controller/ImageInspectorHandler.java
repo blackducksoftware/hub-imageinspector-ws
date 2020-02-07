@@ -54,7 +54,8 @@ public class ImageInspectorHandler {
             final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag, final boolean organizeComponentsByLayer, final boolean includeRemovedComponents, final boolean cleanupWorkingDir,
         final String containerFileSystemPath, final String containerFileSystemExcludedPathListString,
         final String loggingLevel,
-            final String platformTopLayerId) {
+            final String platformTopLayerId,
+        final String targetLinuxDistroOverride) {
         try {
             final String msg = String.format("Black Duck Image Inspector v%s: dockerTarfilePath: %s, blackDuckProjectName: %s, blackDuckProjectVersion: %s, codeLocationPrefix: %s, organizeComponentsByLayer: %b, includeRemovedComponents: %b, cleanupWorkingDir: %b",
                 programVersion.getProgramVersion(),
@@ -63,7 +64,7 @@ public class ImageInspectorHandler {
             logger.info(msg);
             final String bdio = imageInspectorAction.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
                     containerFileSystemPath, containerFileSystemExcludedPathListString,
-                platformTopLayerId);
+                platformTopLayerId, targetLinuxDistroOverride);
             logger.info("Succeeded: Returning BDIO response");
             return responseFactory.createResponse(bdio);
         } catch (final WrongInspectorOsException wrongOsException) {

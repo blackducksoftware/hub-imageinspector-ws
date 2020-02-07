@@ -77,14 +77,15 @@ public class ImageInspectorAction {
         final boolean organizeComponentsByLayer, final boolean includeRemovedComponents,
         final boolean cleanupWorkingDir,
         final String containerFileSystemPath, final String containerFileSystemExcludedPathListString,
-        final String platformTopLayerId)
+        final String platformTopLayerId,
+        final String targetLinuxDistroOverride)
             throws IntegrationException, IOException {
         logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
         final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag,
             organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
                 containerFileSystemPath,
             containerFileSystemExcludedPathListString,
-            currentLinuxDistro, platformTopLayerId);
+            currentLinuxDistro, targetLinuxDistroOverride, platformTopLayerId);
         final ByteArrayOutputStream bdioBytes = new ByteArrayOutputStream();
         try (BdioWriter writer = new BdioWriter(gson, bdioBytes)) {
             writer.writeSimpleBdioDocument(bdio);

@@ -58,6 +58,7 @@ public class ImageInspectorController {
     static final String IMAGE_REPO_PARAM = "imagerepo";
     static final String IMAGE_TAG_PARAM = "imagetag";
     static final String PLATFORM_TOP_LAYER_ID_PARAM = "platformtoplayerid";
+    static final String TARGET_LINUX_DISTRO_OVERRIDE_PARAM = "targetlinuxdistro";
 
     @Autowired
     private ImageInspectorHandler imageInspectorHandler;
@@ -75,14 +76,16 @@ public class ImageInspectorController {
         @RequestParam(value = LOGGING_LEVEL_PARAM, required = false, defaultValue = "INFO") final String loggingLevel,
         @RequestParam(value = IMAGE_REPO_PARAM, required = false, defaultValue = "") final String givenImageRepo,
         @RequestParam(value = IMAGE_TAG_PARAM, required = false, defaultValue = "") final String givenImageTag,
-        @RequestParam(value = PLATFORM_TOP_LAYER_ID_PARAM, required = false, defaultValue = "") final String platformTopLayerId) {
-        logger.info(String.format("Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s, loggingLevel=%s, platformTopLayerId=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath, loggingLevel, platformTopLayerId));
+        @RequestParam(value = PLATFORM_TOP_LAYER_ID_PARAM, required = false, defaultValue = "") final String platformTopLayerId,
+        @RequestParam(value = TARGET_LINUX_DISTRO_OVERRIDE_PARAM, required = false, defaultValue = "") final String targetLinuxDistroOverride) {
+        logger.info(String.format("Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s, loggingLevel=%s, platformTopLayerId=%s, targetLinuxDistroOverride=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath,
+            loggingLevel, platformTopLayerId, targetLinuxDistroOverride));
         setLoggingLevel(loggingLevel);
         return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo,
             givenImageTag,
             organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
             containerFileSystemPath, containerFileSystemExcludedPathListString,
-            loggingLevel, platformTopLayerId);
+            loggingLevel, platformTopLayerId, targetLinuxDistroOverride);
     }
 
     @RequestMapping(path = GET_SERVICE_VERSION, method = RequestMethod.GET)

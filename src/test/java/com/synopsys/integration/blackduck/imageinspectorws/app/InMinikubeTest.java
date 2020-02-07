@@ -42,8 +42,7 @@ public class InMinikubeTest {
 
         final String kubeStatusOutputJoined = execCmd("minikube status", 15);
         System.out.println(String.format("kubeStatusOutputJoined: %s", kubeStatusOutputJoined));
-        assertTrue(kubeStatusOutputJoined.contains("minikube: Running"));
-        assertTrue(kubeStatusOutputJoined.contains("cluster: Running"));
+        assertTrue(kubeStatusOutputJoined.contains(": Running"));
 
         final String[] ipOutput = execCmd("minikube ip", 10).split("\n");
         clusterIp = ipOutput[0];
@@ -174,6 +173,25 @@ public class InMinikubeTest {
         assertTrue(getBdioOutputJoined.contains("libc_utils/"));
         assertTrue(getBdioOutputJoined.contains("x86_64"));
         assertTrue(getBdioOutputJoined.endsWith("]"));
+
+        assertTrue(getBdioOutputJoined.contains("\"externalSystemTypeId\": \"@alpine\","));
+    }
+
+    @Test
+    public void testDistroOverride() throws InterruptedException, IntegrationException, IOException {
+        final String getBdioOutputJoined = execCmd(String.format("curl -i 'http://%s:%s/getbdio?tarfile=/opt/blackduck/shared/target/alpine.tar&targetlinuxdistro=xyz&logginglevel=TRACE'", clusterIp, PORT_ALPINE), 30);
+        System.out.printf("getBdioOutputJoined: %s", getBdioOutputJoined);
+        assertTrue(getBdioOutputJoined.contains("alpine_latest_APK"));
+        assertTrue(getBdioOutputJoined.contains("BillOfMaterials"));
+        assertTrue(getBdioOutputJoined.contains("http:xyz/libc_utils"));
+        assertTrue(getBdioOutputJoined.contains("musl/"));
+        assertTrue(getBdioOutputJoined.contains("musl_utils/"));
+        assertTrue(getBdioOutputJoined.contains("libc_utils/"));
+        assertTrue(getBdioOutputJoined.contains("x86_64"));
+        assertTrue(getBdioOutputJoined.endsWith("]"));
+
+        assertFalse(getBdioOutputJoined.contains("\"externalSystemTypeId\": \"@alpine\","));
+        assertTrue(getBdioOutputJoined.contains("\"externalSystemTypeId\": \"@xyz\","));
     }
 
     @Test
