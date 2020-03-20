@@ -34,6 +34,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
+import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequest;
+import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequestBuilder;
 import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorApi;
 import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
 import com.synopsys.integration.exception.IntegrationException;
@@ -79,13 +81,26 @@ public class ImageInspectorAction {
         final String containerFileSystemPath, final String containerFileSystemExcludedPathListString,
         final String platformTopLayerId,
         final String targetLinuxDistroOverride)
-            throws IntegrationException, IOException {
+        throws IntegrationException, IOException, InterruptedException {
         logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
-        final SimpleBdioDocument bdio = api.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag,
-            organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
-                containerFileSystemPath,
-            containerFileSystemExcludedPathListString,
-            currentLinuxDistro, targetLinuxDistroOverride, platformTopLayerId);
+        // TODO: create the request object earlier, in the controller, and pass it through to here
+        final ImageInspectionRequest imageInspectionRequest = new ImageInspectionRequestBuilder()
+            .setDockerTarfilePath(dockerTarfilePath)
+            .setBlackDuckProjectName(blackDuckProjectName)
+            .setBlackDuckProjectVersion(blackDuckProjectVersion)
+            .setCodeLocationPrefix(codeLocationPrefix)
+            .setGivenImageRepo(givenImageRepo)
+            .setGivenImageTag(givenImageTag)
+            .setOrganizeComponentsByLayer(organizeComponentsByLayer)
+            .setIncludeRemovedComponents(includeRemovedComponents)
+            .setCleanupWorkingDir(cleanupWorkingDir)
+            .setContainerFileSystemOutputPath(containerFileSystemPath)
+            .setContainerFileSystemExcludedPathListString(containerFileSystemExcludedPathListString)
+            .setCurrentLinuxDistro(currentLinuxDistro)
+            .setTargetLinuxDistroOverride(targetLinuxDistroOverride)
+            .setPlatformTopLayerExternalId(platformTopLayerId)
+            .build();
+        final SimpleBdioDocument bdio = api.getBdio(imageInspectionRequest);
         final ByteArrayOutputStream bdioBytes = new ByteArrayOutputStream();
         try (BdioWriter writer = new BdioWriter(gson, bdioBytes)) {
             writer.writeSimpleBdioDocument(bdio);
