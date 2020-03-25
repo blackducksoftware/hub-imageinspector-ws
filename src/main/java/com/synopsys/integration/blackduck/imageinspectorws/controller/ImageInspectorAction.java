@@ -26,7 +26,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.compress.compressors.CompressorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
 import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequest;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequestBuilder;
 import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorApi;
 import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
 import com.synopsys.integration.exception.IntegrationException;
@@ -51,9 +49,6 @@ public class ImageInspectorAction {
 
     @Autowired
     private Gson gson;
-
-    @Value("${current.linux.distro:}")
-    private String currentLinuxDistro;
 
     // In environments like OpenShift, each URL (route) may be different
     @Value("${inspector.url.alpine:}")
@@ -75,31 +70,8 @@ public class ImageInspectorAction {
     @Value("${inspector.port.ubuntu:8082}")
     private String inspectorPortUbuntu;
 
-    public String getBdio(final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion, final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag,
-        final boolean organizeComponentsByLayer, final boolean includeRemovedComponents,
-        final boolean cleanupWorkingDir,
-        final String containerFileSystemPath, final String containerFileSystemExcludedPathListString,
-        final String platformTopLayerId,
-        final String targetLinuxDistroOverride)
-        throws IntegrationException, IOException, InterruptedException {
-        logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
-        // TODO: create the request object earlier, in the controller, and pass it through to here
-        final ImageInspectionRequest imageInspectionRequest = new ImageInspectionRequestBuilder()
-            .setDockerTarfilePath(dockerTarfilePath)
-            .setBlackDuckProjectName(blackDuckProjectName)
-            .setBlackDuckProjectVersion(blackDuckProjectVersion)
-            .setCodeLocationPrefix(codeLocationPrefix)
-            .setGivenImageRepo(givenImageRepo)
-            .setGivenImageTag(givenImageTag)
-            .setOrganizeComponentsByLayer(organizeComponentsByLayer)
-            .setIncludeRemovedComponents(includeRemovedComponents)
-            .setCleanupWorkingDir(cleanupWorkingDir)
-            .setContainerFileSystemOutputPath(containerFileSystemPath)
-            .setContainerFileSystemExcludedPathListString(containerFileSystemExcludedPathListString)
-            .setCurrentLinuxDistro(currentLinuxDistro)
-            .setTargetLinuxDistroOverride(targetLinuxDistroOverride)
-            .setPlatformTopLayerExternalId(platformTopLayerId)
-            .build();
+    public String getBdio(final ImageInspectionRequest imageInspectionRequest)
+            throws IntegrationException, IOException, InterruptedException {
         final SimpleBdioDocument bdio = api.getBdio(imageInspectionRequest);
         final ByteArrayOutputStream bdioBytes = new ByteArrayOutputStream();
         try (BdioWriter writer = new BdioWriter(gson, bdioBytes)) {
