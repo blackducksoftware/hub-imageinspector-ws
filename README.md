@@ -1,6 +1,12 @@
 # Overview #
 A container-based Web Service for analyzing Docker images.
 
+## Build ##
+[![Build Status](https://travis-ci.org/blackducksoftware/hub-imageinspector-ws.svg?branch=master)](https://travis-ci.org/blackducksoftware/hub-imageinspector-ws)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.synopsys.integration%3Ahub-imageinspector-ws&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.synopsys.integration%3Ahub-imageinspector-ws)
+[![Coverage Status](https://coveralls.io/repos/github/blackducksoftware/hub-imageinspector-ws/badge.svg?branch=master)](https://coveralls.io/github/blackducksoftware/hub-imageinspector-ws?branch=master)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 # Where can I get the latest release? #
 You can download the latest source from GitHub: https://github.com/blackducksoftware/hub-imageinspector-ws. 
 
