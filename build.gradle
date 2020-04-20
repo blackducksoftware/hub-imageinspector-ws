@@ -46,7 +46,7 @@ publishing {
 }
 
 dependencies {
-    implementation 'com.synopsys.integration:hub-imageinspector-lib:13.0.1'
+    implementation 'com.synopsys.integration:hub-imageinspector-lib:13.0.2-SNAPSHOT'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation 'io.micrometer:micrometer-registry-prometheus'
