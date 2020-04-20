@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequest;
 import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequestBuilder;
+import com.synopsys.integration.exception.IntegrationException;
 
 import ch.qos.logback.classic.Level;
 
@@ -70,6 +72,9 @@ public class ImageInspectorController {
     @Autowired
     private ImageInspectorHandler imageInspectorHandler;
 
+    @Autowired
+    private ResponseFactory responseFactory;
+
     @GetMapping(path = GET_BDIO_PATH)
     public ResponseEntity<String> getBdio(final HttpServletRequest request,
         @RequestParam(value = TARFILE_PATH_QUERY_PARAM) final String tarFilePath,
@@ -89,23 +94,30 @@ public class ImageInspectorController {
         setLoggingLevel(loggingLevel);
         logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
 
-        final ImageInspectionRequest imageInspectionRequest = (new ImageInspectionRequestBuilder())
-            .setLoggingLevel(loggingLevel)
-            .setDockerTarfilePath(tarFilePath)
-            .setCurrentLinuxDistro(currentLinuxDistro)
-            .setBlackDuckProjectName(blackDuckProjectName)
-            .setBlackDuckProjectVersion(blackDuckProjectVersion)
-            .setCodeLocationPrefix(codeLocationPrefix)
-            .setOrganizeComponentsByLayer(organizeComponentsByLayer)
-            .setIncludeRemovedComponents(includeRemovedComponents)
-            .setCleanupWorkingDir(cleanupWorkingDir)
-            .setContainerFileSystemOutputPath(containerFileSystemPath)
-            .setContainerFileSystemExcludedPathListString(containerFileSystemExcludedPathListString)
-            .setGivenImageRepo(givenImageRepo)
-            .setGivenImageTag(givenImageTag)
-            .setPlatformTopLayerExternalId(platformTopLayerId)
-            .setTargetLinuxDistroOverride(targetLinuxDistroOverride)
-            .build();
+        final ImageInspectionRequest imageInspectionRequest;
+        try {
+            imageInspectionRequest = new ImageInspectionRequestBuilder()
+                .setLoggingLevel(loggingLevel)
+                .setDockerTarfilePath(tarFilePath)
+                .setCurrentLinuxDistro(currentLinuxDistro)
+                .setBlackDuckProjectName(blackDuckProjectName)
+                .setBlackDuckProjectVersion(blackDuckProjectVersion)
+                .setCodeLocationPrefix(codeLocationPrefix)
+                .setOrganizeComponentsByLayer(organizeComponentsByLayer)
+                .setIncludeRemovedComponents(includeRemovedComponents)
+                .setCleanupWorkingDir(cleanupWorkingDir)
+                .setContainerFileSystemOutputPath(containerFileSystemPath)
+                .setContainerFileSystemExcludedPathListString(containerFileSystemExcludedPathListString)
+                .setGivenImageRepo(givenImageRepo)
+                .setGivenImageTag(givenImageTag)
+                .setPlatformTopLayerExternalId(platformTopLayerId)
+                .setTargetLinuxDistroOverride(targetLinuxDistroOverride)
+                .build();
+        } catch (IntegrationException e) {
+            final String msg = String.format("Exception thrown while building request from URL query parameters: %s", e.getMessage());
+            logger.error(msg, e);
+            return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), msg);
+        }
         logger.info(String.format("Endpoint %s called; request: %s", GET_BDIO_PATH, imageInspectionRequest));
         return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getRequestURI(), imageInspectionRequest);
     }
