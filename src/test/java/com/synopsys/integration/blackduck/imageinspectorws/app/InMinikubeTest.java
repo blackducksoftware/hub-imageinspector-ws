@@ -1,6 +1,5 @@
 package com.synopsys.integration.blackduck.imageinspectorws.app;
 
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -27,7 +26,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-
 @Tag("integration")
 public class InMinikubeTest {
     private static final String POD_NAME = "blackduck-imageinspector";
@@ -39,7 +37,6 @@ public class InMinikubeTest {
 
     @BeforeAll
     public static void setUpBeforeClass() throws Exception {
-
         final String kubeStatusOutputJoined = execCmd("minikube status", 15);
         System.out.println(String.format("kubeStatusOutputJoined: %s", kubeStatusOutputJoined));
         assertTrue(kubeStatusOutputJoined.contains(": Running"));
