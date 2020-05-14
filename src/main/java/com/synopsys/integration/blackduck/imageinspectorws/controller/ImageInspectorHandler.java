@@ -33,12 +33,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequest;
+import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequestBuilder;
 import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
 import com.synopsys.integration.blackduck.imageinspector.api.WrongInspectorOsException;
 import com.synopsys.integration.exception.IntegrationException;
 
 @Component
 public class ImageInspectorHandler {
+    private static final String INITIAL_URL_PARAMETER_FORMAT_STRING = "%s=%s";
+    private static final String SUBSEQUENT_URL_PARAMETER_FORMAT_STRING = "&%s=%s";
+    private static final String SUBSEQUENT_URL_PARAMETER_FORMAT_BOOLEAN = "&%s=%b";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
@@ -48,23 +53,14 @@ public class ImageInspectorHandler {
     private ResponseFactory responseFactory;
 
     @Autowired
-    private ProgramVersion programVersion;
+    private ServiceDetails serviceDetails;
 
-    public ResponseEntity<String> getBdio(final String scheme, final String host, final int port, final String requestUri, final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
-            final String codeLocationPrefix, final String givenImageRepo, final String givenImageTag, final boolean organizeComponentsByLayer, final boolean includeRemovedComponents, final boolean cleanupWorkingDir,
-        final String containerFileSystemPath, final String containerFileSystemExcludedPathListString,
-        final String loggingLevel,
-            final String platformTopLayerId,
-        final String targetLinuxDistroOverride) {
+    public ResponseEntity<String> getBdio(final String scheme, final String host, final String requestUri,
+        final ImageInspectionRequest imageInspectionRequest) {
         try {
-            final String msg = String.format("Black Duck Image Inspector v%s: dockerTarfilePath: %s, blackDuckProjectName: %s, blackDuckProjectVersion: %s, codeLocationPrefix: %s, organizeComponentsByLayer: %b, includeRemovedComponents: %b, cleanupWorkingDir: %b",
-                programVersion.getProgramVersion(),
-                dockerTarfilePath,
-                blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir);
-            logger.info(msg);
-            final String bdio = imageInspectorAction.getBdio(dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo, givenImageTag, organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
-                    containerFileSystemPath, containerFileSystemExcludedPathListString,
-                platformTopLayerId, targetLinuxDistroOverride);
+            logger.info(String.format("Black Duck Image Inspector v%s request: %s",
+                serviceDetails.getVersion(), imageInspectionRequest));
+            final String bdio = imageInspectorAction.getBdio(imageInspectionRequest);
             logger.info("Succeeded: Returning BDIO response");
             return responseFactory.createResponse(bdio);
         } catch (final WrongInspectorOsException wrongOsException) {
@@ -72,18 +68,17 @@ public class ImageInspectorHandler {
             final ImageInspectorOsEnum correctInspectorPlatform = wrongOsException.getcorrectInspectorOs();
             URI correctInspectorUri;
             try {
-                correctInspectorUri = adjustUrl(scheme, host, requestUri, dockerTarfilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, cleanupWorkingDir,
-                    containerFileSystemPath, containerFileSystemExcludedPathListString,
-                        correctInspectorPlatform, loggingLevel, givenImageRepo, givenImageTag, platformTopLayerId);
+                correctInspectorUri = adjustUrl(scheme, host, requestUri,
+                    correctInspectorPlatform,
+                    imageInspectionRequest);
             } catch (final IntegrationException deriveUrlException) {
                 final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
                 logger.error(msg, deriveUrlException);
                 return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, deriveUrlException.getMessage(), msg);
             }
 
-            final ResponseEntity<String> redirectResponse = responseFactory.createRedirect(wrongOsException.getcorrectInspectorOs(),
+            return responseFactory.createRedirect(wrongOsException.getcorrectInspectorOs(),
                     correctInspectorUri.toString(), wrongOsException.getMessage());
-            return redirectResponse;
         } catch (final Exception e) {
             final String msg = String.format("Exception thrown while getting image packages: %s", e.getMessage());
             logger.error(msg, e);
@@ -93,7 +88,7 @@ public class ImageInspectorHandler {
 
     public ResponseEntity<String> getServiceVersion() {
         try {
-            return responseFactory.createResponse(programVersion.getProgramVersion());
+            return responseFactory.createResponse(serviceDetails.getVersion());
         } catch (final Exception e) {
             final String msg = String.format("Exception thrown while getting service version: %s", e.getMessage());
             logger.error(msg, e);
@@ -101,23 +96,24 @@ public class ImageInspectorHandler {
         }
     }
 
-    private URI adjustUrl(final String scheme, final String host, final String requestUriString, final String dockerTarfilePath, final String blackDuckProjectName, final String blackDuckProjectVersion,
-            final String codeLocationPrefix, final boolean cleanupWorkingDir, final String containerFileSystemPath, final String containerFileSystemExcludedPathListString, final ImageInspectorOsEnum correctInspectorPlatform, final String loggingLevel,
-        final String givenImageRepo, final String givenImageTag, final String platformTopLayerId)
+    private URI adjustUrl(final String scheme, final String host, final String requestUriString,
+        final ImageInspectorOsEnum correctInspectorPlatform,
+        final ImageInspectionRequest imageInspectionRequest)
             throws IntegrationException {
         final StringBuilder querySb = new StringBuilder();
-        querySb.append(String.format("%s=%s", ImageInspectorController.TARFILE_PATH_QUERY_PARAM, dockerTarfilePath));
-        querySb.append(String.format("&%s=%s", ImageInspectorController.BLACKDUCK_PROJECT_NAME_QUERY_PARAM, blackDuckProjectName));
-        querySb.append(String.format("&%s=%s", ImageInspectorController.BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, blackDuckProjectVersion));
-        querySb.append(String.format("&%s=%s", ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, codeLocationPrefix));
-        querySb.append(String.format("&%s=%b", ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, cleanupWorkingDir));
-        querySb.append(String.format("&%s=%s", ImageInspectorController.CONTAINER_FILESYSTEM_PATH_PARAM, containerFileSystemPath));
-        querySb.append(String.format("&%s=%s", ImageInspectorController.CONTAINER_FILESYSTEM_EXCLUDED_PATHS_PARAM, containerFileSystemExcludedPathListString));
-        querySb.append(String.format("&%s=%s", ImageInspectorController.LOGGING_LEVEL_PARAM, loggingLevel));
-        querySb.append(String.format("&%s=%s", ImageInspectorController.IMAGE_REPO_PARAM, givenImageRepo));
-        querySb.append(String.format("&%s=%s", ImageInspectorController.IMAGE_TAG_PARAM, givenImageTag));
-        querySb.append(String.format("&%s=%s", ImageInspectorController.PLATFORM_TOP_LAYER_ID_PARAM, platformTopLayerId));
-        // TODO shouldn't have to add each new param here too
+        querySb.append(String.format(INITIAL_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.TARFILE_PATH_QUERY_PARAM, imageInspectionRequest.getDockerTarfilePath()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.BLACKDUCK_PROJECT_NAME_QUERY_PARAM, imageInspectionRequest.getBlackDuckProjectName()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, imageInspectionRequest.getBlackDuckProjectVersion()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, imageInspectionRequest.getCodeLocationPrefix()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_BOOLEAN, ImageInspectorController.CLEANUP_WORKING_DIR_QUERY_PARAM, imageInspectionRequest.isCleanupWorkingDir()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.CONTAINER_FILESYSTEM_PATH_PARAM, imageInspectionRequest.getContainerFileSystemOutputPath()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.CONTAINER_FILESYSTEM_EXCLUDED_PATHS_PARAM, imageInspectionRequest.getContainerFileSystemExcludedPathListString()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.LOGGING_LEVEL_PARAM, imageInspectionRequest.getLoggingLevel()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.IMAGE_REPO_PARAM, imageInspectionRequest.getGivenImageRepo()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.IMAGE_TAG_PARAM, imageInspectionRequest.getGivenImageTag()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.PLATFORM_TOP_LAYER_ID_PARAM, imageInspectionRequest.getPlatformTopLayerExternalId()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.TARGET_LINUX_DISTRO_OVERRIDE_PARAM, imageInspectionRequest.getTargetLinuxDistroOverride()));
+        // TODO shouldn't have to add each new param here too, or: an omission should be caught
         final String query = querySb.toString();
         URI adjustedUri;
         URI requestUri;

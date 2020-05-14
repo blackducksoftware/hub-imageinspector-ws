@@ -31,18 +31,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProgramVersion {
-    private final Logger logger = LoggerFactory.getLogger(ProgramVersion.class);
-    private String programVersion;
+public class ServiceDetails {
+    private final Logger logger = LoggerFactory.getLogger(ServiceDetails.class);
+    private String version;
 
-    public String getProgramVersion() throws IOException {
-        if (programVersion == null) {
+    public String getVersion() throws IOException {
+        if (version == null) {
             final Properties props = new Properties();
             final InputStream stream = this.getClass().getClassLoader().getResourceAsStream("version.properties");
             props.load(stream);
-            programVersion = props.getProperty("program.version");
-            logger.debug(String.format("programVersion: %s", programVersion));
+            version = props.getProperty("program.version");
+            logger.debug(String.format("programVersion: %s", version));
         }
-        return programVersion;
+        return version;
     }
 }

@@ -27,16 +27,23 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequest;
+import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequestBuilder;
 
 import ch.qos.logback.classic.Level;
 
 @RestController
 public class ImageInspectorController {
+
+    @Value("${current.linux.distro:}")
+    private String currentLinuxDistro;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static final String BASE_LOGGER_NAME = "com.synopsys";
 
@@ -63,8 +70,9 @@ public class ImageInspectorController {
     @Autowired
     private ImageInspectorHandler imageInspectorHandler;
 
-    @RequestMapping(path = GET_BDIO_PATH, method = RequestMethod.GET)
-    public ResponseEntity<String> getBdio(final HttpServletRequest request, @RequestParam(value = TARFILE_PATH_QUERY_PARAM) final String tarFilePath,
+    @GetMapping(path = GET_BDIO_PATH)
+    public ResponseEntity<String> getBdio(final HttpServletRequest request,
+        @RequestParam(value = TARFILE_PATH_QUERY_PARAM) final String tarFilePath,
         @RequestParam(value = BLACKDUCK_PROJECT_NAME_QUERY_PARAM, defaultValue = "") final String blackDuckProjectName,
         @RequestParam(value = BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, defaultValue = "") final String blackDuckProjectVersion,
         @RequestParam(value = CODELOCATION_PREFIX_QUERY_PARAM, defaultValue = "") final String codeLocationPrefix,
@@ -78,17 +86,31 @@ public class ImageInspectorController {
         @RequestParam(value = IMAGE_TAG_PARAM, required = false, defaultValue = "") final String givenImageTag,
         @RequestParam(value = PLATFORM_TOP_LAYER_ID_PARAM, required = false, defaultValue = "") final String platformTopLayerId,
         @RequestParam(value = TARGET_LINUX_DISTRO_OVERRIDE_PARAM, required = false, defaultValue = "") final String targetLinuxDistroOverride) {
-        logger.info(String.format("Endpoint %s called; tarFilePath: %s; containerFileSystemPath=%s, loggingLevel=%s, platformTopLayerId=%s, targetLinuxDistroOverride=%s", GET_BDIO_PATH, tarFilePath, containerFileSystemPath,
-            loggingLevel, platformTopLayerId, targetLinuxDistroOverride));
         setLoggingLevel(loggingLevel);
-        return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getServerPort(), request.getRequestURI(), tarFilePath, blackDuckProjectName, blackDuckProjectVersion, codeLocationPrefix, givenImageRepo,
-            givenImageTag,
-            organizeComponentsByLayer, includeRemovedComponents, cleanupWorkingDir,
-            containerFileSystemPath, containerFileSystemExcludedPathListString,
-            loggingLevel, platformTopLayerId, targetLinuxDistroOverride);
+        logger.info(String.format("Provided value of current.linux.distro: %s", currentLinuxDistro));
+
+        final ImageInspectionRequest imageInspectionRequest = (new ImageInspectionRequestBuilder())
+            .setLoggingLevel(loggingLevel)
+            .setDockerTarfilePath(tarFilePath)
+            .setCurrentLinuxDistro(currentLinuxDistro)
+            .setBlackDuckProjectName(blackDuckProjectName)
+            .setBlackDuckProjectVersion(blackDuckProjectVersion)
+            .setCodeLocationPrefix(codeLocationPrefix)
+            .setOrganizeComponentsByLayer(organizeComponentsByLayer)
+            .setIncludeRemovedComponents(includeRemovedComponents)
+            .setCleanupWorkingDir(cleanupWorkingDir)
+            .setContainerFileSystemOutputPath(containerFileSystemPath)
+            .setContainerFileSystemExcludedPathListString(containerFileSystemExcludedPathListString)
+            .setGivenImageRepo(givenImageRepo)
+            .setGivenImageTag(givenImageTag)
+            .setPlatformTopLayerExternalId(platformTopLayerId)
+            .setTargetLinuxDistroOverride(targetLinuxDistroOverride)
+            .build();
+        logger.info(String.format("Endpoint %s called; request: %s", GET_BDIO_PATH, imageInspectionRequest));
+        return imageInspectorHandler.getBdio(request.getScheme(), request.getServerName(), request.getRequestURI(), imageInspectionRequest);
     }
 
-    @RequestMapping(path = GET_SERVICE_VERSION, method = RequestMethod.GET)
+    @GetMapping(path = GET_SERVICE_VERSION)
     public ResponseEntity<String> getServiceVersion(final HttpServletRequest request) {
         logger.info(String.format("Endpoint %s called", GET_SERVICE_VERSION));
         return imageInspectorHandler.getServiceVersion();
@@ -97,6 +119,7 @@ public class ImageInspectorController {
     private void setLoggingLevel(final String newLoggingLevel) {
         logger.info(String.format("Setting logging level to %s", newLoggingLevel));
         try {
+            // TODO: is this right??
             final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(BASE_LOGGER_NAME);
             root.setLevel(Level.toLevel(newLoggingLevel));
             if (logger.isDebugEnabled()) {
