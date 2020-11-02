@@ -24,7 +24,7 @@ apply plugin: 'com.synopsys.integration.solution'
 
 // TODO these don't need to be arrays:
 def linuxFlavorsDpkg = ["ubuntu:latest"]
-def linuxFlavorsRpm = ["centos:centos7"]
+def linuxFlavorsRpm = ["fedora:34"]
 def linuxFlavorsApk = ["alpine:latest"]
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
 
@@ -114,10 +114,9 @@ task createRpmDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/output"
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
-            runCommand "localedef -c -f UTF-8 -i en_US en_US.UTF-8"
             environmentVariable('LANG', 'en_US.UTF-8')
             user '10001'
-            defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8081", "--current.linux.distro=${linuxFlavorDirName}"
+            defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8081", "--current.linux.distro=centos"
         }
     }
 }
@@ -152,7 +151,7 @@ task createDpkgDockerfileTasks() {
     }
 }
 
-task createDockerfiles(dependsOn: [createubuntuDockerfile, createcentosDockerfile, createalpineDockerfile]) {
+task createDockerfiles(dependsOn: [createubuntuDockerfile, createfedoraDockerfile, createalpineDockerfile]) {
 }
 
 task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles]) {
@@ -167,7 +166,7 @@ task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles
 	}
 }
 
-task copyJarFileToDockerfileDirs(dependsOn: [copyJarToDockerfileDir_ubuntu, copyJarToDockerfileDir_centos, copyJarToDockerfileDir_alpine]) {
+task copyJarFileToDockerfileDirs(dependsOn: [copyJarToDockerfileDir_ubuntu, copyJarToDockerfileDir_fedora, copyJarToDockerfileDir_alpine]) {
 }
 
 task createRemoveDockerImageTasks() {
@@ -199,7 +198,7 @@ task createBuildDockerImageTasks() {
     }
 }
 
-task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_centos, buildDockerImage_ubuntu]) {
+task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_fedora, buildDockerImage_ubuntu]) {
 }
 
 testIntegration.dependsOn testPrep
@@ -213,7 +212,7 @@ task pushImageAlpine(type: Exec, dependsOn: [buildDockerImage_alpine, dockerLogi
 	commandLine "docker", "push", "blackducksoftware/${appName}-alpine:${version}"
 }
 
-task pushImageCentos(type: Exec, dependsOn: [buildDockerImage_centos, dockerLogin]) {
+task pushImageFedora(type: Exec, dependsOn: [buildDockerImage_fedora, dockerLogin]) {
 	commandLine "docker", "push", "blackducksoftware/${appName}-centos:${version}"
 }
 
@@ -221,7 +220,7 @@ task pushImageUbuntu(type: Exec, dependsOn: [buildDockerImage_ubuntu, dockerLogi
 	commandLine "docker", "push", "blackducksoftware/${appName}-ubuntu:${version}"
 }
 
-task pushImages(dependsOn: [pushImageAlpine, pushImageCentos, pushImageUbuntu]) {
+task pushImages(dependsOn: [pushImageAlpine, pushImageFedora, pushImageUbuntu]) {
 }
 
 //// helper methods ////
@@ -235,6 +234,11 @@ String getNameWithoutVersion(String linuxFlavor) {
 }
 
 private String getSuffix(String linuxFlavorName) {
-    String suffix = "-${linuxFlavorName}"
+    String suffix
+    if ("fedora".equals(linuxFlavorName)) {
+	suffix = "-centos"
+    } else {
+    	suffix = "-${linuxFlavorName}"
+    }
     suffix
 }
