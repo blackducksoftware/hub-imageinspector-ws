@@ -38,8 +38,9 @@ public class ServiceDetails {
     public String getVersion() throws IOException {
         if (version == null) {
             final Properties props = new Properties();
-            final InputStream stream = this.getClass().getClassLoader().getResourceAsStream("version.properties");
-            props.load(stream);
+            try (InputStream stream = this.getClass().getClassLoader().getResourceAsStream("version.properties")) {
+                props.load(stream);
+            }
             version = props.getProperty("program.version");
             logger.debug(String.format("programVersion: %s", version));
         }

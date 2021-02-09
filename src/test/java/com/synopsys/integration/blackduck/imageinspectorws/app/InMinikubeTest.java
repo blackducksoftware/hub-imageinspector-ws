@@ -272,8 +272,14 @@ public class InMinikubeTest {
             pb.environment().putAll(env);
         }
         final Process p = pb.start();
-        final String stdoutString = toString(p.getInputStream());
-        final String stderrString = toString(p.getErrorStream());
+        String stdoutString;
+        try (InputStream stdoutInputStream = p.getInputStream()) {
+            stdoutString = toString(stdoutInputStream);
+        }
+        String stderrString;
+        try (InputStream stderrInputStream = p.getErrorStream()) {
+            stderrString = toString(stderrInputStream);
+        }
         final boolean finished = p.waitFor(timeout, TimeUnit.SECONDS);
         if (!finished) {
             throw new InterruptedException(String.format("Command '%s' timed out", cmd));
