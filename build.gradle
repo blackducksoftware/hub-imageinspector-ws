@@ -15,7 +15,7 @@ plugins {
     id 'org.springframework.boot' version '2.3.4.RELEASE'
 }
 
-version = '5.0.4'
+version = '5.0.5-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
