@@ -25,7 +25,7 @@ apply plugin: 'com.synopsys.integration.solution'
 
 // TODO these don't need to be arrays:
 def linuxFlavorsDpkg = ["ubuntu:latest"]
-def linuxFlavorsRpm = ["fedora:33"] // image is still named "centos"
+def linuxFlavorsRpm = ["fedora:33"] // the image is still named "centos"
 def linuxFlavorsApk = ["alpine:latest"]
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
 
