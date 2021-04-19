@@ -1,5 +1,5 @@
 /*
- * hub-imageinspector-ws
+ * 5.0.5
  *
  * Copyright (c) 2021 Synopsys, Inc.
  *
