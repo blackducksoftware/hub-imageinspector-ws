@@ -1,5 +1,5 @@
 /*
- * hub-imageinspector-ws
+ * blackduck-imageinspector
  *
  * Copyright (c) 2021 Synopsys, Inc.
  *
