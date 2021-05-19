@@ -198,8 +198,8 @@ task createBuildDockerImageTasks() {
 task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_fedora, buildDockerImage_ubuntu]) {
 }
 
-testIntegration.dependsOn testPrep
-testIntegration.dependsOn buildImages
+test.dependsOn testPrep
+test.dependsOn buildImages
 
 task dockerLogin(type: Exec) {
     commandLine "docker", "login", "--username", "$System.env.DOCKER_INT_BLACKDUCK_USER", "--password", "$System.env.DOCKER_INT_BLACKDUCK_PASSWORD"
