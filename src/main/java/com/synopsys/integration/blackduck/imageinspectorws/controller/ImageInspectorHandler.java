@@ -86,7 +86,7 @@ public class ImageInspectorHandler {
         final ImageInspectionRequest imageInspectionRequest)
             throws IntegrationException {
         final StringBuilder querySb = new StringBuilder();
-        querySb.append(String.format(INITIAL_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.TARFILE_PATH_QUERY_PARAM, imageInspectionRequest.getDockerTarfilePath()));
+        querySb.append(String.format(INITIAL_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.TARFILE_PATH_QUERY_PARAM, imageInspectionRequest.getImageTarfilePath()));
         querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.BLACKDUCK_PROJECT_NAME_QUERY_PARAM, imageInspectionRequest.getBlackDuckProjectName()));
         querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.BLACKDUCK_PROJECT_VERSION_QUERY_PARAM, imageInspectionRequest.getBlackDuckProjectVersion()));
         querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.CODELOCATION_PREFIX_QUERY_PARAM, imageInspectionRequest.getCodeLocationPrefix()));
@@ -98,6 +98,7 @@ public class ImageInspectorHandler {
         querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.IMAGE_TAG_PARAM, imageInspectionRequest.getGivenImageTag()));
         querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.PLATFORM_TOP_LAYER_ID_PARAM, imageInspectionRequest.getPlatformTopLayerExternalId()));
         querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_STRING, ImageInspectorController.TARGET_LINUX_DISTRO_OVERRIDE_PARAM, imageInspectionRequest.getTargetLinuxDistroOverride()));
+        querySb.append(String.format(SUBSEQUENT_URL_PARAMETER_FORMAT_BOOLEAN, ImageInspectorController.ORGANIZE_COMPONENTS_BY_LAYER_QUERY_PARAM, imageInspectionRequest.isOrganizeComponentsByLayer()));
         // TODO shouldn't have to add each new param here too, or: an omission should be caught
         final String query = querySb.toString();
         URI adjustedUri;
