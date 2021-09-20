@@ -67,6 +67,9 @@ public class ImageInspectorHandler {
         } catch (final Exception e) {
             final String msg = String.format("Exception thrown while getting image packages: %s", e.getMessage());
             logger.error(msg, e);
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
             return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), msg);
         }
     }
