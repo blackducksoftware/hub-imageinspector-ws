@@ -23,7 +23,7 @@ apply plugin: 'com.bmuschko.docker-remote-api'
 apply plugin: 'com.synopsys.integration.solution'
 
 // TODO these don't need to be arrays:
-def linuxFlavorsDpkg = ["ubuntu:latest"]
+def linuxFlavorsDpkg = ["debian:latest"] // the image is still named "ubuntu"
 def linuxFlavorsRpm = ["fedora:33"] // the image is still named "centos"
 def linuxFlavorsApk = ["alpine:latest"]
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
@@ -141,15 +141,15 @@ task createDpkgDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
             runCommand 'locale-gen "en_US.UTF-8"'
-            runCommand 'apt -y purge locales && apt-get autoremove && apt-get -y clean'
+            runCommand 'apt -y purge locales && apt-get -y autoremove && apt-get -y clean'
             environmentVariable('LANG', 'en_US.UTF-8')
             user '10001'
-            defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=${linuxFlavorDirName}"
+            defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=ubuntu"
         }
     }
 }
 
-task createDockerfiles(dependsOn: [createubuntuDockerfile, createfedoraDockerfile, createalpineDockerfile]) {
+task createDockerfiles(dependsOn: [createdebianDockerfile, createfedoraDockerfile, createalpineDockerfile]) {
 }
 
 task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles]) {
@@ -164,7 +164,7 @@ task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles
 	}
 }
 
-task copyJarFileToDockerfileDirs(dependsOn: [copyJarToDockerfileDir_ubuntu, copyJarToDockerfileDir_fedora, copyJarToDockerfileDir_alpine]) {
+task copyJarFileToDockerfileDirs(dependsOn: [copyJarToDockerfileDir_debian, copyJarToDockerfileDir_fedora, copyJarToDockerfileDir_alpine]) {
 }
 
 task createRemoveDockerImageTasks() {
@@ -196,7 +196,7 @@ task createBuildDockerImageTasks() {
     }
 }
 
-task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_fedora, buildDockerImage_ubuntu]) {
+task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_fedora, buildDockerImage_debian]) {
 }
 
 test.dependsOn testPrep
@@ -213,7 +213,7 @@ task pushImageFedora(type: Exec, dependsOn: [buildDockerImage_fedora, dockerLogi
 	commandLine "docker", "push", "blackducksoftware/${appName}-centos:${version}"
 }
 
-task pushImageUbuntu(type: Exec, dependsOn: [buildDockerImage_ubuntu, dockerLogin]) {
+task pushImageUbuntu(type: Exec, dependsOn: [buildDockerImage_debian, dockerLogin]) {
 	commandLine "docker", "push", "blackducksoftware/${appName}-ubuntu:${version}"
 }
 
@@ -232,7 +232,9 @@ String getNameWithoutVersion(String linuxFlavor) {
 
 private String getSuffix(String linuxFlavorName) {
     String suffix
-    if ("fedora".equals(linuxFlavorName)) {
+    if ("debian".equals(linuxFlavorName)) {
+	suffix = "-ubuntu"
+    } else if ("fedora".equals(linuxFlavorName)) {
 	suffix = "-centos"
     } else {
     	suffix = "-${linuxFlavorName}"
