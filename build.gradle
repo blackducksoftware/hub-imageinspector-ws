@@ -45,6 +45,8 @@ publishing {
     }
 }
 
+ext['log4j2.version'] = '2.16.0'
+
 dependencies {
     implementation 'com.synopsys.integration:hub-imageinspector-lib:14.0.4'
     implementation 'org.springframework.boot:spring-boot-starter-web'
