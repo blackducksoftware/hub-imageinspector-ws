@@ -11,7 +11,7 @@ buildscript {
 }
 
 plugins {
-    id 'org.springframework.boot' version '2.5.4'
+    id 'org.springframework.boot' version '2.6.4'
 }
 
 version = '5.0.11-SNAPSHOT'
@@ -48,10 +48,11 @@ publishing {
 ext['log4j2.version'] = '2.16.0'
 
 dependencies {
-    implementation 'com.synopsys.integration:hub-imageinspector-lib:14.1.0'
+    implementation 'com.synopsys.integration:hub-imageinspector-lib:14.1.1'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'ch.qos.logback:logback-classic:1.2.11'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'org.apache.commons:commons-exec:1.3'
