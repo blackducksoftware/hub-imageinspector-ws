@@ -21,9 +21,8 @@ public class ResponseFactory {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
-    public ResponseEntity<String> createResponse(final HttpStatus status, final String warning, final String body) {
+    public ResponseEntity<String> createResponse(final HttpStatus status, final String body) {
         final HttpHeaders headers = new HttpHeaders();
-        headers.add("Warning", warning);
         return new ResponseEntity<>(body, headers, status);
     }
 

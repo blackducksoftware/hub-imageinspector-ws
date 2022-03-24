@@ -59,7 +59,7 @@ public class ImageInspectorHandler {
             } catch (final IntegrationException deriveUrlException) {
                 final String msg = String.format("Exception thrown while deriving redirect URL: %s", deriveUrlException.getMessage());
                 logger.error(msg, deriveUrlException);
-                return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, deriveUrlException.getMessage(), msg);
+                return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, msg);
             }
 
             return responseFactory.createRedirect(wrongOsException.getcorrectInspectorOs(),
@@ -70,7 +70,7 @@ public class ImageInspectorHandler {
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
-            return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), msg);
+            return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, msg);
         }
     }
 
@@ -80,7 +80,7 @@ public class ImageInspectorHandler {
         } catch (final Exception e) {
             final String msg = String.format("Exception thrown while getting service version: %s", e.getMessage());
             logger.error(msg, e);
-            return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), msg);
+            return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, msg);
         }
     }
 
