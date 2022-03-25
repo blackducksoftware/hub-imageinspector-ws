@@ -76,7 +76,7 @@ task createApkDockerfileTasks() {
         String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
         task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
             destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
-            println "destFile: ${destFile}"
+            logger.lifecycle("destFile: ${destFile}")
             from linuxFlavor
             exposePort 8080
             runCommand 'apk update && apk add bash && apk add openjdk11-jre'
@@ -101,7 +101,7 @@ task createRpmDockerfileTasks() {
         String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
         task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
             destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
-            println "destFile: ${destFile}"
+            logger.lifecycle("destFile: ${destFile}")
             from linuxFlavor
             exposePort 8081
             runCommand 'yum update -y && yum install -y java-11-openjdk && yum clean all -y'
@@ -127,7 +127,7 @@ task createDpkgDockerfileTasks() {
         String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
         task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
             destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
-            println "destFile: ${destFile}"
+            logger.lifecycle("destFile: ${destFile}")
             from linuxFlavor
             exposePort 8082
             runCommand 'apt-get update -y && \
@@ -158,7 +158,7 @@ task createDockerfiles(dependsOn: [createdebianDockerfile, createfedoraDockerfil
 task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles]) {
 	linuxFlavors.eachWithIndex {linuxFlavor, index ->
 		String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
-		println "Creating task to copy jar from build/libs/${project.name}-${version}.jar to Dockerfile dir for ${linuxFlavorDirName}, renaming to ${appName}-${version}.jar"
+		logger.lifecycle("Creating task to copy jar from build/libs/${project.name}-${version}.jar to Dockerfile dir for ${linuxFlavorDirName}, renaming to ${appName}-${version}.jar")
         task "copyJarToDockerfileDir_${linuxFlavorDirName}"(type: Copy, dependsOn: build) {
 			from "build/libs/${project.name}-${version}.jar"
 			into "${buildDir}/images/${linuxFlavorDirName}/${appName}"
@@ -175,7 +175,7 @@ task createRemoveDockerImageTasks() {
         String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
         def taskName = "removeDockerImage_${linuxFlavorDirName}"
         String suffix = getSuffix(linuxFlavorDirName)
-        println "creating task ${taskName}"
+        logger.lifecycle("creating task ${taskName}")
         task "${taskName}"(type: Exec) {
 			ignoreExitValue true
             commandLine "docker", "rmi", "blackducksoftware/${appName}${suffix}:${version}"
@@ -191,7 +191,7 @@ task createBuildDockerImageTasks() {
         String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
         def taskName = "buildDockerImage_${linuxFlavorDirName}"
         String suffix = getSuffix(linuxFlavorDirName)
-        println "creating task ${taskName}"
+        logger.lifecycle("creating task ${taskName}")
         task "${taskName}"(type: Exec, dependsOn: ["removeDockerImage_${linuxFlavorDirName}", buildImageDirs]) {
             commandLine "docker", "build", "--tag", "blackducksoftware/${appName}${suffix}:${version}", \
                 "${buildDir}/images/${linuxFlavorDirName}/${appName}"
