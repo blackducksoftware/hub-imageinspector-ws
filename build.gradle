@@ -3,7 +3,10 @@ import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 
 buildscript {
     apply from: "https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-repositories.gradle", to: buildscript
-    apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-dependencies.gradle', to: buildscript
+    ////////// START BUILDSCRIPT DEPENDENCY //////////
+dependencies { classpath "com.synopsys.integration:common-gradle-plugin:1.12.0" }
+
+////////// END BUILDSCRIPT DEPENDENCY //////////
 
     dependencies {
         classpath 'com.bmuschko:gradle-docker-plugin:6.7.0'
@@ -14,7 +17,7 @@ plugins {
     id 'org.springframework.boot' version '2.6.6'
 }
 
-version = '5.0.15-SNAPSHOT'
+version = '5.0.15'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
