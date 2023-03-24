@@ -205,7 +205,20 @@ task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_fedora, b
 test.dependsOn testPrep
 
 task dockerLogin(type: Exec) {
-    commandLine "docker", "login"
+    String dockerLoginUsername = System.env.DOCKER_INT_BLACKDUCK_USER ?: '<Not Set>'
+
+  doFirst {
+    String dockerLoginPassword = System.env.DOCKER_INT_BLACKDUCK_PASSWORD
+    if (dockerLoginPassword?.trim()) {
+      standardInput = new ByteArrayInputStream(dockerLoginPassword.getBytes())
+    }
+  }
+
+  commandLine 'docker', 'login', '--username', dockerLoginUsername, '--password-stdin'
+
+  onlyIf {
+    System.env.DOCKER_INT_BLACKDUCK_USER != null && System.env.DOCKER_INT_BLACKDUCK_PASSWORD != null
+  }
 }
 
 task pushImageAlpine(type: Exec, dependsOn: [buildDockerImage_alpine, dockerLogin]) {
