@@ -130,8 +130,9 @@ task createDpkgDockerfileTasks() {
             logger.lifecycle("destFile: ${destFile}")
             from linuxFlavor
             exposePort 8082
-            runCommand ' add-apt-repository ppa:openjdk-r/ppa && \
+            runCommand ' apt-get install software-properties-common && \
                 apt-get update -y && \
+                add-apt-repository ppa:openjdk-r/ppa && \
                 apt-get install -y openjdk-11-jdk && \
                 apt-get install -y locales && apt-get -y clean'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
