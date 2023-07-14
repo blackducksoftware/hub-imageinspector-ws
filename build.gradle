@@ -23,7 +23,7 @@ apply plugin: 'com.bmuschko.docker-remote-api'
 apply plugin: 'com.synopsys.integration.solution'
 
 // TODO these don't need to be arrays:
-def linuxFlavorsDpkg = ["debian:10"] // the image is still named "ubuntu"
+def linuxFlavorsDpkg = ["debian:11"] // the image is still named "ubuntu"
 def linuxFlavorsRpm = ["fedora:33"] // the image is still named "centos"
 def linuxFlavorsApk = ["alpine:latest"]
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
