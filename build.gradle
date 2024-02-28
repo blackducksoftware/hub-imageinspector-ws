@@ -17,6 +17,28 @@ plugins {
     id 'org.springframework.boot' version '2.6.6'
 }
 
+final def externalRepoHost = "https://sig-repo.synopsys.com"
+final def internalRepoHost = System.getenv('SNPS_INTERNAL_ARTIFACTORY')
+
+repositories {
+    println "Checking if environment property SNPS_INTERNAL_ARTIFACTORY is configured: ${internalRepoHost}"
+    maven {
+        url = uri("${internalRepoHost}/artifactory/bds-integrations-release")
+    }
+    maven {
+        url = uri("${internalRepoHost}/artifactory/bds-integrations-snapshot")
+    }
+    maven {
+        url = uri("${internalRepoHost}/artifactory/bds-integration-placeholder-release")
+    }
+    maven {
+        url = uri("${externalRepoHost}/artifactory/bds-integration-placeholder-release")
+    }
+    maven {
+        url "${externalRepoHost}/bds-bdio-release"
+    }
+}
+
 version = '5.1.1-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
@@ -51,7 +73,7 @@ publishing {
 ext['log4j2.version'] = '2.16.0'
 
 dependencies {
-    implementation 'com.synopsys.integration:hub-imageinspector-lib:14.2.0'
+    implementation 'com.synopsys.integration:hub-imageinspector-lib:14.2.1'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation 'io.micrometer:micrometer-registry-prometheus'
