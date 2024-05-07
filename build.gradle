@@ -36,7 +36,7 @@ repositories {
     }
 }
 
-version = '5.1.2-SNAPSHOT'
+version = '5.2.1-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
@@ -70,7 +70,7 @@ publishing {
 ext['log4j2.version'] = '2.16.0'
 
 dependencies {
-    implementation 'com.synopsys.integration:hub-imageinspector-lib:14.2.1'
+    implementation 'com.synopsys.integration:hub-imageinspector-lib:14.3.0'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation 'io.micrometer:micrometer-registry-prometheus'
@@ -85,9 +85,9 @@ dependencies {
 // Prepare test config file
 // System.getProperty("user.dir")
 task buildKubeTestPodConfig(type: Copy) {
-	from 'src/test/resources/kube-test-pod.yml'
-	into 'build/classes/java/test/com/synopsys/integration/blackduck/imageinspectorws/app'
-	filter(ReplaceTokens, tokens: [CURRENT_DIR: System.getProperty("user.dir"), VERSION: version])
+    from 'src/test/resources/kube-test-pod.yml'
+    into 'build/classes/java/test/com/synopsys/integration/blackduck/imageinspectorws/app'
+    filter(ReplaceTokens, tokens: [CURRENT_DIR: System.getProperty("user.dir"), VERSION: version])
 }
 
 task testPrep(dependsOn: buildKubeTestPodConfig) {}
@@ -178,15 +178,15 @@ task createDockerfiles(dependsOn: [createdebianDockerfile, createfedoraDockerfil
 }
 
 task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles]) {
-	linuxFlavors.eachWithIndex {linuxFlavor, index ->
-		String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
-		logger.lifecycle("Creating task to copy jar from build/libs/${project.name}-${version}.jar to Dockerfile dir for ${linuxFlavorDirName}, renaming to ${appName}-${version}.jar")
+    linuxFlavors.eachWithIndex {linuxFlavor, index ->
+        String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
+        logger.lifecycle("Creating task to copy jar from build/libs/${project.name}-${version}.jar to Dockerfile dir for ${linuxFlavorDirName}, renaming to ${appName}-${version}.jar")
         task "copyJarToDockerfileDir_${linuxFlavorDirName}"(type: Copy, dependsOn: build) {
-			from "build/libs/${project.name}-${version}.jar"
-			into "${buildDir}/images/${linuxFlavorDirName}/${appName}"
-			rename ("${project.name}-${version}.jar", "${appName}-${version}.jar")
-		}
-	}
+            from "build/libs/${project.name}-${version}.jar"
+            into "${buildDir}/images/${linuxFlavorDirName}/${appName}"
+            rename ("${project.name}-${version}.jar", "${appName}-${version}.jar")
+        }
+    }
 }
 
 task copyJarFileToDockerfileDirs(dependsOn: [copyJarToDockerfileDir_debian, copyJarToDockerfileDir_fedora, copyJarToDockerfileDir_alpine]) {
@@ -199,7 +199,7 @@ task createRemoveDockerImageTasks() {
         String suffix = getSuffix(linuxFlavorDirName)
         logger.lifecycle("creating task ${taskName}")
         task "${taskName}"(type: Exec) {
-			ignoreExitValue true
+            ignoreExitValue true
             commandLine "docker", "rmi", "blackducksoftware/${appName}${suffix}:${version}"
         }
     }
@@ -229,30 +229,30 @@ test.dependsOn testPrep
 task dockerLogin(type: Exec) {
     String dockerLoginUsername = System.env.DOCKER_INT_BLACKDUCK_USER ?: '<Not Set>'
 
-  doFirst {
-    String dockerLoginPassword = System.env.DOCKER_INT_BLACKDUCK_PASSWORD
-    if (dockerLoginPassword?.trim()) {
-      standardInput = new ByteArrayInputStream(dockerLoginPassword.getBytes())
+    doFirst {
+        String dockerLoginPassword = System.env.DOCKER_INT_BLACKDUCK_PASSWORD
+        if (dockerLoginPassword?.trim()) {
+            standardInput = new ByteArrayInputStream(dockerLoginPassword.getBytes())
+        }
     }
-  }
 
-  commandLine 'docker', 'login', '--username', dockerLoginUsername, '--password-stdin'
+    commandLine 'docker', 'login', '--username', dockerLoginUsername, '--password-stdin'
 
-  onlyIf {
-    System.env.DOCKER_INT_BLACKDUCK_USER != null && System.env.DOCKER_INT_BLACKDUCK_PASSWORD != null
-  }
+    onlyIf {
+        System.env.DOCKER_INT_BLACKDUCK_USER != null && System.env.DOCKER_INT_BLACKDUCK_PASSWORD != null
+    }
 }
 
 task pushImageAlpine(type: Exec, dependsOn: [buildDockerImage_alpine, dockerLogin]) {
-	commandLine "docker", "push", "blackducksoftware/${appName}-alpine:${version}"
+    commandLine "docker", "push", "blackducksoftware/${appName}-alpine:${version}"
 }
 
 task pushImageFedora(type: Exec, dependsOn: [buildDockerImage_fedora, dockerLogin]) {
-	commandLine "docker", "push", "blackducksoftware/${appName}-centos:${version}"
+    commandLine "docker", "push", "blackducksoftware/${appName}-centos:${version}"
 }
 
 task pushImageUbuntu(type: Exec, dependsOn: [buildDockerImage_debian, dockerLogin]) {
-	commandLine "docker", "push", "blackducksoftware/${appName}-ubuntu:${version}"
+    commandLine "docker", "push", "blackducksoftware/${appName}-ubuntu:${version}"
 }
 
 task pushImages(dependsOn: [pushImageAlpine, pushImageFedora, pushImageUbuntu]) {
@@ -271,11 +271,11 @@ String getNameWithoutVersion(String linuxFlavor) {
 private String getSuffix(String linuxFlavorName) {
     String suffix
     if ("debian".equals(linuxFlavorName)) {
-	suffix = "-ubuntu"
+        suffix = "-ubuntu"
     } else if ("fedora".equals(linuxFlavorName)) {
-	suffix = "-centos"
+        suffix = "-centos"
     } else {
-    	suffix = "-${linuxFlavorName}"
+        suffix = "-${linuxFlavorName}"
     }
     suffix
 }
