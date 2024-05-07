@@ -36,7 +36,7 @@ repositories {
     }
 }
 
-version = '5.1.2-SNAPSHOT'
+version = '5.2.0'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
@@ -70,7 +70,7 @@ publishing {
 ext['log4j2.version'] = '2.16.0'
 
 dependencies {
-    implementation 'com.synopsys.integration:hub-imageinspector-lib:14.2.1'
+    implementation 'com.synopsys.integration:hub-imageinspector-lib:14.3.0'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation 'io.micrometer:micrometer-registry-prometheus'
