@@ -74,7 +74,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation 'io.micrometer:micrometer-registry-prometheus'
-    implementation 'ch.qos.logback:logback-classic:1.2.11'
+    implementation 'ch.qos.logback:logback-classic:1.2.13'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'org.apache.commons:commons-exec:1.3'
