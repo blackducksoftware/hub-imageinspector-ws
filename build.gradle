@@ -5,6 +5,11 @@ buildscript {
     apply from: "https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-repositories.gradle", to: buildscript
     apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-cgp-version.gradle'
 
+    ext {
+        javaTargetCompatibility = 8
+        javaSourceCompatibility = 8
+    }
+
     dependencies { classpath "com.synopsys.integration:common-gradle-plugin:${managedCgpVersion}" }
     
     dependencies {
@@ -73,7 +78,7 @@ ext['log4j2.version'] = '2.16.0'
 
 dependencies {
 
-    implementation 'com.synopsys.integration:hub-imageinspector-lib:14.3.4'
+    implementation 'com.synopsys.integration:hub-imageinspector-lib:14.3.5'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
