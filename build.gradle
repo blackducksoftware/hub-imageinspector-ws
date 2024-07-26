@@ -5,6 +5,11 @@ buildscript {
     apply from: "https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-repositories.gradle", to: buildscript
     apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-cgp-version.gradle'
 
+    ext {
+        javaTargetCompatibility = 8
+        javaSourceCompatibility = 8
+    }
+
     dependencies { classpath "com.synopsys.integration:common-gradle-plugin:${managedCgpVersion}" }
     
     dependencies {
@@ -38,7 +43,7 @@ repositories {
     }
 }
 
-version = '5.2.5-SNAPSHOT'
+version = '5.2.6-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
