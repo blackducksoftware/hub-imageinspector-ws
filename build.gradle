@@ -21,7 +21,7 @@ plugins {
     id 'org.springframework.boot' version '2.6.6'
 }
 
-final def externalRepoHost = "https://sig-repo.synopsys.com"
+final def externalRepoHost = "https://repo.blackduck.com"
 final def internalRepoHost = System.getenv('SNPS_INTERNAL_ARTIFACTORY')
 
 repositories {
