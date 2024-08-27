@@ -1,17 +1,17 @@
 /*
  * blackduck-imageinspector
  *
- * Copyright (c) 2024 Synopsys, Inc.
+ * Copyright (c) 2024 Blackduck, Inc.
  *
  * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.imageinspectorws.app;
+package com.blackduck.integration.blackduck.imageinspectorws.app;
 
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = { "com.synopsys.integration.blackduck.imageinspector", "com.synopsys.integration.blackduck.imageinspectorws" })
+@SpringBootApplication(scanBasePackages = { "com.synopsys.integration.blackduck.imageinspector", "com.blackduck.integration.blackduck.imageinspectorws" })
 public class Application {
 
     public static void main(final String[] args) {
