@@ -1,9 +1,9 @@
 /*
  * blackduck-imageinspector
  *
- * Copyright (c) 2024 Synopsys, Inc.
+ * Copyright (c) 2024 Blackduck, Inc.
  *
- * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
+ * Use subject to the terms and conditions of the Blackduck End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
 package com.blackduck.integration.blackduck.imageinspectorws.controller;
 
