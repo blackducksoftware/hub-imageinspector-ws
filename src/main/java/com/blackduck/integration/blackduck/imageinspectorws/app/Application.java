@@ -5,7 +5,7 @@
  *
  * Use subject to the terms and conditions of the Blackduck End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.sca.integration.blackduck.imageinspectorws.app;
+package com.blackduck.integration.blackduck.imageinspectorws.app;
 
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;

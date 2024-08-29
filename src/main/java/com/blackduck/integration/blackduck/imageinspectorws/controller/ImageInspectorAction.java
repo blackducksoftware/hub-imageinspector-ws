@@ -5,7 +5,7 @@
  *
  * Use subject to the terms and conditions of the Blackduck End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.sca.integration.blackduck.imageinspectorws.controller;
+package com.blackduck.integration.blackduck.imageinspectorws.controller;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.sca.integration.blackduck.imageinspectorws.app;
+package com.blackduck.integration.blackduck.imageinspectorws.app;
 
 import org.junit.jupiter.api.Test;
 
