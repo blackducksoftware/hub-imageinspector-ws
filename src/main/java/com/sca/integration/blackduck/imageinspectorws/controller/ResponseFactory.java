@@ -5,7 +5,7 @@
  *
  * Use subject to the terms and conditions of the Blackduck End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.blackduck.integration.blackduck.imageinspectorws.controller;
+package com.sca.integration.blackduck.imageinspectorws.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

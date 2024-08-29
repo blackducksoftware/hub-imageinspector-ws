@@ -10,7 +10,7 @@ buildscript {
         javaSourceCompatibility = 8
     }
     ext['logback.version'] = '1.2.13'
-    dependencies { classpath "com.synopsys.integration:common-gradle-plugin:${managedCgpVersion}" }
+    dependencies { classpath "com.blackduck.integration:common-gradle-plugin:${managedCgpVersion}" }
     
     dependencies {
         classpath 'com.bmuschko:gradle-docker-plugin:6.7.0'
@@ -49,7 +49,7 @@ def appName='blackduck-imageinspector'
 apply plugin: 'eclipse'
 apply plugin: "io.spring.dependency-management"
 apply plugin: 'com.bmuschko.docker-remote-api'
-apply plugin: 'com.synopsys.integration.solution'
+apply plugin: 'com.blackduck.integration.solution'
 
 // TODO these don't need to be arrays:
 def linuxFlavorsDpkg = ["debian:11"] // the image is still named "ubuntu"
