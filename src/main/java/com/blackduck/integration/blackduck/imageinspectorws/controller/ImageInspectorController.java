@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequest;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequestBuilder;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectionRequest;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectionRequestBuilder;
 
 import ch.qos.logback.classic.Level;
 
@@ -30,7 +30,7 @@ public class ImageInspectorController {
     private String currentLinuxDistro;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String BASE_LOGGER_NAME = "com.synopsys";
+    private static final String BASE_LOGGER_NAME = "com.blackduck";
 
     // Endpoints
     private static final String GET_BDIO_PATH = "/getbdio";

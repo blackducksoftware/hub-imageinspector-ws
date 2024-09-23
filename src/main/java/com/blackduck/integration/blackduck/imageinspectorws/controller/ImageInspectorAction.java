@@ -18,12 +18,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequest;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorApi;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.bdio.BdioWriter;
-import com.synopsys.integration.bdio.model.SimpleBdioDocument;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectionRequest;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectorApi;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.bdio.BdioWriter;
+import com.blackduck.integration.bdio.model.SimpleBdioDocument;
 
 @Component
 public class ImageInspectorAction {

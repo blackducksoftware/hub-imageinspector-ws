@@ -18,10 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequest;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
-import com.synopsys.integration.blackduck.imageinspector.api.WrongInspectorOsException;
-import com.synopsys.integration.exception.IntegrationException;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectionRequest;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
+import com.blackduck.integration.blackduck.imageinspector.api.WrongInspectorOsException;
+import com.blackduck.integration.exception.IntegrationException;
 
 @Component
 public class ImageInspectorHandler {

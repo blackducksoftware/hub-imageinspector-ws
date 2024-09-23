@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
 
 @Component
 public class ResponseFactory {

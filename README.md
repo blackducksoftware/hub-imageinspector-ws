@@ -65,7 +65,7 @@ GET /httptrace # a list of requests to the service in JSON format.
 GET /metrics # get Spring Boot-generated metrics endpoints in JSON format. Request metric value with /metrics/<metric name>
 GET /prometheus # get Prometheus-generated metrics in Prometheus format.
 GET /loggers # get list of loggers
-POST /loggers/<logger> # Example: curl -i -X POST -H 'Content-Type: application/json' -d '{"configuredLevel": "TRACE"}' http://<IP>:8080/loggers/com.synopsys
+POST /loggers/<logger> # Example: curl -i -X POST -H 'Content-Type: application/json' -d '{"configuredLevel": "TRACE"}' http://<IP>:8080/loggers/com.blackduck
 ```
 
 ### Optimizing Performance ###
