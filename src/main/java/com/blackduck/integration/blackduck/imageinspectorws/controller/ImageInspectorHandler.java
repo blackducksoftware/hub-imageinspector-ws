@@ -1,11 +1,11 @@
 /*
  * blackduck-imageinspector
  *
- * Copyright (c) 2024 Synopsys, Inc.
+ * Copyright (c) 2024 Black Duck Software, Inc.
  *
- * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
+ * Use subject to the terms and conditions of the Black Duck Software End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.imageinspectorws.controller;
+package com.blackduck.integration.blackduck.imageinspectorws.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,11 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequest;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequestBuilder;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
-import com.synopsys.integration.blackduck.imageinspector.api.WrongInspectorOsException;
-import com.synopsys.integration.exception.IntegrationException;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectionRequest;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
+import com.blackduck.integration.blackduck.imageinspector.api.WrongInspectorOsException;
+import com.blackduck.integration.exception.IntegrationException;
 
 @Component
 public class ImageInspectorHandler {

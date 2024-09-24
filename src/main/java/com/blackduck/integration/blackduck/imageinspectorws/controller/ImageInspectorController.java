@@ -1,11 +1,11 @@
 /*
  * blackduck-imageinspector
  *
- * Copyright (c) 2024 Synopsys, Inc.
+ * Copyright (c) 2024 Black Duck Software, Inc.
  *
- * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
+ * Use subject to the terms and conditions of the Black Duck Software End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.imageinspectorws.controller;
+package com.blackduck.integration.blackduck.imageinspectorws.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequest;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequestBuilder;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectionRequest;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectionRequestBuilder;
 
 import ch.qos.logback.classic.Level;
 
@@ -30,7 +30,7 @@ public class ImageInspectorController {
     private String currentLinuxDistro;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private static final String BASE_LOGGER_NAME = "com.synopsys";
+    private static final String BASE_LOGGER_NAME = "com.blackduck";
 
     // Endpoints
     private static final String GET_BDIO_PATH = "/getbdio";

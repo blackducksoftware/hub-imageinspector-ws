@@ -1,11 +1,11 @@
 /*
  * blackduck-imageinspector
  *
- * Copyright (c) 2024 Synopsys, Inc.
+ * Copyright (c) 2024 Black Duck Software, Inc.
  *
- * Use subject to the terms and conditions of the Synopsys End User Software License and Maintenance Agreement. All rights reserved worldwide.
+ * Use subject to the terms and conditions of the Black Duck Software End User Software License and Maintenance Agreement. All rights reserved worldwide.
  */
-package com.synopsys.integration.blackduck.imageinspectorws.controller;
+package com.blackduck.integration.blackduck.imageinspectorws.controller;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,12 +18,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectionRequest;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorApi;
-import com.synopsys.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
-import com.synopsys.integration.exception.IntegrationException;
-import com.synopsys.integration.bdio.BdioWriter;
-import com.synopsys.integration.bdio.model.SimpleBdioDocument;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectionRequest;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectorApi;
+import com.blackduck.integration.blackduck.imageinspector.api.ImageInspectorOsEnum;
+import com.blackduck.integration.exception.IntegrationException;
+import com.blackduck.integration.bdio.BdioWriter;
+import com.blackduck.integration.bdio.model.SimpleBdioDocument;
 
 @Component
 public class ImageInspectorAction {

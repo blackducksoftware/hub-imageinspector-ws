@@ -10,7 +10,7 @@ buildscript {
         javaSourceCompatibility = 8
     }
     ext['logback.version'] = '1.2.13'
-    dependencies { classpath "com.synopsys.integration:common-gradle-plugin:${managedCgpVersion}" }
+    dependencies { classpath "com.blackduck.integration:common-gradle-plugin:${managedCgpVersion}" }
     
     dependencies {
         classpath 'com.bmuschko:gradle-docker-plugin:6.7.0'
@@ -21,7 +21,7 @@ plugins {
     id 'org.springframework.boot' version '2.6.6'
 }
 
-final def externalRepoHost = "https://sig-repo.synopsys.com"
+final def externalRepoHost = "https://repo.blackduck.com"
 final def internalRepoHost = System.getenv('SNPS_INTERNAL_ARTIFACTORY')
 
 repositories {
@@ -43,13 +43,13 @@ repositories {
     }
 }
 
-version = '5.2.8-SNAPSHOT'
+version = '6.0.0-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
 apply plugin: "io.spring.dependency-management"
 apply plugin: 'com.bmuschko.docker-remote-api'
-apply plugin: 'com.synopsys.integration.solution'
+apply plugin: 'com.blackduck.integration.solution'
 
 // TODO these don't need to be arrays:
 def linuxFlavorsDpkg = ["debian:11"] // the image is still named "ubuntu"
@@ -78,7 +78,7 @@ ext['log4j2.version'] = '2.16.0'
 
 dependencies {
 
-    implementation 'com.synopsys.integration:hub-imageinspector-lib:14.3.7'
+    implementation 'com.blackduck.integration:hub-imageinspector-lib:15.0.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -100,7 +100,7 @@ dependencies {
 // System.getProperty("user.dir")
 task buildKubeTestPodConfig(type: Copy) {
     from 'src/test/resources/kube-test-pod.yml'
-    into 'build/classes/java/test/com/synopsys/integration/blackduck/imageinspectorws/app'
+    into 'build/classes/java/test/com/blackduck/integration/blackduck/imageinspectorws/app'
     filter(ReplaceTokens, tokens: [CURRENT_DIR: System.getProperty("user.dir"), VERSION: version])
 }
 

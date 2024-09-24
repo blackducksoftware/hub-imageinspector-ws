@@ -3,7 +3,7 @@ A container-based Web Service for analyzing Docker images.
 
 ## Build ##
 [![Build Status](https://travis-ci.org/blackducksoftware/hub-imageinspector-ws.svg?branch=master)](https://travis-ci.org/blackducksoftware/hub-imageinspector-ws)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.synopsys.integration%3Ahub-imageinspector-ws&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.synopsys.integration%3Ahub-imageinspector-ws)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.blackduck.integration%3Ahub-imageinspector-ws&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.blackduck.integration%3Ahub-imageinspector-ws)
 [![Coverage Status](https://coveralls.io/repos/github/blackducksoftware/hub-imageinspector-ws/badge.svg?branch=master)](https://coveralls.io/github/blackducksoftware/hub-imageinspector-ws?branch=master)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -65,7 +65,7 @@ GET /httptrace # a list of requests to the service in JSON format.
 GET /metrics # get Spring Boot-generated metrics endpoints in JSON format. Request metric value with /metrics/<metric name>
 GET /prometheus # get Prometheus-generated metrics in Prometheus format.
 GET /loggers # get list of loggers
-POST /loggers/<logger> # Example: curl -i -X POST -H 'Content-Type: application/json' -d '{"configuredLevel": "TRACE"}' http://<IP>:8080/loggers/com.synopsys
+POST /loggers/<logger> # Example: curl -i -X POST -H 'Content-Type: application/json' -d '{"configuredLevel": "TRACE"}' http://<IP>:8080/loggers/com.blackduck
 ```
 
 ### Optimizing Performance ###
