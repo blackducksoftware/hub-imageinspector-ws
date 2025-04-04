@@ -146,6 +146,7 @@ task createRpmDockerfileTasks() {
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib"
+            runCommand "chmod -R g+w /usr/lib/sysimage/rpm"
             runCommand "mkdir -p ${dockerInspectorDir}/config"
             runCommand "mkdir -p ${dockerInspectorDir}/target"
             runCommand "mkdir -p ${dockerInspectorDir}/output"
@@ -174,7 +175,6 @@ task createDpkgDockerfileTasks() {
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /var/lib/dpkg"
-            runCommand "chmod -R g+w /usr/lib/sysimage/rpm"
             runCommand "mkdir -p ${dockerInspectorDir}/config"
             runCommand "mkdir -p ${dockerInspectorDir}/target"
             runCommand "mkdir -p ${dockerInspectorDir}/output"
