@@ -43,7 +43,7 @@ repositories {
     }
 }
 
-version = '6.1.0-SNAPSHOT'
+version = '6.2.0-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
