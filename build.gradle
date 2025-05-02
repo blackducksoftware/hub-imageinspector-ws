@@ -270,14 +270,16 @@ task createPushTasks() {
     linuxFlavors.each { linuxFlavor ->
         linuxFlavor = getNameWithoutVersion(linuxFlavor)
         logger.lifecycle("creating push task for ${linuxFlavor}")
-        task "pushImage_${linuxFlavor}"(type: Exec, dependsOn: [buildImages, dockerLogin]) {
+        task "pushImage_${linuxFlavor}"(dependsOn: [buildImages, dockerLogin]) {
             String suffix = getSuffix(linuxFlavor)
             String tagWithoutRegistry = "blackducksoftware/${appName}${suffix}:${version}"
 
-            for (String registry : dockerRegistries) {
-                logger.lifecycle("Pushing image ${tagWithoutRegistry} to registry ${registry}")
-                commandLine "docker", "tag", tagWithoutRegistry, "${registry}/${tagWithoutRegistry}"
-                commandLine "docker", "push", "${registry}/${tagWithoutRegistry}"
+            doLast {
+                for (String registry : dockerRegistries) {
+                    logger.lifecycle("Pushing image ${tagWithoutRegistry} to registry ${registry}")
+                    execCommand "docker", "tag", tagWithoutRegistry, "${registry}/${tagWithoutRegistry}"
+                    execCommand "docker", "push", "${registry}/${tagWithoutRegistry}"
+                }
             }
         }
     }
@@ -289,6 +291,15 @@ task pushImages(dependsOn: [pushImage_alpine, pushImage_fedora, pushImage_debian
 test.dependsOn testPrep
 
 //// helper methods ////
+private void execCommand(String command, String... args) {
+    def process = command.execute(args)
+    process.waitForProcessOutput(System.out, System.err)
+
+    if (process.exitValue() != 0) {
+        throw new RuntimeException("Command '${command}' failed with exit code ${process.exitValue()}")
+    }
+}
+
 String getNameWithoutVersion(String linuxFlavor) {
     String linuxFlavorDirName = linuxFlavor
     int colonIndex = linuxFlavor.indexOf(':')
