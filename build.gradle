@@ -266,23 +266,22 @@ task dockerLogin(type: Exec) {
     }
 }
 
-// Helper method to create push tasks
-void createPushTask(String flavor, String suffix) {
-    task "pushImage${flavor.capitalize()}"(type: Exec, dependsOn: ["buildDockerImage_${flavor}", dockerLogin]) {
-        String tagWithoutRegistry = "blackducksoftware/${appName}-${suffix}:${version}"
-        for (String registry : dockerRegistries) {
-            commandLine "docker", "tag", tagWithoutRegistry, "${registry}/${tagWithoutRegistry}"
-            commandLine "docker", "push", "${registry}/${tagWithoutRegistry}"
+task createPushTasks() {
+    linuxFlavors.each { linuxFlavor ->
+        linuxFlavor = getNameWithoutVersion(linuxFlavor)
+        logger.lifecycle("creating push task for ${linuxFlavor}")
+        task "pushImage_${linuxFlavor}"(type: Exec, dependsOn: ["buildDockerImage_${linuxFlavor}", dockerLogin]) {
+            String suffix = getSuffix(linuxFlavor)
+            String tagWithoutRegistry = "blackducksoftware/${appName}-${suffix}:${version}"
+            for (String registry : dockerRegistries) {
+                commandLine "docker", "tag", tagWithoutRegistry, "${registry}/${tagWithoutRegistry}"
+                commandLine "docker", "push", "${registry}/${tagWithoutRegistry}"
+            }
         }
     }
 }
 
-// Create push tasks for each flavor
-createPushTask("alpine", "alpine")
-createPushTask("fedora", "centos")
-createPushTask("ubuntu", "ubuntu")
-
-task pushImages(dependsOn: [pushImageAlpine, pushImageFedora, pushImageUbuntu]) {
+task pushImages(dependsOn: [pushImage_alpine, pushImage_fedora, pushImage_debian]) {
 }
 
 test.dependsOn testPrep
