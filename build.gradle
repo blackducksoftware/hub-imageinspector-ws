@@ -22,10 +22,10 @@ plugins {
 }
 
 final def externalRepoHost = "https://repo.blackduck.com"
-final def internalRepoHost = System.getenv('SNPS_INTERNAL_ARTIFACTORY')
+final def internalRepoHost = System.getenv('INTERNAL_REPO_BASE_URL')
 
 repositories {
-    println "Checking if environment property SNPS_INTERNAL_ARTIFACTORY is configured: ${internalRepoHost}"
+    println "Checking if environment property INTERNAL_REPO_BASE_URL is configured: ${internalRepoHost}"
     maven {
         url = uri("${internalRepoHost}/artifactory/bds-integrations-release")
     }
@@ -42,6 +42,16 @@ repositories {
         url "${externalRepoHost}/bds-bdio-release"
     }
 }
+
+// Read the additional Docker registry from an environment variable
+final def internalDockerRegistry = System.getenv('INTERNAL_DOCKER_REGISTRY')
+
+if (!internalDockerRegistry) {
+    logger.error("Environment variable INTERNAL_DOCKER_REGISTRY is not set. Failing the build.")
+    throw new GradleException("INTERNAL_DOCKER_REGISTRY environment variable is required but not set.")
+}
+
+String [] dockerRegistries = [/*"docker.io", do not push to docker HUB whiile testing initially*/ internalDockerRegistry]
 
 version = '6.2.0-SNAPSHOT'
 def appName='blackduck-imageinspector'
@@ -239,6 +249,25 @@ task createBuildDockerImageTasks() {
 task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_fedora, buildDockerImage_debian]) {
 }
 
+// Helper method to create push tasks
+void createPushTask(String flavor, String suffix) {
+    task "pushImage${flavor.capitalize()}"(type: Exec, dependsOn: ["buildDockerImage_${flavor}", dockerLogin]) {
+        String tagWithoutRegistry = "blackducksoftware/${appName}-${suffix}:${version}"
+        for (String registry : dockerRegistries) {
+            commandLine "docker", "tag", tagWithoutRegistry, "${registry}/${tagWithoutRegistry}"
+            commandLine "docker", "push", "${registry}/${tagWithoutRegistry}"
+        }
+    }
+}
+
+// Create push tasks for each flavor
+createPushTask("alpine", "alpine")
+createPushTask("fedora", "centos")
+createPushTask("ubuntu", "ubuntu")
+
+task pushImages(dependsOn: [pushImageAlpine, pushImageFedora, pushImageUbuntu]) {
+}
+
 test.dependsOn testPrep
 
 task dockerLogin(type: Exec) {
@@ -256,21 +285,6 @@ task dockerLogin(type: Exec) {
     onlyIf {
         System.env.DOCKER_INT_BLACKDUCK_USER != null && System.env.DOCKER_INT_BLACKDUCK_PASSWORD != null
     }
-}
-
-task pushImageAlpine(type: Exec, dependsOn: [buildDockerImage_alpine, dockerLogin]) {
-    commandLine "docker", "push", "blackducksoftware/${appName}-alpine:${version}"
-}
-
-task pushImageFedora(type: Exec, dependsOn: [buildDockerImage_fedora, dockerLogin]) {
-    commandLine "docker", "push", "blackducksoftware/${appName}-centos:${version}"
-}
-
-task pushImageUbuntu(type: Exec, dependsOn: [buildDockerImage_debian, dockerLogin]) {
-    commandLine "docker", "push", "blackducksoftware/${appName}-ubuntu:${version}"
-}
-
-task pushImages(dependsOn: [pushImageAlpine, pushImageFedora, pushImageUbuntu]) {
 }
 
 //// helper methods ////
