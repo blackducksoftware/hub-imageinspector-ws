@@ -43,7 +43,7 @@ repositories {
     }
 }
 
-// Read the additional Docker registry from an environment variable
+// Additional registry to push images to in host:port format
 final def internalDockerRegistry = System.getenv('INTERNAL_DOCKER_REGISTRY')
 
 if (!internalDockerRegistry) {
@@ -249,6 +249,23 @@ task createBuildDockerImageTasks() {
 task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_fedora, buildDockerImage_debian]) {
 }
 
+task dockerLogin(type: Exec) {
+    String dockerLoginUsername = System.env.DOCKER_INT_BLACKDUCK_USER ?: '<Not Set>'
+
+    doFirst {
+        String dockerLoginPassword = System.env.DOCKER_INT_BLACKDUCK_PASSWORD
+        if (dockerLoginPassword?.trim()) {
+            standardInput = new ByteArrayInputStream(dockerLoginPassword.getBytes())
+        }
+    }
+
+    commandLine 'docker', 'login', '--username', dockerLoginUsername, '--password-stdin'
+
+    onlyIf {
+        System.env.DOCKER_INT_BLACKDUCK_USER != null && System.env.DOCKER_INT_BLACKDUCK_PASSWORD != null
+    }
+}
+
 // Helper method to create push tasks
 void createPushTask(String flavor, String suffix) {
     task "pushImage${flavor.capitalize()}"(type: Exec, dependsOn: ["buildDockerImage_${flavor}", dockerLogin]) {
@@ -269,23 +286,6 @@ task pushImages(dependsOn: [pushImageAlpine, pushImageFedora, pushImageUbuntu]) 
 }
 
 test.dependsOn testPrep
-
-task dockerLogin(type: Exec) {
-    String dockerLoginUsername = System.env.DOCKER_INT_BLACKDUCK_USER ?: '<Not Set>'
-
-    doFirst {
-        String dockerLoginPassword = System.env.DOCKER_INT_BLACKDUCK_PASSWORD
-        if (dockerLoginPassword?.trim()) {
-            standardInput = new ByteArrayInputStream(dockerLoginPassword.getBytes())
-        }
-    }
-
-    commandLine 'docker', 'login', '--username', dockerLoginUsername, '--password-stdin'
-
-    onlyIf {
-        System.env.DOCKER_INT_BLACKDUCK_USER != null && System.env.DOCKER_INT_BLACKDUCK_PASSWORD != null
-    }
-}
 
 //// helper methods ////
 String getNameWithoutVersion(String linuxFlavor) {
