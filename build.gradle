@@ -277,8 +277,8 @@ task createPushTasks() {
             doLast {
                 for (String registry : dockerRegistries) {
                     logger.lifecycle("Pushing image ${tagWithoutRegistry} to registry ${registry}")
-                    execCommand "docker", "tag", tagWithoutRegistry, "${registry}/${tagWithoutRegistry}"
-                    execCommand "docker", "push", "${registry}/${tagWithoutRegistry}"
+                    execCommand("docker", "tag", tagWithoutRegistry, "${registry}/${tagWithoutRegistry}")
+                    execCommand("docker", "push", "${registry}/${tagWithoutRegistry}")
                 }
             }
         }
