@@ -270,16 +270,14 @@ task createPushTasks() {
     linuxFlavors.each { linuxFlavor ->
         linuxFlavor = getNameWithoutVersion(linuxFlavor)
         logger.lifecycle("creating push task for ${linuxFlavor}")
-        task "pushImage_${linuxFlavor}"(type: Exec, dependsOn: ["buildDockerImage_${linuxFlavor}", dockerLogin]) {
-            doLast {
-                String suffix = getSuffix(linuxFlavor)
-                String tagWithoutRegistry = "blackducksoftware/${appName}${suffix}:${version}"
+        task "pushImage_${linuxFlavor}"(type: Exec, dependsOn: [buildImages, dockerLogin]) {
+            String suffix = getSuffix(linuxFlavor)
+            String tagWithoutRegistry = "blackducksoftware/${appName}${suffix}:${version}"
 
-                for (String registry : dockerRegistries) {
-                    logger.lifecycle("Pushing image ${tagWithoutRegistry} to registry ${registry}")
-                    commandLine "docker", "tag", tagWithoutRegistry, "${registry}/${tagWithoutRegistry}"
-                    commandLine "docker", "push", "${registry}/${tagWithoutRegistry}"
-                }
+            for (String registry : dockerRegistries) {
+                logger.lifecycle("Pushing image ${tagWithoutRegistry} to registry ${registry}")
+                commandLine "docker", "tag", tagWithoutRegistry, "${registry}/${tagWithoutRegistry}"
+                commandLine "docker", "push", "${registry}/${tagWithoutRegistry}"
             }
         }
     }
