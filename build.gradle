@@ -51,7 +51,7 @@ if (!internalDockerRegistry) {
     throw new GradleException("INTERNAL_DOCKER_REGISTRY environment variable is required but not set.")
 }
 
-String [] dockerRegistries = [/*"docker.io", do not push to docker HUB whiile testing initially*/ internalDockerRegistry]
+String [] dockerRegistries = ["docker.io", internalDockerRegistry]
 
 version = '6.2.0-SNAPSHOT'
 def appName='blackduck-imageinspector'
