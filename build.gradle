@@ -291,8 +291,8 @@ task pushImages(dependsOn: [pushImage_alpine, pushImage_fedora, pushImage_debian
 test.dependsOn testPrep
 
 //// helper methods ////
-private void execCommand(String command, String... args) {
-    def process = command.execute(args)
+private void execCommand(String... commandAndArgs) {
+    def process = commandAndArgs.execute()
     process.waitForProcessOutput(System.out, System.err)
 
     if (process.exitValue() != 0) {
