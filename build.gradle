@@ -22,10 +22,10 @@ plugins {
 }
 
 final def externalRepoHost = "https://repo.blackduck.com"
-final def internalRepoHost = System.getenv('SNPS_INTERNAL_ARTIFACTORY')
+final def internalRepoHost = System.getenv('INTERNAL_REPO_BASE_URL')
 
 repositories {
-    println "Checking if environment property SNPS_INTERNAL_ARTIFACTORY is configured: ${internalRepoHost}"
+    println "Checking if environment property INTERNAL_REPO_BASE_URL is configured: ${internalRepoHost}"
     maven {
         url = uri("${internalRepoHost}/artifactory/bds-integrations-release")
     }
@@ -42,6 +42,16 @@ repositories {
         url "${externalRepoHost}/bds-bdio-release"
     }
 }
+
+// Additional registry to push images to in host:port format
+final def internalDockerRegistry = System.getenv('INTERNAL_DOCKER_REGISTRY')
+
+if (!internalDockerRegistry) {
+    logger.error("Environment variable INTERNAL_DOCKER_REGISTRY is not set. Failing the build.")
+    throw new GradleException("INTERNAL_DOCKER_REGISTRY environment variable is required but not set.")
+}
+
+String [] dockerRegistries = ["docker.io", internalDockerRegistry]
 
 version = '6.2.0-SNAPSHOT'
 def appName='blackduck-imageinspector'
@@ -239,8 +249,6 @@ task createBuildDockerImageTasks() {
 task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_fedora, buildDockerImage_debian]) {
 }
 
-test.dependsOn testPrep
-
 task dockerLogin(type: Exec) {
     String dockerLoginUsername = System.env.DOCKER_INT_BLACKDUCK_USER ?: '<Not Set>'
 
@@ -258,22 +266,40 @@ task dockerLogin(type: Exec) {
     }
 }
 
-task pushImageAlpine(type: Exec, dependsOn: [buildDockerImage_alpine, dockerLogin]) {
-    commandLine "docker", "push", "blackducksoftware/${appName}-alpine:${version}"
+task createPushTasks() {
+    linuxFlavors.each { linuxFlavor ->
+        linuxFlavor = getNameWithoutVersion(linuxFlavor)
+        logger.lifecycle("creating push task for ${linuxFlavor}")
+        task "pushImage_${linuxFlavor}"(dependsOn: [buildImages, dockerLogin]) {
+            String suffix = getSuffix(linuxFlavor)
+            String tagWithoutRegistry = "blackducksoftware/${appName}${suffix}:${version}"
+
+            doLast {
+                for (String registry : dockerRegistries) {
+                    logger.lifecycle("Pushing image ${tagWithoutRegistry} to registry ${registry}")
+                    this.execCommand("docker", "tag", tagWithoutRegistry, "${registry}/${tagWithoutRegistry}")
+                    this.execCommand("docker", "push", "${registry}/${tagWithoutRegistry}")
+                }
+            }
+        }
+    }
 }
 
-task pushImageFedora(type: Exec, dependsOn: [buildDockerImage_fedora, dockerLogin]) {
-    commandLine "docker", "push", "blackducksoftware/${appName}-centos:${version}"
+task pushImages(dependsOn: [pushImage_alpine, pushImage_fedora, pushImage_debian]) {
 }
 
-task pushImageUbuntu(type: Exec, dependsOn: [buildDockerImage_debian, dockerLogin]) {
-    commandLine "docker", "push", "blackducksoftware/${appName}-ubuntu:${version}"
-}
-
-task pushImages(dependsOn: [pushImageAlpine, pushImageFedora, pushImageUbuntu]) {
-}
+test.dependsOn testPrep
 
 //// helper methods ////
+private void execCommand(String... commandAndArgs) {
+    def process = commandAndArgs.execute()
+    process.waitForProcessOutput(System.out, System.err)
+
+    if (process.exitValue() != 0) {
+        throw new RuntimeException("Command '${command}' failed with exit code ${process.exitValue()}")
+    }
+}
+
 String getNameWithoutVersion(String linuxFlavor) {
     String linuxFlavorDirName = linuxFlavor
     int colonIndex = linuxFlavor.indexOf(':')
