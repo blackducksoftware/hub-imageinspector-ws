@@ -240,7 +240,7 @@ task createBuildDockerImageTasks() {
         String suffix = getSuffix(linuxFlavorDirName)
         logger.lifecycle("creating task ${taskName}")
         task "${taskName}"(type: Exec, dependsOn: ["removeDockerImage_${linuxFlavorDirName}", buildImageDirs]) {
-            commandLine "docker", "build", "--tag", "blackducksoftware/${appName}${suffix}:${version}", \
+            commandLine "docker", "build", "--no-cache", "--tag", "blackducksoftware/${appName}${suffix}:${version}", \
                 "${buildDir}/images/${linuxFlavorDirName}/${appName}"
         }
     }
