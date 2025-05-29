@@ -88,7 +88,7 @@ ext['log4j2.version'] = '2.16.0'
 
 dependencies {
 
-    implementation 'com.blackduck.integration:hub-imageinspector-lib:15.0.2'
+    implementation 'com.blackduck.integration:hub-imageinspector-lib:15.0.3'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
