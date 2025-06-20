@@ -46,11 +46,6 @@ repositories {
 // Additional registry to push images to in host:port format
 final def internalDockerRegistry = System.getenv('INTERNAL_DOCKER_REGISTRY')
 
-if (!internalDockerRegistry) {
-    logger.error("Environment variable INTERNAL_DOCKER_REGISTRY is not set. Failing the build.")
-    throw new GradleException("INTERNAL_DOCKER_REGISTRY environment variable is required but not set.")
-}
-
 String [] dockerRegistries = ["docker.io", internalDockerRegistry]
 
 version = '6.2.1-SNAPSHOT'
@@ -286,6 +281,10 @@ task createPushTasks() {
 }
 
 task pushImages(dependsOn: [pushImage_alpine, pushImage_fedora, pushImage_debian]) {
+    if (!internalDockerRegistry) {
+        logger.error("Environment variable INTERNAL_DOCKER_REGISTRY is not set. Failing the build.")
+        throw new GradleException("INTERNAL_DOCKER_REGISTRY environment variable is required but not set.")
+    }
 }
 
 test.dependsOn testPrep
