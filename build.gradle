@@ -270,6 +270,11 @@ task createPushTasks() {
             String tagWithoutRegistry = "blackducksoftware/${appName}${suffix}:${version}"
 
             doLast {
+                if (!internalDockerRegistry) {
+                    logger.error("Environment variable INTERNAL_DOCKER_REGISTRY is not set. Failing the build.")
+                    throw new GradleException("INTERNAL_DOCKER_REGISTRY environment variable is required but not set.")
+                }
+
                 for (String registry : dockerRegistries) {
                     logger.lifecycle("Pushing image ${tagWithoutRegistry} to registry ${registry}")
                     this.execCommand("docker", "tag", tagWithoutRegistry, "${registry}/${tagWithoutRegistry}")
@@ -281,10 +286,6 @@ task createPushTasks() {
 }
 
 task pushImages(dependsOn: [pushImage_alpine, pushImage_fedora, pushImage_debian]) {
-    if (!internalDockerRegistry) {
-        logger.error("Environment variable INTERNAL_DOCKER_REGISTRY is not set. Failing the build.")
-        throw new GradleException("INTERNAL_DOCKER_REGISTRY environment variable is required but not set.")
-    }
 }
 
 test.dependsOn testPrep
