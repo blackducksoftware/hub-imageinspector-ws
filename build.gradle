@@ -46,7 +46,7 @@ repositories {
 // Additional registry to push images to in host:port format
 final def internalDockerRegistry = System.getenv('INTERNAL_DOCKER_REGISTRY')
 
-version = '6.2.1-SNAPSHOT'
+version = '6.3.0-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
@@ -273,7 +273,7 @@ task createPushTasks() {
                     throw new GradleException("INTERNAL_DOCKER_REGISTRY environment variable is required but not set.")
                 }
 
-                String [] dockerRegistries = ["docker.io", internalDockerRegistry]
+                String [] dockerRegistries = version.contains("SNAPSHOT") ? [internalDockerRegistry] : ["docker.io", internalDockerRegistry]
 
                 for (String registry : dockerRegistries) {
                     logger.lifecycle("Pushing image ${tagWithoutRegistry} to registry ${registry}")
