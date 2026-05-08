@@ -9,8 +9,9 @@ buildscript {
         javaTargetCompatibility = 8
         javaSourceCompatibility = 8
     }
-    ext['logback.version'] = '1.2.13'
+    // ext['logback.version'] = '1.2.13'
     ext['tomcat.version'] = '9.0.117'
+    // ext['snakeyaml.version'] = '2.0'
     dependencies { classpath "com.blackduck.integration:common-gradle-plugin:${managedCgpVersion}" }
     
     dependencies {
@@ -119,7 +120,7 @@ task createApkDockerfileTasks() {
             logger.lifecycle("destFile: ${destFile}")
             from 'cgr.dev/chainguard/wolfi-base:latest'
             exposePort 8080
-            runCommand 'apk update && apk add --no-cache bash openjdk-11-jre'
+            runCommand 'apk --no-cache update && apk --no-cache upgrade && apk --no-cache add bash openjdk-11-jre'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
