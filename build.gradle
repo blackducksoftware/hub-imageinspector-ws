@@ -9,9 +9,10 @@ buildscript {
         javaTargetCompatibility = 8
         javaSourceCompatibility = 8
     }
-    // ext['logback.version'] = '1.2.13'
+    ext['logback.version'] = '1.2.13'
     ext['tomcat.version'] = '9.0.117'
-    // ext['snakeyaml.version'] = '2.0'
+    ext['json-path.version'] = '2.10.0'
+    ext['json-smart.version'] = '2.6.0'
     dependencies { classpath "com.blackduck.integration:common-gradle-plugin:${managedCgpVersion}" }
     
     dependencies {
@@ -48,7 +49,7 @@ repositories {
 // Additional registry to push images to in host:port format
 final def internalDockerRegistry = System.getenv('INTERNAL_DOCKER_REGISTRY')
 
-version = '6.3.0'
+version = '6.3.0-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
@@ -83,7 +84,7 @@ ext['log4j2.version'] = '2.16.0'
 
 dependencies {
 
-    implementation 'com.blackduck.integration:hub-imageinspector-lib:15.0.4'
+    implementation 'com.blackduck.integration:hub-imageinspector-lib:15.0.5'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -99,6 +100,12 @@ dependencies {
     testImplementation 'org.apache.commons:commons-exec:1.3'
     testImplementation 'io.fabric8:kubernetes-client:3.1.8'
     testImplementation 'io.fabric8:kubernetes-model:2.0.8'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.fasterxml.jackson:jackson-bom:2.18.6"
+    }
 }
 
 // Prepare test config file
@@ -118,7 +125,8 @@ task createApkDockerfileTasks() {
         task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
             destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
             logger.lifecycle("destFile: ${destFile}")
-            from 'cgr.dev/chainguard/wolfi-base:latest'
+            from 'artifactory.tools.duckutil.net:5010/blackduck.com/chainguard-base:latest'
+            user 'root'
             exposePort 8080
             runCommand 'apk --no-cache update && apk --no-cache upgrade && apk --no-cache add bash openjdk-11-jre'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
