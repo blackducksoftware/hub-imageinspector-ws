@@ -128,7 +128,7 @@ task createApkDockerfileTasks() {
             from 'artifactory.tools.duckutil.net:5010/blackduck.com/chainguard-base:latest'
             user 'root'
             exposePort 8080
-            runCommand 'apk --no-cache update && apk --no-cache upgrade && apk --no-cache add bash openjdk-11-jre'
+            runCommand 'apk update && apk add bash && apk add openjdk-11-jre'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
