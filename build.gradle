@@ -55,7 +55,8 @@ apply plugin: 'com.bmuschko.docker-remote-api'
 apply plugin: 'com.blackduck.integration.solution'
 
 // TODO these don't need to be arrays:
-def linuxFlavorsDpkg = ["debian:11"] // the image is still named "ubuntu"
+def linuxFlavorsDpkg = ["debian"] // the image is still named "ubuntu"
+def dpkgBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev"
 def linuxFlavorsRpm = ["fedora:41"] // the image is still named "centos"
 def linuxFlavorsApk = ["alpine:latest"]
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
@@ -168,11 +169,10 @@ task createDpkgDockerfileTasks() {
         task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
             destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
             logger.lifecycle("destFile: ${destFile}")
-            from linuxFlavor
+            from dpkgBaseImage
             exposePort 8082
-            runCommand 'apt-get update -y && \
-                apt-get install -y openjdk-11-jdk && \
-                apt-get install -y locales && apt-get -y clean'
+            user 'root'
+            runCommand 'apk add dpkg'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
@@ -183,8 +183,6 @@ task createDpkgDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/output"
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
-            runCommand 'locale-gen "en_US.UTF-8"'
-            runCommand 'apt -y purge locales && apt-get -y autoremove && apt-get -y clean'
             environmentVariable('LANG', 'en_US.UTF-8')
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=ubuntu"
