@@ -61,6 +61,7 @@ apply plugin: 'com.blackduck.integration.solution'
 def linuxFlavorsDpkg = ["debian:11"] // the image is still named "ubuntu"
 def linuxFlavorsRpm = ["fedora:41"] // the image is still named "centos"
 def linuxFlavorsApk = ["alpine:latest"]
+def apkBaseImage = "artifactory.tools.duckutil.net:5010/blackduck.com/chainguard-base:latest"
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
 
 String blackduckDir = "/opt/blackduck"
@@ -125,7 +126,7 @@ task createApkDockerfileTasks() {
         task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
             destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
             logger.lifecycle("destFile: ${destFile}")
-            from 'artifactory.tools.duckutil.net:5010/blackduck.com/chainguard-base:latest'
+            from apkBaseImage
             user 'root'
             exposePort 8080
             runCommand 'apk update && apk add bash && apk add openjdk-11-jre'
