@@ -128,7 +128,7 @@ task createApkDockerfileTasks() {
             logger.lifecycle("destFile: ${destFile}")
             from linuxFlavor
             exposePort 8080
-            runCommand 'apk update && apk add bash && apk add openjdk11-jre'
+            runCommand 'apk update && apk add bash && apk add openjdk21-jre'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
@@ -153,7 +153,7 @@ task createRpmDockerfileTasks() {
             logger.lifecycle("destFile: ${destFile}")
             from linuxFlavor
             exposePort 8081
-            runCommand 'yum update -y && yum install -y java-11-openjdk && yum clean all -y'
+            runCommand 'yum update -y && yum install -y java-21-openjdk && yum clean all -y'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
