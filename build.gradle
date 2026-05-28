@@ -45,7 +45,7 @@ repositories {
 // Additional registry to push images to in host:port format
 final def internalDockerRegistry = System.getenv('INTERNAL_DOCKER_REGISTRY')
 
-version = '6.3.0-SNAPSHOTa'
+version = '6.3.0-SNAPSHOTb'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
