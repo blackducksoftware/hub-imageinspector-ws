@@ -297,6 +297,16 @@ task pushImages(dependsOn: [pushImage_alpine, pushImage_fedora, pushImage_debian
 
 test.dependsOn testPrep
 
+// Gradle 8 strict task validation: codeCoverageReport (CGP's JacocoReport) scans build/ broadly
+// and overlaps with the output directories of the copyJarToDockerfileDir_* tasks. Declare ordering
+// so Gradle knows these tasks don't conflict at runtime.
+afterEvaluate {
+    def coverageTask = tasks.findByName('codeCoverageReport')
+    if (coverageTask) {
+        coverageTask.mustRunAfter copyJarToDockerfileDir_alpine, copyJarToDockerfileDir_fedora, copyJarToDockerfileDir_debian
+    }
+}
+
 //// helper methods ////
 private void execCommand(String... commandAndArgs) {
     def process = commandAndArgs.execute()
