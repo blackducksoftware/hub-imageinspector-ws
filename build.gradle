@@ -284,8 +284,7 @@ task createPushTasks() {
                     throw new GradleException("INTERNAL_DOCKER_REGISTRY environment variable is required but not set.")
                 }
 
-                 String [] dockerRegistries = version.contains("SNAPSHOT") ? [internalDockerRegistry] : ["docker.io", internalDockerRegistry]
-                // String [] dockerRegistries = ["docker.io", internalDockerRegistry]
+                String [] dockerRegistries = version.contains("SNAPSHOT") ? [internalDockerRegistry] : ["docker.io", internalDockerRegistry]
 
                 for (String registry : dockerRegistries) {
                     logger.lifecycle("Pushing image ${tagWithoutRegistry} to registry ${registry}")
