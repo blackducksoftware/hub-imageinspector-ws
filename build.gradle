@@ -61,7 +61,7 @@ apply plugin: 'com.blackduck.integration.solution'
 def linuxFlavorsDpkg = ["debian:11"] // the image is still named "ubuntu"
 def linuxFlavorsRpm = ["fedora:41"] // the image is still named "centos"
 def linuxFlavorsApk = ["alpine:latest"]
-def apkBaseImage = "artifactory.tools.duckutil.net:5010/blackduck.com/chainguard-base:latest"
+def apkBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1-RC"
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
 
 String blackduckDir = "/opt/blackduck"
