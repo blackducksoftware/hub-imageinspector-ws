@@ -6,11 +6,9 @@ buildscript {
     apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-cgp-version.gradle'
 
     ext {
-        javaTargetCompatibility = 8
-        javaSourceCompatibility = 8
+        javaTargetCompatibility = 17
+        javaSourceCompatibility = 17
     }
-    ext['logback.version'] = '1.2.13'
-    ext['tomcat.version'] = '9.0.117'
     ext['json-path.version'] = '2.10.0'
     ext['json-smart.version'] = '2.6.0'
     dependencies { classpath "com.blackduck.integration:common-gradle-plugin:${managedCgpVersion}" }
@@ -21,7 +19,7 @@ buildscript {
 }
 
 plugins {
-    id 'org.springframework.boot' version '2.7.18'
+    id 'org.springframework.boot' version '3.4.1'
 }
 
 final def externalRepoHost = "https://repo.blackduck.com"
@@ -58,7 +56,8 @@ apply plugin: 'com.bmuschko.docker-remote-api'
 apply plugin: 'com.blackduck.integration.solution'
 
 // TODO these don't need to be arrays:
-def linuxFlavorsDpkg = ["debian:11"] // the image is still named "ubuntu"
+def linuxFlavorsDpkg = ["debian"] // the image is still named "ubuntu"
+def dpkgBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1-RC"
 def linuxFlavorsRpm = ["fedora:41"] // the image is still named "centos"
 def linuxFlavorsApk = ["alpine:latest"]
 def apkBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1-RC"
@@ -82,21 +81,32 @@ publishing {
 }
 
 ext['log4j2.version'] = '2.16.0'
+ext['tomcat.version'] = '10.1.55'  // CVE-2025-24813 (RCE via partial PUT) and subsequent fixes; requires 10.1.35+
+
+// common-gradle-plugin pins junit-jupiter to 5.7.x which conflicts with Spring Boot 3.x's
+// junit-platform-commons at 1.11.x. Override to keep all JUnit artifacts aligned at 5.11.x.
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'org.junit.jupiter') {
+            details.useVersion '5.11.4'
+        }
+        if (details.requested.group == 'org.junit.platform') {
+            details.useVersion '1.11.4'
+        }
+    }
+}
 
 dependencies {
 
-    implementation 'com.blackduck.integration:hub-imageinspector-lib:15.0.5'
+    implementation('com.blackduck.integration:hub-imageinspector-lib:15.0.5') {
+        exclude group: 'org.junit.jupiter'
+        exclude group: 'org.junit.platform'
+        exclude group: 'org.junit'
+    }
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation 'io.micrometer:micrometer-registry-prometheus'
-    implementation 'ch.qos.logback:logback-classic:1.2.13'
-    constraints {
-        implementation('ch.qos.logback:logback-core:1.2.13') {
-            because 'previous version has a vulnerability'
-        }
-    }
-
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'org.apache.commons:commons-exec:1.3'
     testImplementation 'io.fabric8:kubernetes-client:3.1.8'
@@ -105,7 +115,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom "com.fasterxml.jackson:jackson-bom:2.18.6"
+        mavenBom "com.fasterxml.jackson:jackson-bom:2.22.0"
     }
 }
 
@@ -129,7 +139,7 @@ task createApkDockerfileTasks() {
             from apkBaseImage
             user 'root'
             exposePort 8080
-            runCommand 'apk update && apk add bash && apk add openjdk-11-jre'
+            runCommand 'apk update && apk add bash && apk add openjdk21-jre'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
@@ -154,7 +164,7 @@ task createRpmDockerfileTasks() {
             logger.lifecycle("destFile: ${destFile}")
             from linuxFlavor
             exposePort 8081
-            runCommand 'yum update -y && yum install -y java-11-openjdk && yum clean all -y'
+            runCommand 'yum update -y && yum install -y java-21-openjdk && yum clean all -y'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
@@ -179,11 +189,10 @@ task createDpkgDockerfileTasks() {
         task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
             destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
             logger.lifecycle("destFile: ${destFile}")
-            from linuxFlavor
+            from dpkgBaseImage
             exposePort 8082
-            runCommand 'apt-get update -y && \
-                apt-get install -y openjdk-11-jdk && \
-                apt-get install -y locales && apt-get -y clean'
+            user 'root'
+            runCommand 'apk add dpkg'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
@@ -194,8 +203,6 @@ task createDpkgDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/output"
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
-            runCommand 'locale-gen "en_US.UTF-8"'
-            runCommand 'apt -y purge locales && apt-get -y autoremove && apt-get -y clean'
             environmentVariable('LANG', 'en_US.UTF-8')
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=ubuntu"
@@ -300,6 +307,16 @@ task pushImages(dependsOn: [pushImage_alpine, pushImage_fedora, pushImage_debian
 }
 
 test.dependsOn testPrep
+
+// Gradle 8 strict task validation: codeCoverageReport (CGP's JacocoReport) scans build/ broadly
+// and overlaps with the output directories of the copyJarToDockerfileDir_* tasks. Declare ordering
+// so Gradle knows these tasks don't conflict at runtime.
+afterEvaluate {
+    def coverageTask = tasks.findByName('codeCoverageReport')
+    if (coverageTask) {
+        coverageTask.mustRunAfter copyJarToDockerfileDir_alpine, copyJarToDockerfileDir_fedora, copyJarToDockerfileDir_debian
+    }
+}
 
 //// helper methods ////
 private void execCommand(String... commandAndArgs) {
