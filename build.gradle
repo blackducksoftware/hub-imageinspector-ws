@@ -57,10 +57,10 @@ apply plugin: 'com.blackduck.integration.solution'
 
 // TODO these don't need to be arrays:
 def linuxFlavorsDpkg = ["debian"] // the image is still named "ubuntu"
-def dpkgBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1-RC"
+def dpkgBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1"
 def linuxFlavorsRpm = ["fedora:41"] // the image is still named "centos"
 def linuxFlavorsApk = ["alpine:latest"]
-def apkBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1-RC"
+def apkBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1"
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
 
 String blackduckDir = "/opt/blackduck"
