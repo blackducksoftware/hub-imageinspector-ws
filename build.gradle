@@ -141,8 +141,6 @@ task createApkDockerfileTasks() {
             // Stage 1: Builder (dev image with shell and apk)
             from(new Dockerfile.From(chainguardDevImage).withStage('builder'))
             user 'root'
-            runCommand 'apk update && apk add bash'
-            // Create all directories and set permissions in builder (non-dev has no coreutils)
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
@@ -153,26 +151,23 @@ task createApkDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/output"
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
-            // Clear the apk installed-packages database so the builder's packages
-            // (including busybox) don't appear in SBOM scans of the final image.
+            // Install bash and prepare /bin/sh symlink (non-dev image has no ln command)
+            runCommand "apk add bash && ln -s /usr/bin/bash /staging-bin-sh"
             runCommand "rm -f /lib/apk/db/installed && touch /lib/apk/db/installed"
 
-            // Stage 2: Final (non-dev image, no busybox, no coreutils)
-            // No RUN commands — non-dev image has no shell, ln, mkdir, chmod, etc.
+            // Stage 2: Final (non-dev image, no busybox)
             from(new Dockerfile.From(apkBaseImage))
-            // Copy shared libs needed by bash and apk (not in non-dev base)
-            instruction('COPY --from=builder /usr/lib/libtinfo* /usr/lib/')
+            // apk shared libs not present in the non-dev base image
             instruction('COPY --from=builder /usr/lib/libapk* /usr/lib/')
-            instruction('COPY --from=builder /usr/lib/libssl* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libcrypto* /usr/lib/')
+            instruction('COPY --from=builder /usr/lib/libssl* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libz.so* /usr/lib/')
-            // Copy bash (for runtime use by the application)
+            instruction('COPY --from=builder /usr/lib/libtinfo* /usr/lib/')
             copyFile(new Dockerfile.CopyFile('/usr/bin/bash', '/usr/bin/bash').withStage('builder'))
-            // Copy apk binary, config, and database (needed at runtime for package inspection)
+            instruction('COPY --from=builder /staging-bin-sh /bin/sh')
             copyFile(new Dockerfile.CopyFile('/sbin/apk', '/sbin/apk').withStage('builder'))
             copyFile(new Dockerfile.CopyFile('/etc/apk', '/etc/apk').withStage('builder'))
-            instruction('COPY --from=builder /usr/lib/apk /usr/lib/apk')
-            // Copy prepared application and inspector directories (with ownership/permissions set)
+            instruction('COPY --from=builder /lib/apk /lib/apk')
             instruction("COPY --from=builder ${imagePgmDir} ${imagePgmDir}")
             instruction("COPY --from=builder ${dockerInspectorDir} ${dockerInspectorDir}")
             exposePort 8080
