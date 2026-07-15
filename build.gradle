@@ -82,15 +82,12 @@ publishing {
 }
 
 ext['log4j2.version'] = '2.16.0'
+ext['tomcat.version'] = '10.1.55'  // CVE-2025-24813 (RCE via partial PUT); requires 10.1.35+
 
 // common-gradle-plugin pins junit-jupiter to 5.7.x which conflicts with Spring Boot 3.x's
 // junit-platform-commons at 1.11.x. Override to keep all JUnit artifacts aligned at 5.11.x.
 configurations.all {
     exclude group: 'org.hdrhistogram', module: 'HdrHistogram'
-    // CVE-2025-24813 (RCE via partial PUT) — requires Tomcat 10.1.35+
-    resolutionStrategy.force 'org.apache.tomcat.embed:tomcat-embed-core:10.1.55',
-        'org.apache.tomcat.embed:tomcat-embed-el:10.1.55',
-        'org.apache.tomcat.embed:tomcat-embed-websocket:10.1.55'
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         if (details.requested.group == 'org.junit.jupiter') {
             details.useVersion '5.11.4'
@@ -230,6 +227,7 @@ task createDpkgDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
             environmentVariable('LANG', 'en_US.UTF-8')
+            instruction('ENTRYPOINT []')
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=ubuntu"
         }
