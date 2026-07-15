@@ -87,6 +87,10 @@ ext['log4j2.version'] = '2.16.0'
 // junit-platform-commons at 1.11.x. Override to keep all JUnit artifacts aligned at 5.11.x.
 configurations.all {
     exclude group: 'org.hdrhistogram', module: 'HdrHistogram'
+    // CVE-2025-24813 (RCE via partial PUT) — requires Tomcat 10.1.35+
+    resolutionStrategy.force 'org.apache.tomcat.embed:tomcat-embed-core:10.1.55',
+        'org.apache.tomcat.embed:tomcat-embed-el:10.1.55',
+        'org.apache.tomcat.embed:tomcat-embed-websocket:10.1.55'
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         if (details.requested.group == 'org.junit.jupiter') {
             details.useVersion '5.11.4'
@@ -117,14 +121,6 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "com.fasterxml.jackson:jackson-bom:2.22.0"
-    }
-    // CVE-2025-24813 (RCE via partial PUT) — requires Tomcat 10.1.35+
-    dependencies {
-        dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.55') {
-            entry 'tomcat-embed-core'
-            entry 'tomcat-embed-el'
-            entry 'tomcat-embed-websocket'
-        }
     }
 }
 
