@@ -87,6 +87,7 @@ ext['tomcat.version'] = '10.1.55'  // CVE-2025-24813 (RCE via partial PUT) and s
 // common-gradle-plugin pins junit-jupiter to 5.7.x which conflicts with Spring Boot 3.x's
 // junit-platform-commons at 1.11.x. Override to keep all JUnit artifacts aligned at 5.11.x.
 configurations.all {
+    exclude group: 'org.hdrhistogram', module: 'HdrHistogram'
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         if (details.requested.group == 'org.junit.jupiter') {
             details.useVersion '5.11.4'
