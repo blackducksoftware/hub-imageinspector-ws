@@ -213,8 +213,9 @@ task createDpkgDockerfileTasks() {
         task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
             destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
             logger.lifecycle("destFile: ${destFile}")
-            from dpkgBaseImage
-            exposePort 8082
+
+            // Stage 1: Builder (dev image with shell and apk)
+            from(new Dockerfile.From(chainguardDevImage).withStage('builder'))
             user 'root'
             runCommand 'apk add dpkg'
             runCommand "mkdir -p ${imagePgmDir}/shared/target"
@@ -227,8 +228,25 @@ task createDpkgDockerfileTasks() {
             runCommand "mkdir -p ${dockerInspectorDir}/output"
             runCommand "mkdir -p ${dockerInspectorDir}/working"
             runCommand "chmod -R g+w ${dockerInspectorDir}"
-            environmentVariable('LANG', 'en_US.UTF-8')
+            // Install bash and prepare /bin/sh symlink (non-dev image has no ln command)
+            runCommand "apk add bash && ln -s /usr/bin/bash /staging-bin-sh"
+
+            // Stage 2: Final (non-dev image, no busybox)
+            from(new Dockerfile.From(apkBaseImage))
+            // dpkg shared libs not present in the non-dev base image
+            instruction('COPY --from=builder /usr/lib/libmd* /usr/lib/')
+            instruction('COPY --from=builder /usr/lib/libz.so* /usr/lib/')
+            instruction('COPY --from=builder /usr/lib/libtinfo* /usr/lib/')
+            copyFile(new Dockerfile.CopyFile('/usr/bin/bash', '/usr/bin/bash').withStage('builder'))
+            instruction('COPY --from=builder /staging-bin-sh /bin/sh')
+            copyFile(new Dockerfile.CopyFile('/usr/bin/dpkg', '/usr/bin/dpkg').withStage('builder'))
+            instruction('COPY --from=builder /var/lib/dpkg /var/lib/dpkg')
+            instruction('COPY --from=builder /etc/dpkg /etc/dpkg')
+            instruction("COPY --from=builder ${imagePgmDir} ${imagePgmDir}")
+            instruction("COPY --from=builder ${dockerInspectorDir} ${dockerInspectorDir}")
+            exposePort 8082
             instruction('ENTRYPOINT []')
+            environmentVariable('LANG', 'en_US.UTF-8')
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=ubuntu"
         }
