@@ -82,7 +82,7 @@ publishing {
 }
 
 ext['log4j2.version'] = '2.16.0'
-ext['tomcat.version'] = '10.1.55'  // CVE-2025-24813 (RCE via partial PUT); requires 10.1.35+
+ext['tomcat.version'] = '10.1.57'  // CVE-2025-24813 (RCE via partial PUT); requires 10.1.35+
 
 // common-gradle-plugin pins junit-jupiter to 5.7.x which conflicts with Spring Boot 3.x's
 // junit-platform-commons at 1.11.x. Override to keep all JUnit artifacts aligned at 5.11.x.
