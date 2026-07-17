@@ -19,7 +19,7 @@ buildscript {
 }
 
 plugins {
-    id 'org.springframework.boot' version '3.4.1'
+    id 'org.springframework.boot' version '3.5.16'
 }
 
 final def externalRepoHost = "https://repo.blackduck.com"
