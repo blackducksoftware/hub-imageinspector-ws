@@ -30,21 +30,6 @@ spec:
           initialDelaySeconds: 120
           periodSeconds: 120
           timeoutSeconds: 60
-      - name: blackduck-imageinspector-centos
-        image: blackducksoftware/blackduck-imageinspector-centos:3.0.0-SNAPSHOT
-        volumeMounts:
-        - name: inspector-shared-dir
-          mountPath: /opt/blackduck/shared
-        ports:
-        - containerPort: 8081
-          hostPort: 8081
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8081
-          initialDelaySeconds: 120
-          periodSeconds: 120
-          timeoutSeconds: 60
       - name: blackduck-imageinspector-ubuntu
         image: blackducksoftware/blackduck-imageinspector-ubuntu:3.0.0-SNAPSHOT
         volumeMounts:

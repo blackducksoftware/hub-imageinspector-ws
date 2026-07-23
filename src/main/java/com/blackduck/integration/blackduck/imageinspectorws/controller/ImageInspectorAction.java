@@ -39,9 +39,6 @@ public class ImageInspectorAction {
     @Value("${inspector.url.alpine:}")
     private String inspectorUrlAlpine;
 
-    @Value("${inspector.url.centos:}")
-    private String inspectorUrlCentos;
-
     @Value("${inspector.url.ubuntu:}")
     private String inspectorUrlUbuntu;
 
@@ -49,15 +46,20 @@ public class ImageInspectorAction {
     @Value("${inspector.port.alpine:8080}")
     private String inspectorPortAlpine;
 
-    @Value("${inspector.port.centos:8081}")
-    private String inspectorPortCentos;
-
     @Value("${inspector.port.ubuntu:8082}")
     private String inspectorPortUbuntu;
 
     public String getBdio(final ImageInspectionRequest imageInspectionRequest)
             throws IntegrationException, IOException, InterruptedException {
         final SimpleBdioDocument bdio = api.getBdio(imageInspectionRequest);
+        return writeBdioDocument(bdio);
+    }
+
+    public String getEmptyBdio() throws IOException {
+        return writeBdioDocument(new SimpleBdioDocument());
+    }
+
+    private String writeBdioDocument(final SimpleBdioDocument bdio) throws IOException {
         final ByteArrayOutputStream bdioBytes = new ByteArrayOutputStream();
         try (BdioWriter writer = new BdioWriter(gson, bdioBytes)) {
             writer.writeSimpleBdioDocument(bdio);
@@ -70,8 +72,6 @@ public class ImageInspectorAction {
         switch (inspectorPlatform) {
         case ALPINE:
             return inspectorUrlAlpine;
-        case CENTOS:
-            return inspectorUrlCentos;
         case UBUNTU:
             return inspectorUrlUbuntu;
         default:
@@ -84,8 +84,6 @@ public class ImageInspectorAction {
         switch (inspectorPlatform) {
         case ALPINE:
             return Integer.parseInt(inspectorPortAlpine);
-        case CENTOS:
-            return Integer.parseInt(inspectorPortCentos);
         case UBUNTU:
             return Integer.parseInt(inspectorPortUbuntu);
         default:
