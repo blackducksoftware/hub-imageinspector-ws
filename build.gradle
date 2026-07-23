@@ -49,7 +49,7 @@ final def internalDockerRegistry = System.getenv('INTERNAL_DOCKER_REGISTRY')
 // Internal Chainguard registry (host:port) for pulling Chainguard base images (port 5002)
 final def internalChainguardRepository = System.getenv('INTERNAL_CHAINGUARD_REPOSITORY')
 
-version = '6.4.0-SNAPSHOT'
+version = '6.3.0-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
