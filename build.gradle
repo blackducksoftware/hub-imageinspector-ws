@@ -3,7 +3,7 @@ import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 
 buildscript {
     apply from: "https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-repositories.gradle", to: buildscript
-    apply from: 'https://raw.githubusercontent.com/blackducksoftware/integration-resources/master/gradle_common/buildscript-cgp-version.gradle'
+    project.ext { managedCgpVersion = '2.1.1' }
 
     ext {
         javaTargetCompatibility = 17
@@ -49,7 +49,7 @@ final def internalDockerRegistry = System.getenv('INTERNAL_DOCKER_REGISTRY')
 // Internal Chainguard registry (host:port) for pulling Chainguard base images (port 5002)
 final def internalChainguardRepository = System.getenv('INTERNAL_CHAINGUARD_REPOSITORY')
 
-version = '6.3.0-SNAPSHOT'
+version = '6.3.0'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
