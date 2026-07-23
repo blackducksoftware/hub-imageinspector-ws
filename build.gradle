@@ -59,10 +59,9 @@ apply plugin: 'com.blackduck.integration.solution'
 def linuxFlavorsDpkg = ["debian"] // the image is still named "ubuntu"
 def chainguardDevImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1"
 def dpkgBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1"
-def linuxFlavorsRpm = ["fedora:41"] // the image is still named "centos"
 def linuxFlavorsApk = ["alpine:latest"]
 def apkBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard:3.0.1"
-def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
+def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsApk
 
 String blackduckDir = "/opt/blackduck"
 String imagePgmDir = "${blackduckDir}/${appName}"
@@ -180,33 +179,6 @@ task createApkDockerfileTasks() {
     }
 }
 
-task createRpmDockerfileTasks() {
-    linuxFlavorsRpm.eachWithIndex {linuxFlavor, index ->
-        String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
-        task "create${linuxFlavorDirName}Dockerfile"(type: Dockerfile) {
-            destFile = project.file("${buildDir}/images/${linuxFlavorDirName}/${appName}/Dockerfile")
-            logger.lifecycle("destFile: ${destFile}")
-            from linuxFlavor
-            exposePort 8081
-            runCommand 'yum update -y && yum install -y java-21-openjdk && yum clean all -y'
-            runCommand "mkdir -p ${imagePgmDir}/shared/target"
-            runCommand "mkdir -p ${imagePgmDir}/shared/output"
-            addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
-            runCommand "chown -R 10001 ${imagePgmDir}"
-            runCommand "chmod -R g+w /var/lib"
-            runCommand "chmod -R g+w /usr/lib/sysimage/rpm"
-            runCommand "mkdir -p ${dockerInspectorDir}/config"
-            runCommand "mkdir -p ${dockerInspectorDir}/target"
-            runCommand "mkdir -p ${dockerInspectorDir}/output"
-            runCommand "mkdir -p ${dockerInspectorDir}/working"
-            runCommand "chmod -R g+w ${dockerInspectorDir}"
-            environmentVariable('LANG', 'en_US.UTF-8')
-            user '10001'
-            defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8081", "--current.linux.distro=centos"
-        }
-    }
-}
-
 task createDpkgDockerfileTasks() {
     linuxFlavorsDpkg.eachWithIndex {linuxFlavor, index ->
         String linuxFlavorDirName = getNameWithoutVersion(linuxFlavor)
@@ -253,7 +225,7 @@ task createDpkgDockerfileTasks() {
     }
 }
 
-task createDockerfiles(dependsOn: [createdebianDockerfile, createfedoraDockerfile, createalpineDockerfile]) {
+task createDockerfiles(dependsOn: [createdebianDockerfile, createalpineDockerfile]) {
 }
 
 task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles]) {
@@ -268,7 +240,7 @@ task createCopyJarToDockerfileDirTasks(type: Copy, dependsOn: [createDockerfiles
     }
 }
 
-task copyJarFileToDockerfileDirs(dependsOn: [copyJarToDockerfileDir_debian, copyJarToDockerfileDir_fedora, copyJarToDockerfileDir_alpine]) {
+task copyJarFileToDockerfileDirs(dependsOn: [copyJarToDockerfileDir_debian, copyJarToDockerfileDir_alpine]) {
 }
 
 task createRemoveDockerImageTasks() {
@@ -300,7 +272,7 @@ task createBuildDockerImageTasks() {
     }
 }
 
-task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_fedora, buildDockerImage_debian]) {
+task buildImages(dependsOn: [buildDockerImage_alpine, buildDockerImage_debian]) {
 }
 
 task dockerLogin(type: Exec) {
@@ -346,7 +318,7 @@ task createPushTasks() {
     }
 }
 
-task pushImages(dependsOn: [pushImage_alpine, pushImage_fedora, pushImage_debian]) {
+task pushImages(dependsOn: [pushImage_alpine, pushImage_debian]) {
 }
 
 test.dependsOn testPrep
@@ -357,7 +329,7 @@ test.dependsOn testPrep
 afterEvaluate {
     def coverageTask = tasks.findByName('codeCoverageReport')
     if (coverageTask) {
-        coverageTask.mustRunAfter copyJarToDockerfileDir_alpine, copyJarToDockerfileDir_fedora, copyJarToDockerfileDir_debian
+        coverageTask.mustRunAfter copyJarToDockerfileDir_alpine, copyJarToDockerfileDir_debian
     }
 }
 
@@ -384,8 +356,6 @@ private String getSuffix(String linuxFlavorName) {
     String suffix
     if ("debian".equals(linuxFlavorName)) {
         suffix = "-ubuntu"
-    } else if ("fedora".equals(linuxFlavorName)) {
-        suffix = "-centos"
     } else {
         suffix = "-${linuxFlavorName}"
     }
