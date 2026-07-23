@@ -44,8 +44,10 @@ repositories {
     }
 }
 
-// Additional registry to push images to in host:port format
+// Internal Docker registry (host:port) for pushing final images
 final def internalDockerRegistry = System.getenv('INTERNAL_DOCKER_REGISTRY')
+// Internal Chainguard registry (host:port) for pulling Chainguard base images (port 5002)
+final def internalChainguardRepository = System.getenv('INTERNAL_CHAINGUARD_REPOSITORY')
 
 version = '6.4.0-SNAPSHOT'
 def appName='blackduck-imageinspector'
@@ -57,11 +59,11 @@ apply plugin: 'com.blackduck.integration.solution'
 
 // TODO these don't need to be arrays:
 def linuxFlavorsDpkg = ["debian"] // the image is still named "ubuntu"
-def chainguardDevImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1"
-def dpkgBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1"
+def chainguardDevImage = "${internalChainguardRepository}/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1"
+def dpkgBaseImage = "${internalChainguardRepository}/blackducksoftware/blackduck-basejre-chainguard-dev:3.0.1"
 def linuxFlavorsRpm = ["fedora:41"] // the image is still named "centos"
 def linuxFlavorsApk = ["alpine:latest"]
-def apkBaseImage = "artifactory.tools.duckutil.net:5002/blackducksoftware/blackduck-basejre-chainguard:3.0.1"
+def apkBaseImage = "${internalChainguardRepository}/blackducksoftware/blackduck-basejre-chainguard:3.0.1"
 def linuxFlavors = linuxFlavorsDpkg + linuxFlavorsRpm + linuxFlavorsApk
 
 String blackduckDir = "/opt/blackduck"
