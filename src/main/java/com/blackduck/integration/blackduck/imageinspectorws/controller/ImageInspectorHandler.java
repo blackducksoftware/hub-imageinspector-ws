@@ -7,6 +7,7 @@
  */
 package com.blackduck.integration.blackduck.imageinspectorws.controller;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -50,6 +51,16 @@ public class ImageInspectorHandler {
         } catch (final WrongInspectorOsException wrongOsException) {
             logger.error(String.format("WrongInspectorOsException thrown while getting image packages: %s", wrongOsException.getMessage()));
             final ImageInspectorOsEnum correctInspectorPlatform = wrongOsException.getcorrectInspectorOs();
+            if (ImageInspectorOsEnum.ALPINE != correctInspectorPlatform && ImageInspectorOsEnum.UBUNTU != correctInspectorPlatform) {
+                try {
+                    logger.warn(String.format("Returning empty BDIO for unsupported inspector platform %s", correctInspectorPlatform));
+                    return responseFactory.createResponse(imageInspectorAction.getEmptyBdio());
+                } catch (final IOException ioException) {
+                    final String msg = String.format("Exception thrown while creating empty BDIO response: %s", ioException.getMessage());
+                    logger.error(msg, ioException);
+                    return responseFactory.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, msg);
+                }
+            }
             URI correctInspectorUri;
             try {
                 correctInspectorUri = adjustUrl(scheme, host, requestUri,
