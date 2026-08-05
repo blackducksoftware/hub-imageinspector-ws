@@ -101,7 +101,7 @@ configurations.all {
 
 dependencies {
 
-    implementation('com.blackduck.integration:hub-imageinspector-lib:15.0.6-TBD') {
+    implementation('com.blackduck.integration:hub-imageinspector-lib:16.0.0') {
         exclude group: 'org.junit.jupiter'
         exclude group: 'org.junit.platform'
         exclude group: 'org.junit'
