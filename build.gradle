@@ -235,6 +235,7 @@ task createDpkgDockerfileTasks() {
 
             // Stage 2: Final (non-dev image, no busybox)
             from(new Dockerfile.From(apkBaseImage))
+            environmentVariable('PATH', '/usr/bin:/bin:/usr/sbin:/sbin')
             // dpkg shared libs not present in the non-dev base image
             instruction('COPY --from=builder /usr/lib/libmd* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libz.so* /usr/lib/')
@@ -242,6 +243,7 @@ task createDpkgDockerfileTasks() {
             copyFile(new Dockerfile.CopyFile('/usr/bin/bash', '/usr/bin/bash').withStage('builder'))
             instruction('COPY --from=builder /staging-bin-sh /bin/sh')
             copyFile(new Dockerfile.CopyFile('/usr/bin/dpkg', '/usr/bin/dpkg').withStage('builder'))
+            copyFile(new Dockerfile.CopyFile('/usr/bin/dpkg-query', '/usr/bin/dpkg-query').withStage('builder'))
             instruction('COPY --from=builder /var/lib/dpkg /var/lib/dpkg')
             instruction('COPY --from=builder /etc/dpkg /etc/dpkg')
             instruction("COPY --from=builder ${imagePgmDir} ${imagePgmDir}")
