@@ -176,6 +176,8 @@ task createApkDockerfileTasks() {
             instruction("COPY --from=builder ${dockerInspectorDir} ${dockerInspectorDir}")
             exposePort 8080
             instruction('ENTRYPOINT []')
+            user 'root'
+            runCommand "chmod 777 /lib/apk"
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8080", "--current.linux.distro=${linuxFlavorDirName}"
         }
@@ -228,6 +230,8 @@ task createDpkgDockerfileTasks() {
             exposePort 8082
             instruction('ENTRYPOINT []')
             environmentVariable('LANG', 'en_US.UTF-8')
+            user 'root'
+            runCommand "chmod 777 /lib/apk && chmod 777 /var/lib/dpkg"
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=ubuntu"
         }
