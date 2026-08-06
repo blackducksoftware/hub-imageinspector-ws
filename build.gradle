@@ -197,6 +197,8 @@ task createDpkgDockerfileTasks() {
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
+            runCommand "chmod -R g+w /lib/apk"
+            runCommand "chown -R 10001 /lib/apk"
             runCommand "chmod -R g+w /var/lib/dpkg"
             runCommand "chown -R 10001 /var/lib/dpkg"
             runCommand "mkdir -p ${dockerInspectorDir}/config"
