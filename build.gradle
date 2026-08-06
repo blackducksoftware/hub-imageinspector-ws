@@ -163,6 +163,7 @@ task createApkDockerfileTasks() {
             from(new Dockerfile.From(apkBaseImage))
             // apk shared libs not present in the non-dev base image
             instruction('COPY --from=builder /usr/lib/libapk* /usr/lib/')
+            instruction('COPY --from=builder /usr/lib/libcrypt* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libcrypto* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libssl* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libz.so* /usr/lib/')
@@ -217,6 +218,7 @@ task createDpkgDockerfileTasks() {
             environmentVariable('PATH', '/usr/bin:/bin:/usr/sbin:/sbin')
             // dpkg shared libs not present in the non-dev base image
             instruction('COPY --from=builder /usr/lib/libmd* /usr/lib/')
+            instruction('COPY --from=builder /usr/lib/libcrypt* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libz.so* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libtinfo* /usr/lib/')
             copyFile(new Dockerfile.CopyFile('/usr/bin/bash', '/usr/bin/bash').withStage('builder'))
