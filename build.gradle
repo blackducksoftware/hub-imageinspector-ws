@@ -176,6 +176,7 @@ task createApkDockerfileTasks() {
             instruction("COPY --from=builder ${dockerInspectorDir} ${dockerInspectorDir}")
             exposePort 8080
             instruction('ENTRYPOINT []')
+            instruction('COPY --from=builder /usr/bin/chmod /usr/bin/chmod')
             user 'root'
             runCommand "chmod 777 /lib/apk"
             user '10001'
@@ -230,6 +231,7 @@ task createDpkgDockerfileTasks() {
             exposePort 8082
             instruction('ENTRYPOINT []')
             environmentVariable('LANG', 'en_US.UTF-8')
+            instruction('COPY --from=builder /usr/bin/chmod /usr/bin/chmod')
             user 'root'
             runCommand "chmod 777 /lib/apk && chmod 777 /var/lib/dpkg"
             user '10001'
