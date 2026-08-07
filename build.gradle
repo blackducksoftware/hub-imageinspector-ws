@@ -49,7 +49,7 @@ final def internalDockerRegistry = System.getenv('INTERNAL_DOCKER_REGISTRY')
 // Internal Chainguard registry (host:port) for pulling Chainguard base images (port 5002)
 final def internalChainguardRepository = System.getenv('INTERNAL_CHAINGUARD_REPOSITORY')
 
-version = '7.0.0-SNAPSHOT'
+version = '7.0.5-SNAPSHOT'
 def appName='blackduck-imageinspector'
 
 apply plugin: 'eclipse'
@@ -149,6 +149,7 @@ task createApkDockerfileTasks() {
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
             runCommand "chmod -R g+w /lib/apk"
+            runCommand "chown -R 10001 /lib/apk"
             runCommand "mkdir -p ${dockerInspectorDir}/config"
             runCommand "mkdir -p ${dockerInspectorDir}/target"
             runCommand "mkdir -p ${dockerInspectorDir}/output"
@@ -162,6 +163,7 @@ task createApkDockerfileTasks() {
             from(new Dockerfile.From(apkBaseImage))
             // apk shared libs not present in the non-dev base image
             instruction('COPY --from=builder /usr/lib/libapk* /usr/lib/')
+            instruction('COPY --from=builder /usr/lib/libcrypt* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libcrypto* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libssl* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libz.so* /usr/lib/')
@@ -170,11 +172,14 @@ task createApkDockerfileTasks() {
             instruction('COPY --from=builder /staging-bin-sh /bin/sh')
             copyFile(new Dockerfile.CopyFile('/sbin/apk', '/sbin/apk').withStage('builder'))
             copyFile(new Dockerfile.CopyFile('/etc/apk', '/etc/apk').withStage('builder'))
-            instruction('COPY --from=builder /lib/apk /lib/apk')
+            instruction('COPY --chown=10001:10001 --from=builder /lib/apk /lib/apk')
             instruction("COPY --from=builder ${imagePgmDir} ${imagePgmDir}")
             instruction("COPY --from=builder ${dockerInspectorDir} ${dockerInspectorDir}")
             exposePort 8080
             instruction('ENTRYPOINT []')
+            instruction('COPY --from=builder /usr/bin/chmod /usr/bin/chmod')
+            user 'root'
+            runCommand "chmod 777 /lib/apk"
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8080", "--current.linux.distro=${linuxFlavorDirName}"
         }
@@ -196,7 +201,10 @@ task createDpkgDockerfileTasks() {
             runCommand "mkdir -p ${imagePgmDir}/shared/output"
             addFile("${appName}-${version}.jar", "${imagePgmDir}/${appName}.jar")
             runCommand "chown -R 10001 ${imagePgmDir}"
+            runCommand "chmod -R g+w /lib/apk"
+            runCommand "chown -R 10001 /lib/apk"
             runCommand "chmod -R g+w /var/lib/dpkg"
+            runCommand "chown -R 10001 /var/lib/dpkg"
             runCommand "mkdir -p ${dockerInspectorDir}/config"
             runCommand "mkdir -p ${dockerInspectorDir}/target"
             runCommand "mkdir -p ${dockerInspectorDir}/output"
@@ -210,19 +218,24 @@ task createDpkgDockerfileTasks() {
             environmentVariable('PATH', '/usr/bin:/bin:/usr/sbin:/sbin')
             // dpkg shared libs not present in the non-dev base image
             instruction('COPY --from=builder /usr/lib/libmd* /usr/lib/')
+            instruction('COPY --from=builder /usr/lib/libcrypt* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libz.so* /usr/lib/')
             instruction('COPY --from=builder /usr/lib/libtinfo* /usr/lib/')
             copyFile(new Dockerfile.CopyFile('/usr/bin/bash', '/usr/bin/bash').withStage('builder'))
             instruction('COPY --from=builder /staging-bin-sh /bin/sh')
             copyFile(new Dockerfile.CopyFile('/usr/bin/dpkg', '/usr/bin/dpkg').withStage('builder'))
             copyFile(new Dockerfile.CopyFile('/usr/bin/dpkg-query', '/usr/bin/dpkg-query').withStage('builder'))
-            instruction('COPY --from=builder /var/lib/dpkg /var/lib/dpkg')
+            instruction('COPY --chown=10001:10001 --from=builder /lib/apk /lib/apk')
+            instruction('COPY --chown=10001:10001 --from=builder /var/lib/dpkg /var/lib/dpkg')
             instruction('COPY --from=builder /etc/dpkg /etc/dpkg')
             instruction("COPY --from=builder ${imagePgmDir} ${imagePgmDir}")
             instruction("COPY --from=builder ${dockerInspectorDir} ${dockerInspectorDir}")
             exposePort 8082
             instruction('ENTRYPOINT []')
             environmentVariable('LANG', 'en_US.UTF-8')
+            instruction('COPY --from=builder /usr/bin/chmod /usr/bin/chmod')
+            user 'root'
+            runCommand "chmod 777 /lib/apk && chmod 777 /var/lib/dpkg"
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=ubuntu"
         }
