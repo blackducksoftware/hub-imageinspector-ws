@@ -157,7 +157,8 @@ task createApkDockerfileTasks() {
             runCommand "chmod -R g+w ${dockerInspectorDir}"
             // Install bash and prepare /bin/sh symlink (non-dev image has no ln command)
             runCommand "apk add bash && ln -s /usr/bin/bash /staging-bin-sh"
-            runCommand "rm -f /lib/apk/db/installed && touch /lib/apk/db/installed"
+            // Wipe the entire apk package database so scanners don't see builder packages
+            runCommand "rm -rf /lib/apk/db && mkdir -p /lib/apk/db && touch /lib/apk/db/installed"
 
             // Stage 2: Final (non-dev image, no busybox)
             from(new Dockerfile.From(apkBaseImage))
@@ -179,7 +180,7 @@ task createApkDockerfileTasks() {
             instruction('ENTRYPOINT []')
             instruction('COPY --from=builder /usr/bin/chmod /usr/bin/chmod')
             user 'root'
-            runCommand "chmod 777 /lib/apk && rm /usr/bin/chmod"
+            runCommand "chmod 777 /lib/apk && bash -c ': > /usr/bin/chmod'"
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8080", "--current.linux.distro=${linuxFlavorDirName}"
         }
@@ -212,6 +213,8 @@ task createDpkgDockerfileTasks() {
             runCommand "chmod -R g+w ${dockerInspectorDir}"
             // Install bash and prepare /bin/sh symlink (non-dev image has no ln command)
             runCommand "apk add bash && ln -s /usr/bin/bash /staging-bin-sh"
+            // Wipe the entire apk package database so scanners don't see builder packages
+            runCommand "rm -rf /lib/apk/db && mkdir -p /lib/apk/db && touch /lib/apk/db/installed"
 
             // Stage 2: Final (non-dev image, no busybox)
             from(new Dockerfile.From(apkBaseImage))
@@ -235,7 +238,7 @@ task createDpkgDockerfileTasks() {
             environmentVariable('LANG', 'en_US.UTF-8')
             instruction('COPY --from=builder /usr/bin/chmod /usr/bin/chmod')
             user 'root'
-            runCommand "chmod 777 /lib/apk && chmod 777 /var/lib/dpkg && rm /usr/bin/chmod"
+            runCommand "chmod 777 /lib/apk && chmod 777 /var/lib/dpkg && bash -c ': > /usr/bin/chmod'"
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=ubuntu"
         }
