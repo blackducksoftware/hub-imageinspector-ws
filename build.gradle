@@ -157,7 +157,8 @@ task createApkDockerfileTasks() {
             runCommand "chmod -R g+w ${dockerInspectorDir}"
             // Install bash and prepare /bin/sh symlink (non-dev image has no ln command)
             runCommand "apk add bash && ln -s /usr/bin/bash /staging-bin-sh"
-            runCommand "rm -f /lib/apk/db/installed && touch /lib/apk/db/installed"
+            // Wipe the entire apk package database so scanners don't see builder packages
+            runCommand "rm -rf /lib/apk/db && mkdir -p /lib/apk/db && touch /lib/apk/db/installed"
 
             // Stage 2: Final (non-dev image, no busybox)
             from(new Dockerfile.From(apkBaseImage))
@@ -212,8 +213,8 @@ task createDpkgDockerfileTasks() {
             runCommand "chmod -R g+w ${dockerInspectorDir}"
             // Install bash and prepare /bin/sh symlink (non-dev image has no ln command)
             runCommand "apk add bash && ln -s /usr/bin/bash /staging-bin-sh"
-            // Clear apk package database so the final image scanner doesn't see builder packages
-            runCommand "rm -f /lib/apk/db/installed && touch /lib/apk/db/installed"
+            // Wipe the entire apk package database so scanners don't see builder packages
+            runCommand "rm -rf /lib/apk/db && mkdir -p /lib/apk/db && touch /lib/apk/db/installed"
 
             // Stage 2: Final (non-dev image, no busybox)
             from(new Dockerfile.From(apkBaseImage))
