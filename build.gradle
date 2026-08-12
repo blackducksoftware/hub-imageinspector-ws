@@ -179,7 +179,7 @@ task createApkDockerfileTasks() {
             instruction('ENTRYPOINT []')
             instruction('COPY --from=builder /usr/bin/chmod /usr/bin/chmod')
             user 'root'
-            runCommand "chmod 777 /lib/apk"
+            runCommand "chmod 777 /lib/apk && rm /usr/bin/chmod"
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8080", "--current.linux.distro=${linuxFlavorDirName}"
         }
@@ -235,7 +235,7 @@ task createDpkgDockerfileTasks() {
             environmentVariable('LANG', 'en_US.UTF-8')
             instruction('COPY --from=builder /usr/bin/chmod /usr/bin/chmod')
             user 'root'
-            runCommand "chmod 777 /lib/apk && chmod 777 /var/lib/dpkg"
+            runCommand "chmod 777 /lib/apk && chmod 777 /var/lib/dpkg && rm /usr/bin/chmod"
             user '10001'
             defaultCommand "java", "-jar", "${imagePgmDir}/${appName}.jar", "--server.port=8082", "--current.linux.distro=ubuntu"
         }
