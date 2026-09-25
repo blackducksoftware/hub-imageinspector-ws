@@ -83,9 +83,9 @@ publishing {
 }
 
 ext['log4j2.version'] = '2.16.0'
-ext['tomcat.version'] = '10.1.60'  // CVE-2025-24813 (RCE via partial PUT); requires 10.1.35+
-ext['logback.version'] = '1.5.38'  // CVE-2026-13006 (Janino conditional-config ACE); fixed in 1.5.37+
-ext['micrometer.version'] = '1.16.7'  // CVE-2026-59295 / CVE-2026-59296; fixed in 1.16.7+ (no 1.15.x patch exists)
+ext['tomcat.version'] = '10.1.60'
+ext['logback.version'] = '1.6.4'
+ext['micrometer.version'] = '1.16.7'
 
 // common-gradle-plugin pins junit-jupiter to 5.7.x which conflicts with Spring Boot 3.x's
 // junit-platform-commons at 1.11.x. Override to keep all JUnit artifacts aligned at 5.11.x.
