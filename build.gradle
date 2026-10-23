@@ -83,7 +83,7 @@ publishing {
 }
 
 ext['log4j2.version'] = '2.16.0'
-ext['tomcat.version'] = '10.1.60'
+ext['tomcat.version'] = '10.1.61'
 ext['logback.version'] = '1.6.4'
 ext['micrometer.version'] = '1.16.7'
 
